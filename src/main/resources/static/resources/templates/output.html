@@ -1,0 +1,39 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">配置</li>
+  </ul>
+  <div class="layui-tab-content">
+    <div class="layui-tab-item layui-show">
+    	<div class="layui-form editor-form-node">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="nodeName" placeholder="请输入节点名称" value="{{d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		{{# layui.each(d.data.object.outputs,function(index,output){ }}
+    			<hr>
+	    		<div class="layui-form-item layui-form-relative">
+	    			<i class="layui-icon layui-icon-close variable-remove"></i>  
+	    			<label class="layui-form-label">输出项</label>
+	    			<div class="layui-input-block">
+	    				<input type="text" name="output-name" placeholder="输出项" autocomplete="off" class="layui-input" value="{{output.name || ''}}">
+	    			</div>
+	    		</div>
+	    		<div class="layui-form-item">
+	    			<label class="layui-form-label">输出值</label>
+	    			<div class="layui-input-block">
+	    				<input type="text" name="output-value" placeholder="输出值" autocomplete="off" class="layui-input" value="{{output.value || ''}}">
+	    			</div>
+	    		</div>
+    		{{# }) }}
+    		<hr>
+    		<div class="layui-form-item">
+    			<div class="layui-input-block">
+	    			<button class="layui-btn output-add">添加一个输出项</button>
+	    		</div>
+	    	</div>
+    	</div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,178 @@
+/* start */
+.layui-layout-right{
+	right:15px;
+}
+iframe{
+	background:#fff;
+}
+.layui-layout-admin .layui-header,.layui-laypage .layui-laypage-curr .layui-laypage-em,.layui-form-checked[lay-skin=primary] i{
+	background-color:#1890FF;
+}
+.layui-layout-admin .layui-layout-right.layui-nav .layui-nav-child dd.layui-this a,
+.layui-layout-admin .layui-layout-right.layui-nav .layui-nav-child dd.layui-this{
+	background-color:#1890FF;
+}
+.layui-laydate li.layui-this,.layui-laydate td.layui-this{
+	background-color:#1890FF !important;
+	color : #fff !important;
+}
+.layui-laydate .layui-laydate-header i:hover, .layui-laydate .layui-laydate-header span:hover,.layui-laydate .layui-laydate-footer span:hover{
+	color : #1890FF;
+}
+.layui-btn.layui-btn-normal,.layui-form-select dl dd.layui-this{
+	background-color:#1890FF;
+	color : #fff;
+}
+.layui-btn{
+    background-color: transparent;
+    color : #1890FF
+}
+.layui-btn-danger{
+    background-color: #FF5722;
+    color : #fff
+}
+.layui-btn-common{
+    background-color: #009688;
+    color : #fff
+}
+.layui-btn.layui-btn-normal:hover{
+	color : #fff;
+}
+.layui-btn-sm{
+	padding:0;
+}
+.layui-btn-sm.layui-btn-normal{
+	padding:0 10px;
+}
+.layui-table-cell .layui-btn:not(:last-child){
+	margin-right:3px;
+}
+.layui-table tbody tr:hover, .layui-table-click, .layui-table-header, .layui-table-hover, .layui-table-mend, .layui-table-patch, .layui-table-tool, .layui-table-total, .layui-table-total tr, .layui-table[lay-even] tr:nth-child(even){
+	background-color: rgb(230, 247, 255);
+}
+.layui-table thead tr{
+	background-color:#fafafa !important;
+}
+.layui-btn-primary:hover,.layui-form-checked[lay-skin=primary] i,.layui-form-checkbox[lay-skin=primary]:hover i{
+	border-color:#1890FF;
+}
+.layui-input:hover,.layui-textarea:hover,.layui-laypage input:focus, .layui-laypage select:focus{
+	border-color:#40a9ff !important;
+}
+.layui-input:hover,.layui-textarea{
+    -webkit-box-shadow: 0 0 0 2px rgba(24,144,255,.2);
+    box-shadow: 0 0 0 2px rgba(24,144,255,.2);
+    border-right-width: 1px!important;
+}
+.layui-table-cell .layui-btn:not(:last-child)::after{
+	display: inline-block;
+	content : ' ';
+	position: absolute;
+	top:5px;
+	padding-right:5px;
+	bottom:5px;
+	border-right:1px solid #e8e8e8;
+}
+.layui-btn:hover,.layui-laypage a:hover,.layui-tab-brief>.layui-tab-title .layui-this{
+	color : #40a9ff;
+}
+.layui-nav .layui-nav-item a,.layui-layout-admin .layui-logo{
+	color : #fff;
+}
+.layui-nav .layui-nav-item.layui-this{
+	background-color: rgba(255,255,255,.2);
+}
+.layui-nav .layui-this:after, .layui-nav-bar, .layui-nav-tree .layui-nav-itemed:after{
+	display: none;
+}
+.layui-tab-title li .layui-tab-close{
+	visibility: hidden;
+}
+.layui-tab-title li:hover,.layui-tab-title .layui-this,.layui-form-radio>i:hover, .layui-form-radioed>i{
+	color : #1890FF;
+}
+.layui-treeSelect .ztree li a.curSelectedNode{
+	color : #1890FF !important;
+}
+.layui-tab-title li .layui-tab-close:hover{
+	background: transparent;
+	color:#231f1f;
+}
+.layui-nav .layui-nav-child a{
+	color:rgba(0, 0, 0, 0.65);
+}
+.layui-body .layui-tab .layui-tab-content{
+	top:64px !important;
+	left:24px;
+	right:24px;
+	bottom:24px !important;
+}
+.layui-layout-admin .layui-body,.layui-layout-admin .layui-footer{
+	background-color: #f0f2f5;
+}
+.layui-layout-admin .layui-tab-title{
+	background-color: #fff;
+}
+.layui-tab-title li:hover .layui-tab-close{
+	visibility: visible;
+}
+.layui-nav{
+	background:#fff;
+}
+.layui-nav-itemed>.layui-nav-child{
+	background-color : transparent !important;
+	margin-left:15px;
+}
+.layui-nav-tree .layui-nav-item a{
+	color : rgba(0, 0, 0, 0.65) !important;
+}
+.layui-nav-tree .layui-nav-item a:hover{
+	background-color: transparent !important;
+	color : #1890FF !important;
+}
+.layui-nav .layui-nav-more{
+	border-color : rgba(0, 0, 0, 0.3) transparent transparent;
+}
+.layui-nav-tree .layui-nav-child dd.layui-this, .layui-nav-tree .layui-nav-child dd.layui-this a, .layui-nav-tree .layui-this, .layui-nav-tree .layui-this>a, .layui-nav-tree .layui-this>a:hover{
+	color : #1890FF !important;
+	background-color: #e6f7ff;
+	border-right: 2px solid #1890FF;
+}
+.layui-nav .layui-nav-mored, .layui-nav-itemed>a .layui-nav-more{
+	border-color : transparent transparent rgba(0, 0, 0, 0.3);
+}
+.layui-nav-tree .layui-nav-bar{
+	display: none;
+}
+.menu-list{
+	border-right: 1px solid #e8e8e8;
+}
+.layui-tab-brief>.layui-tab-more li.layui-this:after, .layui-tab-brief>.layui-tab-title .layui-this:after{
+	border-bottom-color: #1890FF;
+}
+
+.layui-tab-title .layui-tab-bar{
+	display: none;
+}
+.layui-tab .layui-tab-title{
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+.layui-tab[overflow]>.layui-tab-title{
+	overflow : auto;
+	overflow-y: hidden;
+}
+.layui-tab .layui-tab-title::-webkit-scrollbar{
+	width: 3px;
+	height: 2px;
+}
+.layui-tab .layui-tab-title::-webkit-scrollbar-thumb{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+	background: #1890ff;
+}
+.layui-tab .layui-tab-title::-webkit-scrollbar-track{
+	-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+   	border-radius: 10px;
+	background: #EDEDED;
+}

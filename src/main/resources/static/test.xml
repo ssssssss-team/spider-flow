@@ -1,0 +1,127 @@
+<mxGraphModel>
+  <root>
+    <mxCell id="0">
+      <JsonProperty as="data">
+        {}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="1" parent="0"/>
+    <mxCell id="2" value="开始" style="shape=start" parent="1" vertex="1">
+      <mxGeometry x="50" y="50" width="80" height="80" as="geometry"/>
+      <JsonProperty as="data">
+        {&quot;shape&quot;:&quot;start&quot;}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="3" value="输出" style="shape=output" parent="1" vertex="1">
+      <mxGeometry x="840" y="210" width="80" height="80" as="geometry"/>
+      <JsonProperty as="data">
+        {&quot;shape&quot;:&quot;output&quot;,&quot;outputs&quot;:[{&quot;name&quot;:&quot;项目名&quot;,&quot;value&quot;:&quot;projectNames[projectIndex]&quot;},{&quot;name&quot;:&quot;项目地址&quot;,&quot;value&quot;:&quot;https://gitee.com${projectUrls[projectIndex]}&quot;},{&quot;name&quot;:&quot;项目描述&quot;,&quot;value&quot;:&quot;${projectDesc}&quot;}],&quot;output-name&quot;:&quot;项目地址&quot;,&quot;output-value&quot;:&quot;projectUrls[projectIndex]&quot;}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="4" value="抓取首页" style="shape=rectangle" parent="1" vertex="1">
+      <mxGeometry x="350" y="50" width="80" height="80" as="geometry"/>
+      <JsonProperty as="data">
+        {&quot;shape&quot;:&quot;rectangle&quot;,&quot;url&quot;:&quot;https://gitee.com/gvp/all&quot;}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="5" value="提取项目名、地址" style="shape=parallelogram" parent="1" vertex="1">
+      <mxGeometry x="540" y="40" width="150" height="80" as="geometry"/>
+      <JsonProperty as="data">
+        {&quot;shape&quot;:&quot;parallelogram&quot;,&quot;variables&quot;:[{&quot;name&quot;:&quot;projectUrls&quot;,&quot;value&quot;:&quot;${selectors(resp.html,&#39;.categorical-project-card a&#39;,&#39;attr&#39;,&#39;href&#39;)}&quot;},{&quot;name&quot;:&quot;projectNames&quot;,&quot;value&quot;:&quot;${selectors(resp.html,&#39;.project-name&#39;)}&quot;}]}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="6" value="" parent="1" source="4" target="5" edge="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="460" y="80" as="sourcePoint"/>
+      </mxGeometry>
+      <JsonProperty as="data">
+        {}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="7" value="" parent="1" source="2" target="20" edge="1">
+      <mxGeometry relative="1" as="geometry"/>
+      <JsonProperty as="data">
+        {}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="9" value="projectIndex&lt;10" parent="1" source="14" target="10" edge="1">
+      <mxGeometry y="21" relative="1" as="geometry">
+        <mxPoint x="780" y="170" as="sourcePoint"/>
+        <mxPoint x="-5" y="1" as="offset"/>
+      </mxGeometry>
+      <JsonProperty as="data">
+        {&quot;condition&quot;:&quot;${projectIndex&lt;10}&quot;}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="10" value="抓取详情页" style="shape=rectangle" parent="1" vertex="1">
+      <mxGeometry x="1130" y="40" width="80" height="80" as="geometry"/>
+      <JsonProperty as="data">
+        {&quot;shape&quot;:&quot;rectangle&quot;,&quot;url&quot;:&quot;https://gitee.com/${projectUrls[projectIndex]}&quot;}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="11" value="提取项目描述" style="shape=parallelogram" parent="1" vertex="1">
+      <mxGeometry x="1110" y="190" width="120" height="80" as="geometry"/>
+      <JsonProperty as="data">
+        {&quot;shape&quot;:&quot;parallelogram&quot;,&quot;variables&quot;:[{&quot;name&quot;:&quot;projectDesc&quot;,&quot;value&quot;:&quot;${selector(resp.html,&#39;.git-project-desc-text&#39;)}&quot;}],&quot;nodeName&quot;:&quot;提取项目描述&quot;}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="12" value="" parent="1" source="10" target="11" edge="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1170" y="160"/>
+        </Array>
+      </mxGeometry>
+      <JsonProperty as="data">
+        {}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="14" value="变量自增" style="shape=parallelogram" parent="1" vertex="1">
+      <mxGeometry x="840" y="40" width="80" height="80" as="geometry"/>
+      <JsonProperty as="data">
+        {&quot;shape&quot;:&quot;parallelogram&quot;,&quot;variables&quot;:[{&quot;name&quot;:&quot;projectIndex&quot;,&quot;value&quot;:&quot;${((projectIndex)!&#39;0&#39;)?number + 1}&quot;}],&quot;nodeName&quot;:&quot;定义变量&quot;}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="15" value="" parent="1" source="5" target="14" edge="1">
+      <mxGeometry relative="1" as="geometry"/>
+      <JsonProperty as="data">
+        {}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="20" value="定义数据源" style="shape=datasource" parent="1" vertex="1">
+      <mxGeometry x="190" y="60" width="80" height="80" as="geometry"/>
+      <JsonProperty as="data">
+        {&quot;shape&quot;:&quot;datasource&quot;,&quot;datasourceType&quot;:&quot;mysql&quot;,&quot;datasourceUrl&quot;:&quot;jdbc:mysql://localhost:3306/test&quot;,&quot;datasourceUsername&quot;:&quot;root&quot;,&quot;datasourcePassword&quot;:&quot;123456&quot;}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="29" value="" parent="1" source="20" target="4" edge="1">
+      <mxGeometry relative="1" as="geometry"/>
+      <JsonProperty as="data">
+        {}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="31" value="执行sql" style="shape=executeSql" parent="1" vertex="1">
+      <mxGeometry x="980" y="200" width="80" height="80" as="geometry"/>
+      <JsonProperty as="data">
+        {&quot;shape&quot;:&quot;executeSql&quot;,&quot;datasourceId&quot;:null,&quot;statementType&quot;:&quot;insert&quot;,&quot;sql&quot;:&quot;insert gitee_gvp values(#${projectNames[projectIndex]}#,#https://gitee.com${projectUrls[projectIndex]}#,#${projectDesc}#)&quot;}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="33" value="" parent="1" source="11" target="31" edge="1">
+      <mxGeometry relative="1" as="geometry"/>
+      <JsonProperty as="data">
+        {}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="34" value="" parent="1" source="31" target="3" edge="1">
+      <mxGeometry relative="1" as="geometry"/>
+      <JsonProperty as="data">
+        {}
+      </JsonProperty>
+    </mxCell>
+    <mxCell id="35" value="" parent="1" source="3" target="14" edge="1">
+      <mxGeometry relative="1" as="geometry"/>
+      <JsonProperty as="data">
+        {}
+      </JsonProperty>
+    </mxCell>
+  </root>
+</mxGraphModel>
