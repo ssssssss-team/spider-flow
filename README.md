@@ -17,3 +17,6 @@
 - [ ] 支持插件扩展
 
 #### 项目部分截图
+![gif](https://images.gitee.com/uploads/images/2019/0716/184553_e15aba16_297689.gif "animate.gif")
+![png1](https://images.gitee.com/uploads/images/2019/0716/184606_0aca457c_297689.png "demo-1.png")
+![png2](https://images.gitee.com/uploads/images/2019/0716/184618_21bce697_297689.png "demo-2.png")
