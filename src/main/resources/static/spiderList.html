@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>SpiderFlow</title>
+		<link rel="stylesheet" href="js/layui/css/layui.css" />
+		<link rel="stylesheet" href="css/layui-blue.css" />
+		<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+	</head>
+	<body style="padding:5px;">
+		<a class="layui-btn layui-btn-sm layui-btn-normal" href="editor.html"><i class="layui-icon">&#xe654;</i> 添加爬虫</a>
+		<hr>
+		<table class="layui-table" id="table" lay-filter="table"></table>
+		<script>
+			var $ = layui.$;
+			var $table = layui.table.render({
+				id : 'table',
+				elem : '#table',
+				url : 'spider/list',
+				page : true,
+				parseData : function(resp){
+					return {
+						code : 0,
+						data : resp.content,
+						count : resp.numberOfElements
+					}
+				},
+				cols : [[{
+					title : '序号',
+					width : 60,
+					type : 'numbers',
+					align : 'center'
+				},{
+					title : '爬虫名称',
+					field : 'name'
+				},{
+					title : 'cron表达式',
+					field : 'cron',
+					width : 100
+				},{
+					title : '状态',
+					field : 'enabled',
+					width : 80,
+					templet : function(row){
+						return row.enabled == '1' ? '已启用': '已禁用'
+					}
+				},{
+					title : '创建时间',
+					width : 160,
+					field : 'createDate',
+					align : 'center'
+				},{
+					title : '上次执行时间',
+					width : 160,
+					field : 'lastExecuteTime',
+					align : 'center'
+				},{
+					title : '已执行次数',
+					width : 120,
+					field : 'executeCount',
+				},{
+					title : '下次执行时间',
+					width : 160,
+					field : 'nextExecuteTime',
+					align : 'center'
+				},{
+					title : '操作',
+					templet : '#buttons'
+				}]]
+			})
+			$("body").on('click','.btn-remove',function(){
+				var id = $(this).data('id');
+				layui.layer.confirm('您确定要删除此爬虫吗？',{
+					title : '删除'
+				},function(index){
+					$table.reload();
+					$.ajax({
+						url : 'spider/remove',
+						data : {
+							id : id
+						},
+						success : function(){
+							layui.layer.msg('删除成功',{time : 500},function(){
+								$table.reload();
+							})	
+						},
+						error : function(){
+							layui.layer.msg('删除失败')	
+						}
+					})
+					layui.layer.close(index);
+				})
+			})
+		</script>
+		<script type="text/html" id="buttons">
+			<a class="layui-btn layui-btn-sm btn-edit-cron" data-id="{{d.id}}">编辑cron表达式</a>
+			<a class="layui-btn layui-btn-sm" href="editor.html?id={{d.id}}">编辑XML</a>
+			<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
+		</script>
+	</body>
+</html>
