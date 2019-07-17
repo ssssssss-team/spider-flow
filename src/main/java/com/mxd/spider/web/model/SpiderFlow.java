@@ -1,5 +1,7 @@
 package com.mxd.spider.web.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -16,9 +18,21 @@ public class SpiderFlow {
 	@GeneratedValue(generator = "uuidGenerator")
 	private String id;
 	
+	private String cron;
+	
 	private String name;
 	
 	private String xml;
+	
+	private String enabled;
+	
+	private Date createDate;
+	
+	private Date lastExecuteTime;
+	
+	private Date nextExecuteTime;
+	
+	private Integer executeCount;
 
 	public String getId() {
 		return id;
@@ -42,5 +56,53 @@ public class SpiderFlow {
 
 	public void setXml(String xml) {
 		this.xml = xml;
+	}
+
+	public String getCron() {
+		return cron;
+	}
+
+	public void setCron(String cron) {
+		this.cron = cron;
+	}
+
+	public String getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(String enabled) {
+		this.enabled = enabled;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getLastExecuteTime() {
+		return lastExecuteTime;
+	}
+
+	public void setLastExecuteTime(Date lastExecuteTime) {
+		this.lastExecuteTime = lastExecuteTime;
+	}
+
+	public Date getNextExecuteTime() {
+		return nextExecuteTime;
+	}
+
+	public void setNextExecuteTime(Date nextExecuteTime) {
+		this.nextExecuteTime = nextExecuteTime;
+	}
+
+	public Integer getExecuteCount() {
+		return executeCount;
+	}
+
+	public void setExecuteCount(Integer executeCount) {
+		this.executeCount = executeCount;
 	}
 }

@@ -117,6 +117,12 @@ $(function(){
 					}
 				}
 			}
+		}).on("keyup",".editor-form-node .layui-form-item input[name=spiderName]",function(){
+			var cell = graph.getModel().getRoot();
+			if(cell != null){
+				cell.data = cell.data || new JsonProperty();
+				cell.data.set('spiderName',$(this).val())
+			}
 		}).on("keyup",".editor-form-node .layui-form-item input[name^=variable-]",function(){	//变量操作
 			resetFormArray(graph,'variable','variables');
 		}).on("click",".editor-form-node .variable-remove",function(){	//移除单个变量
@@ -211,7 +217,11 @@ $(function(){
 			processSelectValue(graph);
 		});
 		loadTemplate('root',graph.getModel().getRoot(),graph);
-		loadXML('test.xml',graph);
+		var id = getQueryString('id');
+		if(id != null){
+			loadXML('spider/xml?id=' +  id,graph);
+			processCellEvent(graph.getSelectionCell(),graph);
+		}
 	}
 	
 	function processSelectValue(graph){
@@ -496,7 +506,26 @@ $(function(){
 					});
 				}
 			})
-		})
+		}).on('click',".btn-return",function(){
+			location.href="spiderList.html"
+		}).on('click','.btn-save',function(){
+			$.ajax({
+				url : 'spider/save',
+				type : 'post',
+				data : {
+					id : getQueryString('id'),
+					xml : getXML(editor),
+					name : editor.graph.getModel().getRoot().data.get('spiderName') || '未定义名称',
+				},
+				success : function(){
+					layui.layer.msg('保存成功',{
+						time : 800
+					},function(){
+						location.href = "spiderList.html";
+					})
+				}
+			})
+		});
 	}
 	
 	function getXML(editor){

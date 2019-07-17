@@ -8,7 +8,7 @@
     		<div class="layui-form-item">
     			<label class="layui-form-label">爬虫名称</label>
     			<div class="layui-input-block">
-    				<input type="text" name="spider-name" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input" value="{{d.data.object.spiderName || ''}}">
+    				<input type="text" name="spiderName" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input" value="{{d.data.object.spiderName || '未定义名称'}}">
     			</div>
     		</div>
     		{{# layui.each(d.data.object.headers,function(index,header){ }}
