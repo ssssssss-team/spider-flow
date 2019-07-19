@@ -4,8 +4,8 @@
 新一代爬虫平台，以图形化方式定义爬虫流程，不写代码即可完成爬虫。
 
 #### 项目部署启动
--SpiderApplication.java 右键main
--访问路径：http://localhost:8088/
+- SpiderApplication.java 右键main
+- 访问路径：http://localhost:8088/
 
 #### 特性
 - [x] 支持css选择器、正则提取
