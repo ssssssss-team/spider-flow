@@ -22,6 +22,8 @@ import com.mxd.spider.core.freemarker.FreeMarkerEngine;
 import com.mxd.spider.core.model.SpiderNode;
 import com.mxd.spider.core.model.SpiderOutput;
 import com.mxd.spider.core.utils.Maps;
+import com.mxd.spider.core.utils.SpiderFlowUtils;
+import com.mxd.spider.web.model.SpiderFlow;
 
 @Component
 public class Spider {
@@ -33,6 +35,14 @@ public class Spider {
 	
 	@Autowired
 	private FreeMarkerEngine engine;
+	
+	public void run(SpiderFlow spiderFlow){
+		SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
+		SpiderContext context = new SpiderContext();
+		int threadPoolSize = 8;
+		ThreadPoolExecutor pool = new ThreadPoolExecutor(threadPoolSize,threadPoolSize,5000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
+		execute(pool,root, context,new HashMap<>());
+	}
 	
 	public List<SpiderOutput> runWithTest(SpiderNode root,SpiderContext context){
 		//开始不允许设置任何东西

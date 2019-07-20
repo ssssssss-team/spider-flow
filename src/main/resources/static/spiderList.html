@@ -90,10 +90,33 @@
 					})
 					layui.layer.close(index);
 				})
+			}).on('click','.btn-edit-cron',function(){
+				var id = $(this).data('id');
+				layui.layer.prompt({
+					title : '请输入cron表达式',
+					value : $(this).data('cron') || ''
+				},function(value,index){
+					$.ajax({
+						url : 'spider/cron',
+						data : {
+							id : id,
+							cron : value
+						},
+						success : function(){
+							layui.layer.msg('修改成功',{time : 500},function(){
+								$table.reload();
+							})	
+						},
+						error : function(){
+							layui.layer.msg('修改失败')	
+						}
+					})
+					layui.layer.close(index);
+				})
 			})
 		</script>
 		<script type="text/html" id="buttons">
-			<a class="layui-btn layui-btn-sm btn-edit-cron" data-id="{{d.id}}">编辑cron表达式</a>
+			<a class="layui-btn layui-btn-sm btn-edit-cron" data-id="{{d.id}}" data-cron="{{d.cron}}">编辑cron表达式</a>
 			<a class="layui-btn layui-btn-sm" href="editor.html?id={{d.id}}">编辑XML</a>
 			<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
 		</script>

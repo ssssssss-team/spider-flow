@@ -11,7 +11,7 @@ import com.mxd.spider.web.model.SpiderFlow;
 public interface SpiderFlowRepository extends JpaRepository<SpiderFlow, String>{
 
 	@Modifying
-	@Query(value = "insert into sp_flow(id,name,xml,enabled) values(?1,?2,?3,'1')",nativeQuery = true)
+	@Query(value = "insert into sp_flow(id,name,xml,enabled) values(?1,?2,?3,'0')",nativeQuery = true)
 	public int insertSpiderFlow(String id,String name,String xml);
 	
 	@Modifying

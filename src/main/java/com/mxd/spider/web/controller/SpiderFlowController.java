@@ -39,6 +39,21 @@ public class SpiderFlowController {
 		spiderFlowService.remove(id);
 	}
 	
+	@RequestMapping("/start")
+	public void start(String id){
+		spiderFlowService.start(id);
+	}
+	
+	@RequestMapping("/stop")
+	public void stop(String id){
+		spiderFlowService.stop(id);
+	}
+	
+	@RequestMapping("/cron")
+	public void cron(String id,String cron){
+		spiderFlowService.resetCornExpression(id, cron);
+	}
+	
 	@RequestMapping("/xml")
 	public String xml(String id){
 		return spiderFlowService.get(id).getXml();
