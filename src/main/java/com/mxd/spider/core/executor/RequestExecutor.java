@@ -18,7 +18,6 @@ import com.mxd.spider.core.io.HttpResponse;
 import com.mxd.spider.core.model.SpiderJsonProperty;
 import com.mxd.spider.core.model.SpiderNameValue;
 import com.mxd.spider.core.model.SpiderNode;
-import com.mxd.spider.core.utils.Maps;
 
 @Component
 public class RequestExecutor implements Executor{
@@ -34,11 +33,10 @@ public class RequestExecutor implements Executor{
 	}
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		HttpRequest request = HttpRequest.create();
 		SpiderJsonProperty property = node.getJsonProperty();
 		List<SpiderNameValue> parameters = property.getParameters();
-		Map<String, Object> variables = Maps.add(context, "resp", node.getLastResponse());
 		//设置请求url
 		String url = null;
 		try {
@@ -97,12 +95,8 @@ public class RequestExecutor implements Executor{
 		}
 		try {
 			HttpResponse response = request.execute();
-			List<SpiderNode> nodes = node.getNextNodes();
-			if(nodes != null){
-				for (SpiderNode nextNode : nodes) {
-					nextNode.setLastResponse(response);
-				}
-			}
+			//结果存入变量
+			variables.put("resp", response);
 		} catch (IOException e) {
 			logger.error("请求{}出错",url,e);
 			context.log(String.format("请求%s出错,异常信息:%s", url,ExceptionUtils.getStackTrace(e)));

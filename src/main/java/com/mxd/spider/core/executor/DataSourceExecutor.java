@@ -1,5 +1,7 @@
 package com.mxd.spider.core.executor;
 
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -17,7 +19,7 @@ public class DataSourceExecutor implements Executor{
 	private static Logger logger = LoggerFactory.getLogger(DataSourceExecutor.class);
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		SpiderJsonProperty property = node.getJsonProperty();
 		if(property != null){
 			if(property.getDatasourceType() == null){

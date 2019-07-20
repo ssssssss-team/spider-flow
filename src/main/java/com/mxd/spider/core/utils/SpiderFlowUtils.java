@@ -39,6 +39,10 @@ public class SpiderFlowUtils {
 				if("start".equals(node.getJsonProperty().getShape())){
 					root = node;
 				}
+				if(jsonProperty.getLoopCount() != null){
+					node.setLoopCount(jsonProperty.getLoopCount());
+					node.setLoopVariableName(jsonProperty.getLoopVariableName());
+				}
 			}
 		}
 		//处理连线

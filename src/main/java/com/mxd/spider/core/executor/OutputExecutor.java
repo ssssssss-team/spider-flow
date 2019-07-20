@@ -14,7 +14,6 @@ import com.mxd.spider.core.model.SpiderJsonProperty;
 import com.mxd.spider.core.model.SpiderNameValue;
 import com.mxd.spider.core.model.SpiderNode;
 import com.mxd.spider.core.model.SpiderOutput;
-import com.mxd.spider.core.utils.Maps;
 
 @Component
 public class OutputExecutor implements Executor{
@@ -25,13 +24,12 @@ public class OutputExecutor implements Executor{
 	private static Logger logger = LoggerFactory.getLogger(OutputExecutor.class);
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		SpiderJsonProperty property = node.getJsonProperty();
 		SpiderOutput output = new SpiderOutput();
 		output.setNodeName(node.getNodeName());
 		output.setNodeId(node.getNodeId());
 		if(property != null){
-			Map<String, Object> variables = Maps.add(context, "resp", node.getLastResponse());
 			for (SpiderNameValue nameValue : property.getOutputs()) {
 				Object value = null;
 				try {

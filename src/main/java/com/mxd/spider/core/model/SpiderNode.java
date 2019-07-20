@@ -3,8 +3,6 @@ package com.mxd.spider.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mxd.spider.core.io.HttpResponse;
-
 
 public class SpiderNode {
 	
@@ -14,11 +12,13 @@ public class SpiderNode {
 	
 	private String condition;
 	
-	private HttpResponse lastResponse;
-	
 	private String nodeName;
 	
 	private String nodeId;
+	
+	private String loopCount;
+	
+	private String loopVariableName;
 	
 	public String getNodeId() {
 		return nodeId;
@@ -68,18 +68,29 @@ public class SpiderNode {
 		this.condition = condition;
 	}
 	
-	public HttpResponse getLastResponse() {
-		return lastResponse;
+	public String getLoopCount() {
+		return loopCount;
 	}
 
-	public void setLastResponse(HttpResponse lastResponse) {
-		this.lastResponse = lastResponse;
+	public void setLoopCount(String loopCount) {
+		this.loopCount = loopCount;
+	}
+
+	public String getLoopVariableName() {
+		return loopVariableName;
+	}
+	
+	
+
+	public void setLoopVariableName(String loopVariableName) {
+		this.loopVariableName = loopVariableName;
 	}
 
 	@Override
 	public String toString() {
 		return "SpiderNode [jsonProperty=" + jsonProperty + ", nextNodes=" + nextNodes + ", condition=" + condition
-				+ ", lastResponse=" + lastResponse + ", nodeName=" + nodeName + ", nodeId=" + nodeId + "]";
+				+ ", nodeName=" + nodeName + ", nodeId=" + nodeId + ", loopCount=" + loopCount + ", loopVariableName="
+				+ loopVariableName + "]";
 	}
 	
 }

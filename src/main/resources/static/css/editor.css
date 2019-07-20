@@ -85,11 +85,11 @@ html,body{
 }
 
 .test-window-container .output-container{
-	height: 300px;
+	height: 320px;
     overflow: auto;
 }
 .test-window-container .log-container{
-	height : 170px;
+	height : 100px;
 }
 .test-window-container .log-container textarea{
 	width : 100%;

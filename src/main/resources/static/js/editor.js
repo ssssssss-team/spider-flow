@@ -123,6 +123,12 @@ $(function(){
 				cell.data = cell.data || new JsonProperty();
 				cell.data.set('spiderName',$(this).val())
 			}
+		}).on("keyup",".editor-form-node .layui-form-item input[name=loopCount]",function(){
+			var cell = graph.getSelectionCell();
+			if(cell != null){
+				cell.data = cell.data || new JsonProperty();
+				cell.data.set('loopCount',$(this).val())
+			}
 		}).on("keyup",".editor-form-node .layui-form-item input[name^=variable-]",function(){	//变量操作
 			resetFormArray(graph,'variable','variables');
 		}).on("click",".editor-form-node .variable-remove",function(){	//移除单个变量
@@ -135,7 +141,6 @@ $(function(){
 			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close variable-remove"></i><label class="layui-form-label">变量名</label><div class="layui-input-block"><input type="text" name="variable-name" placeholder="变量名称" autocomplete="off" class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">变量值</label><div class="layui-input-block"><input type="text" name="variable-value" placeholder="请输入变量值" autocomplete="off" class="layui-input"></div></div><hr>');
 		}).on("keyup",".editor-form-node .layui-form-item input[name^=header-]",function(e){	//Header操作
 			resetFormArray(graph,'header','headers');
-			console.log('header-input');
 			e.stopPropagation();
 		}).on("click",".editor-form-node .header-remove",function(){	//移除单个Header
 			var $dom = $(this).parent();
@@ -494,7 +499,10 @@ $(function(){
 									tableMap[tableId].instance = layui.table.render({
 										elem : '#' + tableId,
 										cols : tableMap[tableId].cols,
-										data : tableMap[tableId].data
+										data : tableMap[tableId].data,
+										page : true,
+										limit : 5,
+										limits : [5]
 									})
 								}
 							}else if(eventType == 'log'){

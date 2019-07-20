@@ -13,7 +13,6 @@ import com.mxd.spider.core.freemarker.FreeMarkerEngine;
 import com.mxd.spider.core.model.SpiderJsonProperty;
 import com.mxd.spider.core.model.SpiderNameValue;
 import com.mxd.spider.core.model.SpiderNode;
-import com.mxd.spider.core.utils.Maps;
 
 @Component
 public class VariableExecutor implements Executor{
@@ -24,10 +23,9 @@ public class VariableExecutor implements Executor{
 	private FreeMarkerEngine engine;
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		SpiderJsonProperty property = node.getJsonProperty();
 		if(property != null){
-			Map<String, Object> variables = Maps.add(context, "resp", node.getLastResponse());
 			for (SpiderNameValue nameValue : property.getVariables()) {
 				Object value = null;
 				try {
@@ -41,7 +39,7 @@ public class VariableExecutor implements Executor{
 					context.log(String.format("设置变量%s出错,异常信息：%s", nameValue.getName(),ExceptionUtils.getStackTrace(e)));
 					ExceptionUtils.wrapAndThrow(e);
 				}
-				context.put(nameValue.getName(), value);
+				variables.put(nameValue.getName(), value);
 			}
 		}
 	}

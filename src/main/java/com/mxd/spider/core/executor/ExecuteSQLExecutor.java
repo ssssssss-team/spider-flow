@@ -17,7 +17,6 @@ import com.mxd.spider.core.freemarker.FreeMarkerEngine;
 import com.mxd.spider.core.model.SpiderJsonProperty;
 import com.mxd.spider.core.model.SpiderNode;
 import com.mxd.spider.core.utils.ExtractUtils;
-import com.mxd.spider.core.utils.Maps;
 
 @Component
 public class ExecuteSQLExecutor implements Executor{
@@ -28,7 +27,7 @@ public class ExecuteSQLExecutor implements Executor{
 	private FreeMarkerEngine engine;
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		SpiderJsonProperty property = node.getJsonProperty();
 		if(property != null){
 			if(StringUtils.isEmpty(property.getDatasourceId())){
@@ -46,7 +45,6 @@ public class ExecuteSQLExecutor implements Executor{
 				//把变量替换成占位符
 				String sql = property.getSql().replaceAll("#(.*?)#", "?");
 				List<String> parameters = ExtractUtils.getMatchers(property.getSql(), "#(.*?)#", true);
-				Map<String, Object> variables = Maps.add(context, "resp", node.getLastResponse());
 				int size = parameters.size();
 				Object[] params = new Object[size];
 				for (int i = 0;i<size;i++) {

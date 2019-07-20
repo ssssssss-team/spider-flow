@@ -11,7 +11,20 @@ public class SpiderJsonProperty{
 	
 	private List<SpiderNameValue> outputs;
 	
+	/**
+	 * 条件判断表达式
+	 */
 	private String condition;
+
+	/**
+	 * 循环次数
+	 */
+	private String loopCount;
+	
+	/**
+	 * 循环变量
+	 */
+	private String loopVariableName;
 	
 	/*爬取参数--start*/
 	
@@ -168,13 +181,29 @@ public class SpiderJsonProperty{
 		this.sql = sql;
 	}
 
+	public String getLoopCount() {
+		return loopCount;
+	}
+
+	public void setLoopCount(String loopCount) {
+		this.loopCount = loopCount;
+	}
+	
+	public String getLoopVariableName() {
+		return loopVariableName;
+	}
+
+	public void setLoopVariableName(String loopVariableName) {
+		this.loopVariableName = loopVariableName;
+	}
+
 	@Override
 	public String toString() {
 		return "SpiderJsonProperty [shape=" + shape + ", variables=" + variables + ", outputs=" + outputs
-				+ ", condition=" + condition + ", url=" + url + ", method=" + method + ", headers=" + headers
-				+ ", parameters=" + parameters + ", datasourceType=" + datasourceType + ", datasourceUrl="
-				+ datasourceUrl + ", datasourceUsername=" + datasourceUsername + ", datasourcePassword="
-				+ datasourcePassword + ", datasourceId=" + datasourceId + ", statementType=" + statementType + ", sql="
-				+ sql + "]";
+				+ ", condition=" + condition + ", loopCount=" + loopCount + ", loopVariableName=" + loopVariableName
+				+ ", url=" + url + ", method=" + method + ", headers=" + headers + ", parameters=" + parameters
+				+ ", datasourceType=" + datasourceType + ", datasourceUrl=" + datasourceUrl + ", datasourceUsername="
+				+ datasourceUsername + ", datasourcePassword=" + datasourcePassword + ", datasourceId=" + datasourceId
+				+ ", statementType=" + statementType + ", sql=" + sql + "]";
 	}
 }
