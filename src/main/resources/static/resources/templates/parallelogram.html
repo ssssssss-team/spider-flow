@@ -8,7 +8,7 @@
     		<div class="layui-form-item">
     			<label class="layui-form-label">节点名称</label>
     			<div class="layui-input-block">
-    				<input type="text" name="value" placeholder="请输入节点名称" value="{{d.value}}" autocomplete="off" class="layui-input">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{(d.value || '').replace('"','&quot;')}}" autocomplete="off" class="layui-input">
     			</div>
     		</div>
     		{{# layui.each(d.data.object.variables,function(index,variable){ }}
@@ -17,13 +17,13 @@
 	    			<i class="layui-icon layui-icon-close variable-remove"></i>  
 	    			<label class="layui-form-label">变量名</label>
 	    			<div class="layui-input-block">
-	    				<input type="text" name="variable-name" placeholder="变量名称" autocomplete="off" class="layui-input" value="{{variable.name || ''}}">
+	    				<input type="text" name="variable-name" placeholder="变量名称" autocomplete="off" class="layui-input" value="{{(variable.name || '').replace('"','&quot;')}}">
 	    			</div>
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">变量值</label>
 	    			<div class="layui-input-block">
-	    				<input type="text" name="variable-value" placeholder="变量值" autocomplete="off" class="layui-input" value="{{variable.value || ''}}">
+	    				<input type="text" name="variable-value" placeholder="变量值" autocomplete="off" class="layui-input" value="{{(variable.value || '').replace('"','&quot;')}}">
 	    			</div>
 	    		</div>
     		{{# }) }}

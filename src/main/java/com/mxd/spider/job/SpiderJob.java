@@ -9,6 +9,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +25,15 @@ public class SpiderJob extends QuartzJobBean{
 	private static Spider spider;
 	
 	private static SpiderFlowService spiderFlowService;
+	
+	@Value("${spider.job.enable:true}")
+	private boolean spiderJobEnable;
 
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+		if(!spiderJobEnable){
+			return;
+		}
 		Date now = new Date();
 		//下次执行时间
 		Date nextExecuteTime = context.getNextFireTime();

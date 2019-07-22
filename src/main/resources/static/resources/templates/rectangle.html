@@ -14,19 +14,19 @@
     		<div class="layui-form-item">
     			<label class="layui-form-label">循环变量</label>
     			<div class="layui-input-block">
-    				<input type="text" name="loopVariableName" placeholder="请输入循环变量" autocomplete="off" class="layui-input" value="{{d.data.object.loopVariableName || ''}}">
+    				<input type="text" name="loopVariableName" placeholder="请输入循环变量" autocomplete="off" class="layui-input" value="{{(d.data.object.loopVariableName || '').replace('"','&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">循环次数</label>
     			<div class="layui-input-block">
-    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input" value="{{d.data.object.loopCount || ''}}">
+    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input" value="{{(d.data.object.loopCount || '').replace('"','&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">起始URL</label>
     			<div class="layui-input-block">
-    				<input type="text" name="url" placeholder="请输入起始url" autocomplete="off" class="layui-input" value="{{d.data.object.url || ''}}">
+    				<input type="text" name="url" placeholder="请输入起始url" autocomplete="off" class="layui-input" value="{{(d.data.object.url || '').replace('"','&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
@@ -42,13 +42,13 @@
 	    			<i class="layui-icon layui-icon-close parameter-remove"></i>  
 	    			<label class="layui-form-label">参数名</label>
 	    			<div class="layui-input-block">
-	    				<input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input" value="{{parameter.name || ''}}">
+	    				<input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input" value="{{(parameter.name || '').replace('"','&quot;')}}">
 	    			</div>
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">参数值</label>
 	    			<div class="layui-input-block">
-	    				<input type="text" name="parameter-value" placeholder="请输入参数值" autocomplete="off" class="layui-input" value="{{parameter.value || ''}}">
+	    				<input type="text" name="parameter-value" placeholder="请输入参数值" autocomplete="off" class="layui-input" value="{{(parameter.value || '').replace('"','&quot;')}}">
 	    			</div>
 	    		</div>
     		{{# }) }}
@@ -65,13 +65,13 @@
 	    			<i class="layui-icon layui-icon-close header-remove"></i>  
 	    			<label class="layui-form-label">header名</label>
 	    			<div class="layui-input-block">
-	    				<input type="text" name="header-name" placeholder="请输入header名" autocomplete="off" class="layui-input" value="{{header.name || ''}}">
+	    				<input type="text" name="header-name" placeholder="请输入header名" autocomplete="off" class="layui-input" value="{{(header.name || '').replace('"','&quot;')}}">
 	    			</div>
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">header值</label>
 	    			<div class="layui-input-block">
-	    				<input type="text" name="header-value" placeholder="请输入header值" autocomplete="off" class="layui-input" value="{{header.value || ''}}">
+	    				<input type="text" name="header-value" placeholder="请输入header值" autocomplete="off" class="layui-input" value="{{(header.value || '').replace('"','&quot;')}}">
 	    			</div>
 	    		</div>
     		{{# }) }}

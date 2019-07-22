@@ -90,6 +90,17 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<finalName>spider-flow</finalName>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+					<mainClass>com.mxd.spider.SpiderApplication</mainClass>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

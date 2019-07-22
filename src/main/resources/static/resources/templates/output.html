@@ -8,19 +8,19 @@
     		<div class="layui-form-item">
     			<label class="layui-form-label">节点名称</label>
     			<div class="layui-input-block">
-    				<input type="text" name="nodeName" placeholder="请输入节点名称" value="{{d.value}}" autocomplete="off" class="layui-input">
+    				<input type="text" name="nodeName" placeholder="请输入节点名称" value="{{(d.value).replace('"','&quot;')}}" autocomplete="off" class="layui-input">
     			</div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">循环变量</label>
     			<div class="layui-input-block">
-    				<input type="text" name="loopVariableName" placeholder="请输入循环变量" autocomplete="off" class="layui-input" value="{{d.data.object.loopVariableName || ''}}">
+    				<input type="text" name="loopVariableName" placeholder="请输入循环变量" autocomplete="off" class="layui-input" value="{{(d.data.object.loopVariableName || '').replace('"','&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">循环次数</label>
     			<div class="layui-input-block">
-    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input" value="{{d.data.object.loopCount || ''}}">
+    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input" value="{{(d.data.object.loopCount || '').replace('"','&quot;')}}">
     			</div>
     		</div>
     		{{# layui.each(d.data.object.outputs,function(index,output){ }}
@@ -29,13 +29,13 @@
 	    			<i class="layui-icon layui-icon-close variable-remove"></i>  
 	    			<label class="layui-form-label">输出项</label>
 	    			<div class="layui-input-block">
-	    				<input type="text" name="output-name" placeholder="输出项" autocomplete="off" class="layui-input" value="{{output.name || ''}}">
+	    				<input type="text" name="output-name" placeholder="输出项" autocomplete="off" class="layui-input" value="{{(output.name || '').replace('"','&quot;')}}">
 	    			</div>
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">输出值</label>
 	    			<div class="layui-input-block">
-	    				<input type="text" name="output-value" placeholder="输出值" autocomplete="off" class="layui-input" value="{{output.value || ''}}">
+	    				<input type="text" name="output-value" placeholder="输出值" autocomplete="off" class="layui-input" value="{{(output.value || '').replace('"','&quot;')}}">
 	    			</div>
 	    		</div>
     		{{# }) }}
