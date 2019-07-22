@@ -552,7 +552,7 @@ $(function(){
 	
 	function createWebSocket(options){
 		options = options || {};
-		var socket = new WebSocket(options.url || (location.origin.replace("http",'ws') + '/ws')););
+		var socket = new WebSocket(options.url || (location.origin.replace("http",'ws') + '/ws'));
 		socket.onopen = options.onopen;
 		socket.onmessage = options.onmessage;
 		socket.onerror = options.onerror || function(){
