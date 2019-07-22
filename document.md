@@ -23,7 +23,7 @@
 
 #### 定义变量
 - 变量名：定义变量名称
-- 变量值：可使用${}从变量中获取值（FreeMarker语法）如：${selectors(resp.html,'.categorical-project-card a','attr','href')}
+- 变量值：```可使用${}从变量中获取值（FreeMarker语法）如：${selectors(resp.html,'.categorical-project-card a','attr','href')}```
 
 #### 定义数据源
 - 数据库类型，目前仅支持Mysql(其它驱动未引入至项目中)
@@ -39,7 +39,7 @@
 #### 执行SQL
 - 数据源，选择之前定义好的数据源
 - 语句类型，select/insert/update/delete
-- SQL语句，如INSERT INTO gitee_gvp(project_name, project_link,project_desc) VALUES (#${projectNames[projectIndex]}#,#${projectUrls[projectIndex]}#,#${projectDesc}#)
+- SQL语句，如```INSERT INTO gitee_gvp(project_name, project_link,project_desc) VALUES (#${projectNames[projectIndex]}#,#${projectUrls[projectIndex]}#,#${projectDesc}#)```
 > 需要注意的是，SQL语句不支持${}语法，但是参数是支持的，另外参数需要用##包起来
 
 #### 箭头
