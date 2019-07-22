@@ -517,22 +517,7 @@ $(function(){
 		}).on('click',".btn-return",function(){
 			location.href="spiderList.html"
 		}).on('click','.btn-save',function(){
-			$.ajax({
-				url : 'spider/save',
-				type : 'post',
-				data : {
-					id : getQueryString('id'),
-					xml : getXML(editor),
-					name : editor.graph.getModel().getRoot().data.get('spiderName') || '未定义名称',
-				},
-				success : function(){
-					layui.layer.msg('保存成功',{
-						time : 800
-					},function(){
-//						location.href = "spiderList.html";
-					})
-				}
-			})
+			Save();
 		});
 	}
 	
@@ -575,5 +560,32 @@ $(function(){
 		}
 		return socket;
 	}
+	
+	function Save(){
+		$.ajax({
+			url : 'spider/save',
+			type : 'post',
+			data : {
+				id : getQueryString('id'),
+				xml : getXML(editor),
+				name : editor.graph.getModel().getRoot().data.get('spiderName') || '未定义名称',
+			},
+			success : function() {
+				layui.layer.msg('保存成功', {
+					time : 800
+				}, function() {
+					// location.href = "spiderList.html";
+				})
+			}
+		})
+	}
+	
+	window.addEventListener("keydown", function(e) {
+		// 可以判断是不是mac，如果是mac,ctrl变为花键  按 ctrl+s是保存流程图
+		if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+			e.preventDefault();
+			Save();
+		}
+	}, false);
 	
 });
