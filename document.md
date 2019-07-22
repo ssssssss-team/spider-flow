@@ -56,7 +56,7 @@
 | -------- | -------- | -------- |
 |  html    |  String  | 页面HTML |
 |  json    |  JSONObject/JSONArray | 内容转json结果         |
-|  bytes   |  bytes[] | 二进制结果  |
+|  bytes   |  byte[] | 二进制结果  |
 |  cookies | Map<String,String>  |  cookies   |
 |  headers | Map<String,String>  |  headers   |
 |  statusCode | int  |  HTTP状态码 |
