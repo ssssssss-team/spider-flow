@@ -17,6 +17,10 @@
 #### 使用说明
 [点击跳转](https://gitee.com/jmxd/spider-flow/blob/master/document.md)
 
+#### 演示站点
+[点击跳转](http://39.105.125.219:8088/)
+> 服务器配置较低,如有卡顿请谅解
+
 ### 项目部分截图
 ![gif1](https://images.gitee.com/uploads/images/2019/0716/184746_b4b350c7_297689.gif "animate.gif")
 ![png1](https://images.gitee.com/uploads/images/2019/0716/184606_0aca457c_297689.png "demo-1.png")
