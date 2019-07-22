@@ -61,7 +61,7 @@ public class ExecuteSQLExecutor implements Executor{
 						context.log(String.format("执行sql出错,异常信息:%s", ExceptionUtils.getStackTrace(e)));
 						logger.error("执行sql出错,异常信息:{}",e);
 					}
-					context.put("rs", rs);
+					variables.put("rs", rs);
 				}else if("update".equals(statementType) || "insert".equals(statementType) || "delete".equals(statementType)){
 					int rs = -1;
 					try{
@@ -70,7 +70,7 @@ public class ExecuteSQLExecutor implements Executor{
 						context.log(String.format("执行sql出错,异常信息:%s", ExceptionUtils.getStackTrace(e)));
 						logger.error("执行sql出错,异常信息:{}",e);
 					}
-					context.put("rs", rs);
+					variables.put("rs", rs);
 				}
 			}
 		}
