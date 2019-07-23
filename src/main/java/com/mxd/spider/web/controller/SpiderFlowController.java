@@ -25,8 +25,9 @@ public class SpiderFlowController {
 	}
 	
 	@RequestMapping("/save")
-	public void save(SpiderFlow spiderFlow){
+	public String save(SpiderFlow spiderFlow){
 		spiderFlowService.save(spiderFlow);
+		return spiderFlow.getId();
 	}
 	
 	@RequestMapping("/get")

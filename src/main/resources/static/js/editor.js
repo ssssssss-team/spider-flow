@@ -558,6 +558,12 @@ $(function(){
 		keyHandler.bindControlKey(86,function(){	// Ctrl+V
 			editor.execute('paste')
 		});
+		keyHandler.bindControlKey(83,function(){	// Ctrl+S
+			Save();
+		});
+		keyHandler.bindControlKey(81,function(){	// Ctrl+S
+			$(".btn-test").click();
+		});
 	}
 	
 	function createWebSocket(options){
@@ -570,17 +576,18 @@ $(function(){
 		}
 		return socket;
 	}
-	
+	var flowId;
 	function Save(){
 		$.ajax({
 			url : 'spider/save',
 			type : 'post',
 			data : {
-				id : getQueryString('id'),
+				id : getQueryString('id') || flowId,
 				xml : getXML(editor),
 				name : editor.graph.getModel().getRoot().data.get('spiderName') || '未定义名称',
 			},
-			success : function() {
+			success : function(id) {
+				flowId = id;
 				layui.layer.msg('保存成功', {
 					time : 800
 				}, function() {
@@ -589,13 +596,5 @@ $(function(){
 			}
 		})
 	}
-	
-	window.addEventListener("keydown", function(e) {
-		// 可以判断是不是mac，如果是mac,ctrl变为花键  按 ctrl+s是保存流程图
-		if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
-			e.preventDefault();
-			Save();
-		}
-	}, false);
 	
 });
