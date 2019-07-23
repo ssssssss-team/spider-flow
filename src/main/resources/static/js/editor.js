@@ -438,6 +438,8 @@ $(function(){
 		var graph = editor.graph;
 		$(".toolbar-container").on('click','.btn-delete',function(){
 			deleteSelectCells(graph);
+		}).on("click",".btn-selectAll",function(){
+			editor.execute('selectAll');
 		}).on('click',".btn-undo",function(){
 			editor.execute('undo');
 		}).on('click',".btn-redo",function(){
@@ -556,13 +558,16 @@ $(function(){
 			editor.execute('copy');
 		});
 		keyHandler.bindControlKey(86,function(){	// Ctrl+V
-			editor.execute('paste')
+			editor.execute('paste');
 		});
 		keyHandler.bindControlKey(83,function(){	// Ctrl+S
 			Save();
 		});
 		keyHandler.bindControlKey(81,function(){	// Ctrl+S
 			$(".btn-test").click();
+		});
+		keyHandler.bindControlKey(65,function(){	// Ctrl+A
+			editor.execute('selectAll');
 		});
 	}
 	
