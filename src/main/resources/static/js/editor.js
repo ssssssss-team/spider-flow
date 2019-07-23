@@ -310,8 +310,10 @@ $(function(){
 	 * 加载各种图形
 	 */
 	function loadShapes(editor,container){
-		var createSVG =function(width,height,sw,sh,d,stroke,fill){
+		var createSVG =function(title,width,height,sw,sh,d,stroke,fill){
 			var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');
+			var span = document.createElement('span');
+			span.title = title;
 			svg.setAttribute('width',width);
 			svg.setAttribute('height',height);
 			svg.setAttribute('viewBox','0 0 ' + sw +' ' + sh);
@@ -321,7 +323,8 @@ $(function(){
 			pathEl.setAttribute('stroke-width',4);
 			pathEl.setAttribute('fill',fill);
 			svg.appendChild(pathEl);
-			return svg;
+			span.appendChild(svg);
+			return span;
 		}
 		var root = mxUtils.load('resources/shapes.xml').getDocumentElement();
 		var shape = root.firstChild;
@@ -335,7 +338,7 @@ $(function(){
 				var shapeName = shape.getAttribute('name');
 				mxStencilRegistry.addStencil(shapeName, new mxStencil(shape));
 				if(shape.getAttribute('hidden') != '1'){
-					var svg = createSVG(36,36,shape.getAttribute("w"),shape.getAttribute("h"),shape.getAttribute("d"),'#333','none');
+					var svg = createSVG(shape.getAttribute('title'),36,36,shape.getAttribute("w"),shape.getAttribute("h"),shape.getAttribute("d"),'#333','none');
 					container.appendChild(svg);
 					addSidebarShape(editor,graph,container,shape.getAttribute('title') || 'Label',svg,shapeName);
 				}
