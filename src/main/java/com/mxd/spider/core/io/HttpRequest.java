@@ -1,13 +1,15 @@
 package com.mxd.spider.core.io;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
+import org.jsoup.Jsoup;
 
 public class HttpRequest {
 	
@@ -18,6 +20,13 @@ public class HttpRequest {
 	private Map<String,String> data = null;
 	
 	private String method = "GET";
+	
+	private Proxy proxy;
+	
+	/**
+	 * 超时时间
+	 */
+	private int timeout = 60000;
 	
 	public static HttpRequest create(){
 		return new HttpRequest();
@@ -46,7 +55,7 @@ public class HttpRequest {
 	
 	public HttpRequest header(String key,Object value){
 		if(value != null){
-			return header(key,data.toString());
+			return header(key,value.toString());
 		}
 		return this;
 	}
@@ -78,11 +87,18 @@ public class HttpRequest {
 		return this;
 	}
 	
+	public HttpRequest proxy(String host,int port){
+		this.proxy = new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(host, port));
+		return this;
+	}
+	
 	public HttpResponse execute() throws IOException{
 		Connection connection = Jsoup.connect(this.url);
 		connection.ignoreContentType(true);
 		connection.ignoreHttpErrors(true);
 		connection.method(Method.GET);
+		connection.maxBodySize(0);
+		connection.timeout(this.timeout);
 		if("POST".equals(this.method)){
 			connection.method(Method.POST);
 		}
@@ -91,6 +107,9 @@ public class HttpRequest {
 		}
 		if(this.data != null){
 			connection.data(data);
+		}
+		if(this.proxy != null){
+			connection.proxy(proxy);
 		}
 		Response response = connection.execute();
 		return new HttpResponse(response);

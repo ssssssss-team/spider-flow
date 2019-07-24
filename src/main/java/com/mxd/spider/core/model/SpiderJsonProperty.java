@@ -10,6 +10,8 @@ public class SpiderJsonProperty{
 	private List<SpiderNameValue> variables;
 	
 	private List<SpiderNameValue> outputs;
+
+	private String sleep;
 	
 	/**
 	 * 条件判断表达式
@@ -35,6 +37,11 @@ public class SpiderJsonProperty{
 	private List<SpiderNameValue> headers;
 	
 	private List<SpiderNameValue> parameters;
+	
+	/**
+	 * 代理
+	 */
+	private String proxy;
 	
 	/*爬取参数--end*/
 	
@@ -196,14 +203,31 @@ public class SpiderJsonProperty{
 	public void setLoopVariableName(String loopVariableName) {
 		this.loopVariableName = loopVariableName;
 	}
+	
+	public String getProxy() {
+		return proxy;
+	}
+
+	public void setProxy(String proxy) {
+		this.proxy = proxy;
+	}
+	
+	public String getSleep() {
+		return sleep;
+	}
+
+	public void setSleep(String sleep) {
+		this.sleep = sleep;
+	}
 
 	@Override
 	public String toString() {
-		return "SpiderJsonProperty [shape=" + shape + ", variables=" + variables + ", outputs=" + outputs
-				+ ", condition=" + condition + ", loopCount=" + loopCount + ", loopVariableName=" + loopVariableName
-				+ ", url=" + url + ", method=" + method + ", headers=" + headers + ", parameters=" + parameters
-				+ ", datasourceType=" + datasourceType + ", datasourceUrl=" + datasourceUrl + ", datasourceUsername="
-				+ datasourceUsername + ", datasourcePassword=" + datasourcePassword + ", datasourceId=" + datasourceId
-				+ ", statementType=" + statementType + ", sql=" + sql + "]";
+		return "SpiderJsonProperty [shape=" + shape + ", variables=" + variables + ", outputs=" + outputs + ", sleep="
+				+ sleep + ", condition=" + condition + ", loopCount=" + loopCount + ", loopVariableName="
+				+ loopVariableName + ", url=" + url + ", method=" + method + ", headers=" + headers + ", parameters="
+				+ parameters + ", proxy=" + proxy + ", datasourceType=" + datasourceType + ", datasourceUrl="
+				+ datasourceUrl + ", datasourceUsername=" + datasourceUsername + ", datasourcePassword="
+				+ datasourcePassword + ", datasourceId=" + datasourceId + ", statementType=" + statementType + ", sql="
+				+ sql + "]";
 	}
 }

@@ -99,7 +99,18 @@ $(function(){
 			processCellEvent(graph.getSelectionCell(),graph);
 		});
 		//节点名称输入框事件
-		$("body").on("keyup",".editor-form-node .layui-form-item input[name=value]",function(){
+		$("body").on("mousewheel",".layui-tab .layui-tab-title",function(e,delta){
+			var $dom = $(this);
+			var wheel = e.originalEvent.wheelDelta || -e.originalEvent.detail;
+		    var delta = Math.max(-1, Math.min(1, wheel) );
+		    e.preventDefault = function(){}
+		    if(delta > 0){
+		        $dom.scrollLeft($dom.scrollLeft()-60);
+			}else{
+				$dom.scrollLeft($dom.scrollLeft()+60);
+			}
+			return false;
+		}).on("keyup",".editor-form-node .layui-form-item input[name=value]",function(){
 			var cell = graph.getSelectionCell();
 			if(cell != null){
 				var $input = $(this);
@@ -117,17 +128,11 @@ $(function(){
 					}
 				}
 			}
-		}).on("keyup",".editor-form-node .layui-form-item input[name=spiderName]",function(){
+		}).on("keyup",".editor-form-node .layui-form-item input.input-default",function(){
 			var cell = graph.getModel().getRoot();
 			if(cell != null){
 				cell.data = cell.data || new JsonProperty();
-				cell.data.set('spiderName',$(this).val())
-			}
-		}).on("keyup",".editor-form-node .layui-form-item input[name=loopCount]",function(){
-			var cell = graph.getSelectionCell();
-			if(cell != null){
-				cell.data = cell.data || new JsonProperty();
-				cell.data.set('loopCount',$(this).val())
+				cell.data.set($(this).attr('name'),$(this).val())
 			}
 		}).on("keyup",".editor-form-node .layui-form-item input[name^=variable-]",function(){	//变量操作
 			resetFormArray(graph,'variable','variables');
@@ -438,6 +443,8 @@ $(function(){
 		var graph = editor.graph;
 		$(".toolbar-container").on('click','.btn-delete',function(){
 			deleteSelectCells(graph);
+		}).on("click",".btn-selectAll",function(){
+			editor.execute('selectAll');
 		}).on('click',".btn-undo",function(){
 			editor.execute('undo');
 		}).on('click',".btn-redo",function(){
@@ -521,7 +528,7 @@ $(function(){
 			location.href="spiderList.html"
 		}).on('click','.btn-save',function(){
 			Save();
-		});
+		})
 	}
 	
 	function getXML(editor){
@@ -556,13 +563,16 @@ $(function(){
 			editor.execute('copy');
 		});
 		keyHandler.bindControlKey(86,function(){	// Ctrl+V
-			editor.execute('paste')
+			editor.execute('paste');
 		});
 		keyHandler.bindControlKey(83,function(){	// Ctrl+S
 			Save();
 		});
 		keyHandler.bindControlKey(81,function(){	// Ctrl+S
 			$(".btn-test").click();
+		});
+		keyHandler.bindControlKey(65,function(){	// Ctrl+A
+			editor.execute('selectAll');
 		});
 	}
 	

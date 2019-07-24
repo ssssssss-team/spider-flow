@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,16 @@ public class RequestExecutor implements Executor{
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
+		String sleepCondition = node.getJsonProperty() == null ? null : node.getJsonProperty().getSleep();
+		if(StringUtils.isNotEmpty(sleepCondition)){
+			try {
+				Object value = engine.execute(sleepCondition, variables);
+				long sleepTime = ((Long)value).longValue();
+				Thread.sleep(sleepTime);
+			} catch (InterruptedException e) {
+				
+			}
+		}
 		HttpRequest request = HttpRequest.create();
 		SpiderJsonProperty property = node.getJsonProperty();
 		List<SpiderNameValue> parameters = property.getParameters();
@@ -93,6 +104,24 @@ public class RequestExecutor implements Executor{
 				request.header(nameValue.getName(),value);
 			}
 		}
+		//设置代理
+		String proxy = property.getProxy();
+		if(proxy != null){
+			try {
+				proxy = engine.execute(proxy, variables).toString();
+				String[] proxyArr = proxy.split(":");
+				if(proxyArr != null && proxyArr.length == 2){
+					request.proxy(proxyArr[0], Integer.parseInt(proxyArr[1]));
+					context.log(String.format("设置代理：%s", proxy));
+					if(logger.isDebugEnabled()){
+						logger.debug("设置代理：{}",proxy);
+					}
+				}
+			} catch (Exception e) {
+				context.log("设置代理出错，异常信息：" + ExceptionUtils.getStackTrace(e));
+				logger.error("设置代理出错",e);
+			}
+		}
 		try {
 			HttpResponse response = request.execute();
 			//结果存入变量
@@ -104,5 +133,5 @@ public class RequestExecutor implements Executor{
 			
 		}
 	}
-
+	
 }
