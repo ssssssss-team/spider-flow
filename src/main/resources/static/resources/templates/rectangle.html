@@ -17,25 +17,25 @@
     		<div class="layui-form-item">
     			<label class="layui-form-label">循环变量</label>
     			<div class="layui-input-block">
-    				<input type="text" name="loopVariableName" placeholder="请输入循环变量" autocomplete="off" class="layui-input input-default" value="{{(d.data.object.loopVariableName || '').replace('"','&quot;')}}">
+    				<input type="text" name="loopVariableName" placeholder="请输入循环变量" autocomplete="off" class="layui-input input-default" value="{{(d.data.object.loopVariableName || '').replace(/\"/g,'&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">循环次数</label>
     			<div class="layui-input-block">
-    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input input-default" value="{{(d.data.object.loopCount || '').replace('"','&quot;')}}">
+    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input input-default" value="{{(d.data.object.loopCount || '').replace(/\"/g,'&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">延迟时间</label>
     			<div class="layui-input-block">
-    				<input type="text" name="sleep" placeholder="请输入延迟时间" autocomplete="off" class="layui-input input-default" value="{{(d.data.object.sleep || '').replace('"','&quot;')}}">
+    				<input type="text" name="sleep" placeholder="请输入延迟时间" autocomplete="off" class="layui-input input-default" value="{{(d.data.object.sleep || '').replace(/\"/g,'&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">URL</label>
     			<div class="layui-input-block">
-    				<input type="text" name="url" placeholder="请输入起始url" autocomplete="off" class="layui-input input-default" value="{{(d.data.object.url || '').replace('"','&quot;')}}">
+    				<input type="text" name="url" placeholder="请输入起始url" autocomplete="off" class="layui-input input-default" value="{{(d.data.object.url || '').replace(/\"/g,'&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
@@ -53,13 +53,13 @@
     			<i class="layui-icon layui-icon-close parameter-remove"></i>  
     			<label class="layui-form-label">参数名</label>
     			<div class="layui-input-block">
-    				<input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input" value="{{(parameter.name || '').replace('"','&quot;')}}">
+    				<input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input" value="{{(parameter.name || '').replace(/\"/g,'&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">参数值</label>
     			<div class="layui-input-block">
-    				<input type="text" name="parameter-value" placeholder="请输入参数值" autocomplete="off" class="layui-input" value="{{(parameter.value || '').replace('"','&quot;')}}">
+    				<input type="text" name="parameter-value" placeholder="请输入参数值" autocomplete="off" class="layui-input" value="{{(parameter.value || '').replace(/\"/g,'&quot;')}}">
     			</div>
     		</div>
     		<hr>
@@ -76,13 +76,13 @@
     			<i class="layui-icon layui-icon-close header-remove"></i>  
     			<label class="layui-form-label">header名</label>
     			<div class="layui-input-block">
-    				<input type="text" name="header-name" placeholder="请输入header名" autocomplete="off" class="layui-input" value="{{(header.name || '').replace('"','&quot;')}}">
+    				<input type="text" name="header-name" placeholder="请输入header名" autocomplete="off" class="layui-input" value="{{(header.name || '').replace(/\"/g,'&quot;')}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">header值</label>
     			<div class="layui-input-block">
-    				<input type="text" name="header-value" placeholder="请输入header值" autocomplete="off" class="layui-input" value="{{(header.value || '').replace('"','&quot;')}}">
+    				<input type="text" name="header-value" placeholder="请输入header值" autocomplete="off" class="layui-input" value="{{(header.value || '').replace(/\"/g,'&quot;')}}">
     			</div>
     		</div>
     		<hr>
@@ -97,7 +97,7 @@
     	<div class="layui-form-item">
    			<label class="layui-form-label">代理</label>
    			<div class="layui-input-block">
-   				<input type="text" name="proxy" placeholder="ip:host" value="{{(d.data.object.proxy || '').replace('"','&quot;')}}" autocomplete="off" class="layui-input input-default">
+   				<input type="text" name="proxy" placeholder="ip:host" value="{{(d.data.object.proxy || '').replace(/\"/g,'&quot;')}}" autocomplete="off" class="layui-input input-default">
    			</div>
    		</div>
     </div>

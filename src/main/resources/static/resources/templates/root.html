@@ -26,7 +26,7 @@
     		<div class="layui-form-item">
     			<label class="layui-form-label">header值</label>
     			<div class="layui-input-block">
-    				<input type="text" name="header-value" placeholder="请输入header值" autocomplete="off" class="layui-input" value="{{(header.value || '').replace('"','&quot;')}}">
+    				<input type="text" name="header-value" placeholder="请输入header值" autocomplete="off" class="layui-input" value="{{(header.value || '').replace(/\"/g,'&quot;')}}">
     			</div>
     		</div>
     		<hr>

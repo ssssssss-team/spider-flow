@@ -8,7 +8,7 @@
     		<div class="layui-form-item">
     			<label class="layui-form-label">节点名称</label>
     			<div class="layui-input-block">
-    				<input type="text" name="value" placeholder="请输入节点名称" value="{{(d.value).replace('"','&quot;')}}" autocomplete="off" class="layui-input">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{(d.value).replace(/\"/g,'&quot;')}}" autocomplete="off" class="layui-input">
     			</div>
     		</div>
     		<div class="layui-form-item">
