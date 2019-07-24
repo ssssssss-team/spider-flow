@@ -594,7 +594,7 @@ $(function(){
 			data : {
 				id : getQueryString('id') || flowId,
 				xml : getXML(editor),
-				name : editor.graph.getModel().getRoot().data.get('spiderName') || '未定义名称',
+				name : $("[name=spiderName]").val(),
 			},
 			success : function(id) {
 				flowId = id;
