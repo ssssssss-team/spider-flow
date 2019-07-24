@@ -9,7 +9,7 @@
 - [x] 支持Xpath/JsonPath提取
 - [x] 支持多数据源、SQL select/insert/update/delete
 - [ ] 支持爬取JS动态渲染的页面
-- [ ] 支持代理
+- [x] 支持代理
 - [x] 支持二进制格式
 - [ ] 支持保存/读取文件(csv、xls、jpg等)
 - [ ] 支持插件扩展
