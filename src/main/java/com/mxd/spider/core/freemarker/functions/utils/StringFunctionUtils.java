@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class StringFunctionUtils {
 
@@ -78,4 +79,17 @@ public class StringFunctionUtils {
 			return null;
 		}
 	}
+	
+	public static String uuid() {
+		return UUID.randomUUID().toString().replace("-", "");
+	}
+	
+	public static List<String> uuids(Integer size) {
+		List<String> ids = new ArrayList<String>();
+		for (int i = 0; i < size; i++) {
+			ids.add(UUID.randomUUID().toString().replace("-", ""));
+		}
+		return ids;
+	}
+	
 }

@@ -12,12 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.mxd.spider.core.freemarker.functions.FreemarkerTemplateMethodModel;
-import com.mxd.spider.core.freemarker.functions.utils.*;
+import com.mxd.spider.core.freemarker.functions.utils.Base64FunctionUtils;
+import com.mxd.spider.core.freemarker.functions.utils.DateFunctionUtils;
+import com.mxd.spider.core.freemarker.functions.utils.FileFunctionUtils;
+import com.mxd.spider.core.freemarker.functions.utils.ListFunctionUtils;
+import com.mxd.spider.core.freemarker.functions.utils.RandomFunctionUtils;
+import com.mxd.spider.core.freemarker.functions.utils.StringFunctionUtils;
+import com.mxd.spider.core.freemarker.functions.utils.UrlFunctionUtils;
 import com.mxd.spider.core.utils.ExtractUtils;
 
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapperBuilder;
+import freemarker.template.ObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModelException;
@@ -49,9 +57,10 @@ public class FreeMarkerEngine {
 	 */
 	private void loadStaticFunctions() throws TemplateModelException{
 		BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
+		ObjectWrapper wrapper = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_28).build();
 		builder.setOuterIdentity((obj)->{
 			threadLocal.set(new FreemarkerObject(obj));
-			return null;
+			return wrapper.wrap(obj);
 		});
 		BeansWrapper beansWrapper = builder.build();
 		TemplateHashModel model = beansWrapper.getStaticModels();
