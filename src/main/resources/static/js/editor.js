@@ -128,7 +128,7 @@ $(function(){
 					}
 				}
 			}
-		}).on("keyup",".editor-form-node .layui-form-item input.input-default",function(){
+		}).on("keyup",".editor-form-node .layui-form-item input.input-default,.editor-form-node .layui-form-item input.layui-input",function(){
 			var cell = graph.getModel().getRoot();
 			if(cell != null){
 				cell.data = cell.data || new JsonProperty();
@@ -594,7 +594,7 @@ $(function(){
 			data : {
 				id : getQueryString('id') || flowId,
 				xml : getXML(editor),
-				name : $("[name=spiderName]").val(),
+				name : editor.graph.getModel().getRoot().data.get('spiderName') || '未定义名称',
 			},
 			success : function(id) {
 				flowId = id;
