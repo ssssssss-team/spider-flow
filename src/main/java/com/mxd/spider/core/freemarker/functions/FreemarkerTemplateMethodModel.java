@@ -15,13 +15,10 @@ public abstract class FreemarkerTemplateMethodModel implements TemplateMethodMod
 	@Override
 	public Object exec(@SuppressWarnings("rawtypes") List arguments) throws TemplateModelException{
 		Object value = process(arguments);
-		if(value != null){
-			if(value instanceof String){
-				return value;
-			}else{
-				FreeMarkerEngine.setFreemarkerObjectValue(new FreemarkerObject(value));
-			}
+		if(value != null && value instanceof String){
+			return value;
 		}
+		FreeMarkerEngine.setFreemarkerObjectValue(new FreemarkerObject(value));
 		return null;
 	}
 	

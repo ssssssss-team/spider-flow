@@ -67,6 +67,8 @@ public class SpiderJsonProperty{
 	
 	/*执行sql--end*/
 	
+	private String function;
+	
 	
 	public String getUrl() {
 		return url;
@@ -220,14 +222,12 @@ public class SpiderJsonProperty{
 		this.sleep = sleep;
 	}
 
-	@Override
-	public String toString() {
-		return "SpiderJsonProperty [shape=" + shape + ", variables=" + variables + ", outputs=" + outputs + ", sleep="
-				+ sleep + ", condition=" + condition + ", loopCount=" + loopCount + ", loopVariableName="
-				+ loopVariableName + ", url=" + url + ", method=" + method + ", headers=" + headers + ", parameters="
-				+ parameters + ", proxy=" + proxy + ", datasourceType=" + datasourceType + ", datasourceUrl="
-				+ datasourceUrl + ", datasourceUsername=" + datasourceUsername + ", datasourcePassword="
-				+ datasourcePassword + ", datasourceId=" + datasourceId + ", statementType=" + statementType + ", sql="
-				+ sql + "]";
+	public String getFunction() {
+		return function;
 	}
+
+	public void setFunction(String function) {
+		this.function = function;
+	}
+
 }

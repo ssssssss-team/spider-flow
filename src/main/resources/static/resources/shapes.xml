@@ -108,6 +108,15 @@
 			<stroke color="#000"/>
 		</foreground>
 	</shape>
+	
+	<shape name="function" title="执行函数" w="100" h="100" d="M 10,30 L 10,70 A 40,20,0,1,0,90,70 L 90 30 A 40,20,0,1,0,10,30 A 40,20,0,1,0,90,30">
+		<background>
+			<ellipse x="10" y="10" w="80" h = "80"/>
+		</background>
+		<foreground>
+			<stroke color="#000"/>
+		</foreground>
+	</shape>
 	<shape name="start" w="100" h="100" hidden="1" default="1" title="开始">
 		<background>
 			<path>

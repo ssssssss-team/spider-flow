@@ -4,6 +4,7 @@ encoding//src/main/resources=UTF-8
 encoding//src/main/resources/static/resources/templates/datasource.html=UTF-8
 encoding//src/main/resources/static/resources/templates/edge.html=UTF-8
 encoding//src/main/resources/static/resources/templates/executeSql.html=UTF-8
+encoding//src/main/resources/static/resources/templates/function.html=UTF-8
 encoding//src/main/resources/static/resources/templates/output.html=UTF-8
 encoding//src/main/resources/static/resources/templates/parallelogram.html=UTF-8
 encoding//src/main/resources/static/resources/templates/rectangle.html=UTF-8
