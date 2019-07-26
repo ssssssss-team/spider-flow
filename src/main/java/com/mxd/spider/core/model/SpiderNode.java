@@ -3,21 +3,39 @@ package com.mxd.spider.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * 爬虫节点
+ * @author Administrator
+ *
+ */
 public class SpiderNode {
-	
+	/**
+	 * 节点的Json属性
+	 */
 	private SpiderJsonProperty jsonProperty;
-	
+	/**
+	 * 节点列表中的下一个节点
+	 */
 	private List<SpiderNode> nextNodes = new ArrayList<>();
-	
+	/**
+	 * 节点流转条件(连线位置添加
+	 */
 	private String condition;
-	
+	/**
+	 * 节点名称
+	 */
 	private String nodeName;
-	
+	/**
+	 * 节点ID
+	 */
 	private String nodeId;
-	
+	/**
+	 * 循环次数
+	 */
 	private String loopCount;
-	
+	/**
+	 * 循环变量的名称
+	 */
 	private String loopVariableName;
 	
 	public String getNodeId() {

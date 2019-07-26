@@ -29,26 +29,42 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModelException;
-
+/**
+ * 选择器
+ * @author Administrator
+ *
+ */
 @Component
 public class FreeMarkerEngine {
-	
+	/**
+	 * 生成指定版本配置的模板模型
+	 */
 	private Configuration configuration = new Configuration(Configuration.VERSION_2_3_28);
-	
+	/**
+	 * 选择器自定义方法列表
+	 */
 	@Autowired
 	private List<FreemarkerTemplateMethodModel> customMethods;
-	
+	/**
+	 * 线程内共享的选择器目标对象
+	 */
 	private static ThreadLocal<FreemarkerObject> threadLocal = new ThreadLocal<FreemarkerObject>();
-	
+	/**
+	 * 初始化方法
+	 * @throws TemplateModelException 模板模型异常 由loadStaticFunctions()方法抛出
+	 */
 	@PostConstruct
 	private void init() throws TemplateModelException{
 		configuration.setDefaultEncoding("UTF-8");
+		//设置兼容性 经典兼容性
 		configuration.setClassicCompatible(true);
+		//如果自定义方法不为空 就将自定义方法列表中的方法循环添加到模板模型
 		if(customMethods != null){
 			for (FreemarkerTemplateMethodModel method : customMethods) {
 				configuration.setSharedVariable(method.getFunctionName(), method);
 			}
 		}
+		//加载静态方法
 		loadStaticFunctions();
 	}
 	

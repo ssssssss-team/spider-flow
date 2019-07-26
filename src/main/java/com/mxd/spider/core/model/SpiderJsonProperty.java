@@ -1,16 +1,28 @@
 package com.mxd.spider.core.model;
 
 import java.util.List;
-
+/**
+ * 节点的Json属性
+ * @author Administrator
+ *
+ */
 public class SpiderJsonProperty{
-
+	/**
+	 * 形状
+	 */
 	private String shape;
 	
-	
+	/**
+	 * 入参列表
+	 */
 	private List<SpiderNameValue> variables;
-	
+	/**
+	 * 输出列表
+	 */
 	private List<SpiderNameValue> outputs;
-
+	/**
+	 * 间歇时间
+	 */
 	private String sleep;
 	
 	/**
@@ -29,13 +41,21 @@ public class SpiderJsonProperty{
 	private String loopVariableName;
 	
 	/*爬取参数--start*/
-	
+	/**
+	 * 需要爬取的目标地址
+	 */
 	private String url;
-	
+	/**
+	 * 爬取所采用的方法
+	 */
 	private String method;
-	
+	/**
+	 * 头文件列表
+	 */
 	private List<SpiderNameValue> headers;
-	
+	/**
+	 * 参数设置列表
+	 */
 	private List<SpiderNameValue> parameters;
 	
 	/**
@@ -46,27 +66,43 @@ public class SpiderJsonProperty{
 	/*爬取参数--end*/
 	
 	/*数据源参数--start*/
-	
+	/**
+	 * 数据库类型
+	 */
 	private String datasourceType;
-	
+	/**
+	 * 数据库地址
+	 */
 	private String datasourceUrl;
-	
+	/**
+	 * 数据库名称
+	 */
 	private String datasourceUsername;
-	
+	/**
+	 * 数据库密码
+	 */
 	private String datasourcePassword;
 	
 	/*数据源参数--end*/
 	
 	/*执行sql--start*/
-	
+	/**
+	 * 数据库ID
+	 */
 	private String datasourceId;
-	
+	/**
+	 * 语句类型 DML
+	 */
 	private String statementType;
-	
+	/**
+	 * 具体的sql语句
+	 */
 	private String sql;
 	
 	/*执行sql--end*/
-	
+	/**
+	 * sql执行后的回调方法?
+	 */
 	private String function;
 	
 	

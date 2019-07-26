@@ -12,7 +12,11 @@ import com.mxd.spider.core.context.SpiderContext;
 import com.mxd.spider.core.model.SpiderJsonProperty;
 import com.mxd.spider.core.model.SpiderNode;
 import com.mxd.spider.core.utils.DataSourceUtils;
-
+/**
+ * 数据源执行器
+ * @author Administrator
+ *
+ */
 @Component
 public class DataSourceExecutor implements Executor{
 	
@@ -25,7 +29,7 @@ public class DataSourceExecutor implements Executor{
 			if(property.getDatasourceType() == null){
 				context.log("数据库类型为空！");
 				if(logger.isDebugEnabled()){
-					logger.debug("数据库类型为空！");	
+					logger.debug("数据库类型为空！");
 				}
 			}else{
 				String className = DataSourceUtils.getDriverClassByDataBaseType(property.getDatasourceType());
