@@ -7,7 +7,11 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONObject;
 
 import freemarker.template.TemplateModelException;
-
+/**
+ * 封装Json对象的选择器方法类
+ * @author Administrator
+ *
+ */
 @Component
 public class JsonObjectFunction extends FreemarkerTemplateMethodModel {
 

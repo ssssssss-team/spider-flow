@@ -22,18 +22,29 @@ import com.mxd.spider.core.model.SpiderOutput;
 import com.mxd.spider.core.utils.Maps;
 import com.mxd.spider.core.utils.SpiderFlowUtils;
 import com.mxd.spider.web.model.SpiderFlow;
-
+/**
+ * 爬虫的核心类
+ * @author Administrator
+ *
+ */
 @Component
 public class Spider {
 	
 	private static Logger logger = LoggerFactory.getLogger(Spider.class);
-	
+	/**
+	 * 节点执行器列表 当前爬虫的全部流程
+	 */
 	@Autowired
 	private List<Executor> executors;
-	
+	/**
+	 * 选择器
+	 */
 	@Autowired
 	private FreeMarkerEngine engine;
-	
+	/**
+	 * 
+	 * @param spiderFlow
+	 */
 	public void run(SpiderFlow spiderFlow){
 		SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
 		SpiderContext context = new SpiderContext();

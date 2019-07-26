@@ -16,7 +16,11 @@ import org.seimicrawler.xpath.JXNode;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONPath;
-
+/**
+ * 抽取数据工具类
+ * @author Administrator
+ *
+ */
 public class ExtractUtils {
 	
 	private static Map<String,Pattern> patterns = new HashMap<>();

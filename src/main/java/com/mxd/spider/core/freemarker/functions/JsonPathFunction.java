@@ -7,7 +7,11 @@ import org.springframework.stereotype.Component;
 import com.mxd.spider.core.utils.ExtractUtils;
 
 import freemarker.template.TemplateModelException;
-
+/**
+ * 封装Json路径的选择器方法类
+ * @author Administrator
+ *
+ */
 @Component
 public class JsonPathFunction extends FreemarkerTemplateMethodModel{
 

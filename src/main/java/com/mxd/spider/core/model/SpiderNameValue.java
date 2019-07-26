@@ -1,9 +1,17 @@
 package com.mxd.spider.core.model;
-
+/**
+ * 参数NV对
+ * @author Administrator
+ *
+ */
 public class SpiderNameValue {
-	
+	/**
+	 * 参数名称
+	 */
 	private String name;
-	
+	/**
+	 * 参数值
+	 */
 	private String value;
 
 	public String getName() {
