@@ -11,7 +11,7 @@ import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateScalarModel;
 /**
  * 选择器模版方法模型抽象类
- * @author Administrator
+ * @author jmxd
  *
  */
 public abstract class FreemarkerTemplateMethodModel implements TemplateMethodModelEx{

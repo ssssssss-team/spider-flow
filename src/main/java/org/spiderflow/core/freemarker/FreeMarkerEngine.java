@@ -30,7 +30,7 @@ import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModelException;
 /**
  * 选择器
- * @author Administrator
+ * @author jmxd
  *
  */
 @Component

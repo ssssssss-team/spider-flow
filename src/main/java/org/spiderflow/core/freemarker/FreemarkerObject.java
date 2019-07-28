@@ -1,7 +1,7 @@
 package org.spiderflow.core.freemarker;
 /**
  * 选择器对象
- * @author Administrator
+ * @author jmxd
  *
  */
 public class FreemarkerObject {

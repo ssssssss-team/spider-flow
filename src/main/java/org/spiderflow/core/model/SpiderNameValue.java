@@ -1,7 +1,7 @@
 package org.spiderflow.core.model;
 /**
  * 参数NV对
- * @author Administrator
+ * @author jmxd
  *
  */
 public class SpiderNameValue {

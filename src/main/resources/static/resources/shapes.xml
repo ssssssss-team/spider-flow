@@ -1,31 +1,4 @@
 <shapes>
-	<!--<shape name="diamond" w="100" h="100" d="M 50 0 L 100 50 L 50 100 L 0 50 Z">
-		<background>
-			<path>
-				<move x="50" y="0"/>
-				<line x="100" y="50"/>
-				<line x="50" y="100"/>
-				<line x="0" y="50"/>
-				<close/>
-			</path>
-		</background>
-		<foreground>
-			<stroke color="#000"/>
-		</foreground>
-	</shape>-->
-	<!--<shape name="circle" w="100" h="100" d="M 10, 50 a40,40 0 1,0 80,0 a40,40 0 1,0 -80,0 Z">
-		<background>
-			<path>
-				<move x="0" y="50"/>
-				<arc large-arc-flag="1" rx="50" ry="50" sweep-flag="0" x="100" x-axis-rotation="0" y="50"/>
-				<arc large-arc-flag="1" rx="50" ry="50" sweep-flag="0" x="0" x-axis-rotation="0" y="50"/>
-				<close/>
-			</path>
-		</background>
-		<foreground>
-			<stroke color="#000"/>
-		</foreground>
-	</shape>-->
 	<shape name="rectangle" title="开始抓取" w="100" h="100" d="M 10,10 L 90,10 L 90,90 L 10,90 Z">
 		<background>
 			<path>
@@ -109,7 +82,7 @@
 		</foreground>
 	</shape>
 	
-	<shape name="function" title="执行函数" w="100" h="100" d="M 10,30 L 10,70 A 40,20,0,1,0,90,70 L 90 30 A 40,20,0,1,0,10,30 A 40,20,0,1,0,90,30">
+	<shape name="function" title="执行函数" w="100" h="100" d="M 10, 50 a40,40 0 1,0 80,0 a40,40 0 1,0 -80,0 Z">
 		<background>
 			<ellipse x="10" y="10" w="80" h = "80"/>
 		</background>

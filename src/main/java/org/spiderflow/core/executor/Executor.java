@@ -6,10 +6,15 @@ import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.model.SpiderNode;
 /**
  * 执行器接口
- * @author Administrator
+ * @author jmxd
  *
  */
 public interface Executor {
+	
+	public static final String LOOP_VARIABLE_NAME = "loopVariableName";
+	
+	public static final String LOOP_COUNT = "loopCount";
+	
 	/**
 	 * 节点形状
 	 * @return 节点形状名称

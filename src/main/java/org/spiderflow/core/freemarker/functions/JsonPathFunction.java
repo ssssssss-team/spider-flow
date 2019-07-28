@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import freemarker.template.TemplateModelException;
 /**
  * 封装Json路径的选择器方法类
- * @author Administrator
+ * @author jmxd
  *
  */
 @Component

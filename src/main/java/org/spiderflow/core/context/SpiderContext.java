@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import org.spiderflow.core.model.SpiderOutput;
 /**
  * 爬虫上下文集合
- * @author Administrator
+ * @author jmxd
  *
  */
 public class SpiderContext extends HashMap<String, Object>{

@@ -8,13 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
-import org.spiderflow.core.model.SpiderJsonProperty;
 import org.spiderflow.core.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FunctionExecutor implements Executor{
+	
+	public static final String FUNCTION = "function";
 	
 	private static Logger logger = LoggerFactory.getLogger(FunctionExecutor.class);
 	
@@ -23,13 +24,13 @@ public class FunctionExecutor implements Executor{
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
-		SpiderJsonProperty property = node.getJsonProperty();
-		if(property != null && StringUtils.isNotBlank(property.getFunction())){
+		String function = node.getStringJsonValue(FUNCTION);
+		if(StringUtils.isNotBlank(function)){
 			try {
-				engine.execute(property.getFunction(), variables);
+				engine.execute(function, variables);
 			} catch (Exception e) {
-				logger.error("执行函数{}失败",property.getFunction(),e);
-				context.log(String.format("执行函数%s失败,异常信息:%s",property.getFunction(),ExceptionUtils.getStackTrace(e)));
+				logger.error("执行函数{}失败",function,e);
+				context.log(String.format("执行函数%s失败,异常信息:%s",function,ExceptionUtils.getStackTrace(e)));
 			}
 		}
 	}

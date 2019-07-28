@@ -18,7 +18,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONPath;
 /**
  * 抽取数据工具类
- * @author Administrator
+ * @author jmxd
  *
  */
 public class ExtractUtils {

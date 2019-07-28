@@ -13,7 +13,7 @@ public class FileFunctionUtils {
 	private static File getFile(String path,boolean createDirectory){
 		File f = new File(path);
 		if(createDirectory&&!f.getParentFile().exists()){
-			f.mkdirs();
+			f.getParentFile().mkdirs();
 		}
 		return f;
 	}

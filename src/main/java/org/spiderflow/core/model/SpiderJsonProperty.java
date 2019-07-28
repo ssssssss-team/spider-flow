@@ -3,7 +3,7 @@ package org.spiderflow.core.model;
 import java.util.List;
 /**
  * 节点的Json属性
- * @author Administrator
+ * @author jmxd
  *
  */
 public class SpiderJsonProperty{

@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import freemarker.template.TemplateModelException;
 /**
  * 封装Json数组的选择器方法类
- * @author Administrator
+ * @author jmxd
  *
  */
 @Component

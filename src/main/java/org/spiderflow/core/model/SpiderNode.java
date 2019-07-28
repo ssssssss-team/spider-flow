@@ -1,26 +1,30 @@
 package org.spiderflow.core.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSONArray;
 
 /**
  * 爬虫节点
- * @author Administrator
+ * @author jmxd
  *
  */
 public class SpiderNode {
 	/**
 	 * 节点的Json属性
 	 */
-	private SpiderJsonProperty jsonProperty;
+	private Map<String,Object> jsonProperty = new HashMap<>();
 	/**
 	 * 节点列表中的下一个节点
 	 */
 	private List<SpiderNode> nextNodes = new ArrayList<>();
 	/**
-	 * 节点流转条件(连线位置添加
+	 * 节点流转条件
 	 */
-	private String condition;
+	private Map<String,String> condition = new HashMap<>();
 	/**
 	 * 节点名称
 	 */
@@ -29,14 +33,7 @@ public class SpiderNode {
 	 * 节点ID
 	 */
 	private String nodeId;
-	/**
-	 * 循环次数
-	 */
-	private String loopCount;
-	/**
-	 * 循环变量的名称
-	 */
-	private String loopVariableName;
+	
 	
 	public String getNodeId() {
 		return nodeId;
@@ -54,15 +51,35 @@ public class SpiderNode {
 		this.nodeName = nodeName;
 	}
 
-	public String getShape(){
-		return jsonProperty == null ? null : jsonProperty.getShape();
+	public String getStringJsonValue(String key){
+		return (String) this.jsonProperty.get(key);
 	}
 	
-	public SpiderJsonProperty getJsonProperty() {
-		return jsonProperty;
+	public List<Map<String,String>> getListJsonValue(String ... keys){
+		List<JSONArray> arrays = new ArrayList<>();
+		int size = -1;
+		List<Map<String,String>> result = new ArrayList<>();
+		for (int i = 0; i < keys.length; i++) {
+			JSONArray jsonArray = (JSONArray) this.jsonProperty.get(keys[i]);
+			if(jsonArray != null){
+				if(size == -1){
+					size = jsonArray.size();
+				}else if(size != jsonArray.size()){
+					throw new ArrayIndexOutOfBoundsException();
+				}
+				arrays.add(jsonArray);
+			}
+		}
+		for (int i = 0;i < size;i++) {
+			Map<String,String> item = new HashMap<>();
+			for (int j = 0; j < keys.length; j++) {
+				item.put(keys[j],arrays.get(j).getString(i));
+			}
+			result.add(item);
+		}
+		return result;
 	}
-
-	public void setJsonProperty(SpiderJsonProperty jsonProperty) {
+	public void setJsonProperty(Map<String, Object> jsonProperty) {
 		this.jsonProperty = jsonProperty;
 	}
 
@@ -78,37 +95,17 @@ public class SpiderNode {
 		this.nextNodes = nextNodes;
 	}
 
-	public String getCondition() {
-		return condition;
+	public String getCondition(String fromNodeId) {
+		return condition.get(fromNodeId);
 	}
 
-	public void setCondition(String condition) {
-		this.condition = condition;
-	}
-	
-	public String getLoopCount() {
-		return loopCount;
-	}
-
-	public void setLoopCount(String loopCount) {
-		this.loopCount = loopCount;
-	}
-
-	public String getLoopVariableName() {
-		return loopVariableName;
-	}
-	
-	
-
-	public void setLoopVariableName(String loopVariableName) {
-		this.loopVariableName = loopVariableName;
+	public void setCondition(String fromNodeId,String condition) {
+		this.condition.put(fromNodeId, condition);
 	}
 
 	@Override
 	public String toString() {
 		return "SpiderNode [jsonProperty=" + jsonProperty + ", nextNodes=" + nextNodes + ", condition=" + condition
-				+ ", nodeName=" + nodeName + ", nodeId=" + nodeId + ", loopCount=" + loopCount + ", loopVariableName="
-				+ loopVariableName + "]";
+				+ ", nodeName=" + nodeName + ", nodeId=" + nodeId + "]";
 	}
-	
 }

@@ -13,14 +13,28 @@ import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.io.HttpRequest;
 import org.spiderflow.core.io.HttpResponse;
-import org.spiderflow.core.model.SpiderJsonProperty;
-import org.spiderflow.core.model.SpiderNameValue;
 import org.spiderflow.core.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RequestExecutor implements Executor{
+	
+	public static final String SLEEP = "sleep";
+	
+	public static final String URL = "url";
+	
+	public static final String PROXY = "proxy";
+	
+	public static final String REQUEST_METHOD = "method";
+	
+	public static final String PARAMETER_NAME = "parameter-name";
+	
+	public static final String PARAMETER_VALUE = "parameter-value";
+	
+	public static final String HEADER_NAME = "header-name";
+	
+	public static final String HEADER_VALUE = "header-value";
 	
 	private static Logger logger = LoggerFactory.getLogger(RequestExecutor.class);
 	
@@ -29,13 +43,13 @@ public class RequestExecutor implements Executor{
 
 	@Override
 	public String supportShape() {
-		return "rectangle";
+		return "request";
 	}
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
-		String sleepCondition = node.getJsonProperty() == null ? null : node.getJsonProperty().getSleep();
-		if(StringUtils.isNotEmpty(sleepCondition)){
+		String sleepCondition = node.getStringJsonValue(SLEEP);
+		if(StringUtils.isNotBlank(sleepCondition)){
 			try {
 				Object value = engine.execute(sleepCondition, variables);
 				long sleepTime = ((Long)value).longValue();
@@ -45,12 +59,12 @@ public class RequestExecutor implements Executor{
 			}
 		}
 		HttpRequest request = HttpRequest.create();
-		SpiderJsonProperty property = node.getJsonProperty();
-		List<SpiderNameValue> parameters = property.getParameters();
+		
+		List<Map<String, String>> parameters = node.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE);
 		//设置请求url
 		String url = null;
 		try {
-			url = engine.execute(property.getUrl(), variables).toString();
+			url = engine.execute(node.getStringJsonValue(URL), variables).toString();
 		} catch (Exception e) {
 			context.log("设置请求url出错，异常信息：" + ExceptionUtils.getStackTrace(e));
 			logger.error("设置请求url出错",e);
@@ -61,7 +75,7 @@ public class RequestExecutor implements Executor{
 		}
 		context.log(String.format("设置请求url:%s", url));
 		request.url(url);
-		String method = Objects.toString(property.getMethod(), "GET");
+		String method = Objects.toString(node.getStringJsonValue("METHOD"), "GET");
 		//设置请求方法
 		request.method(method);
 		if(logger.isDebugEnabled()){
@@ -70,41 +84,45 @@ public class RequestExecutor implements Executor{
 		context.log(String.format("设置请求方法:%s", method));
 		//设置请求参数
 		if(parameters != null){
-			for (SpiderNameValue nameValue : parameters) {
+			for (Map<String,String> nameValue : parameters) {
 				Object value = null;
+				String parameterName = nameValue.get(PARAMETER_NAME);
+				String parameterValue = nameValue.get(PARAMETER_VALUE);
 				try {
-					value = engine.execute(nameValue.getValue(), variables);
-					context.log(String.format("设置请求参数:%s=%s", nameValue.getName(),value));
+					value = engine.execute(parameterValue, variables);
+					context.log(String.format("设置请求参数:%s=%s", parameterName,value));
 					if(logger.isDebugEnabled()){
-						logger.debug("设置请求参数：%s=%s",nameValue.getName(),value);
+						logger.debug("设置请求参数：%s=%s",parameterName,value);
 					}
 				} catch (Exception e) {
-					context.log(String.format("设置请求参数:%s出错，异常信息：%s", nameValue.getName(),ExceptionUtils.getStackTrace(e)));
-					logger.error("设置请求参数：%s出错",nameValue.getName(),e);
+					context.log(String.format("设置请求参数:%s出错，异常信息：%s", parameterName,ExceptionUtils.getStackTrace(e)));
+					logger.error("设置请求参数：%s出错",parameterName,e);
 				}
-				request.data(nameValue.getName(), value);
+				request.data(parameterName, value);
 			}
 		}
 		//设置请求header
-		List<SpiderNameValue> headers = property.getHeaders();
+		List<Map<String,String>> headers = node.getListJsonValue(HEADER_NAME,HEADER_VALUE);
 		if(headers != null){
-			for (SpiderNameValue nameValue : headers) {
+			for (Map<String,String> nameValue : headers) {
 				Object value = null;
+				String headerName = nameValue.get(HEADER_NAME);
+				String headerValue = nameValue.get(HEADER_VALUE);
 				try {
-					value = engine.execute(nameValue.getValue(), variables);
-					context.log(String.format("设置请求Header:%s=%s", nameValue.getName(),value));
+					value = engine.execute(headerValue, variables);
+					context.log(String.format("设置请求Header:%s=%s", headerName,value));
 					if(logger.isDebugEnabled()){
-						logger.debug("设置请求Header：%s=%s",nameValue.getName(),value);
+						logger.debug("设置请求Header：%s=%s",headerName,value);
 					}
 				} catch (Exception e) {
-					context.log(String.format("设置请求Header:%s出错，异常信息：%s", nameValue.getName(),ExceptionUtils.getStackTrace(e)));
-					logger.error("设置请求Header：%s出错",nameValue.getName(),e);
+					context.log(String.format("设置请求Header:%s出错，异常信息：%s", headerName,ExceptionUtils.getStackTrace(e)));
+					logger.error("设置请求Header：%s出错",headerName,e);
 				}
-				request.header(nameValue.getName(),value);
+				request.header(headerName,value);
 			}
 		}
 		//设置代理
-		String proxy = property.getProxy();
+		String proxy = node.getStringJsonValue(PROXY);
 		if(proxy != null){
 			try {
 				proxy = engine.execute(proxy, variables).toString();
@@ -132,5 +150,4 @@ public class RequestExecutor implements Executor{
 			
 		}
 	}
-	
 }

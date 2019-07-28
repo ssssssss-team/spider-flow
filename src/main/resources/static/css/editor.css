@@ -13,7 +13,7 @@ html,body{
 }
 .main-container .sidebar-container{
 	position: absolute;
-	width : 60px;
+	width : 38px;
 	left : 0px;
 	top : 30px;
 	bottom:0px;
@@ -23,12 +23,14 @@ html,body{
 	z-index: 1;
 	border-radius: 2px;
 }
-.main-container .sidebar-container svg{
-	padding: 3px 6px;
-	margin : 2px 4px;
+.main-container .sidebar-container img{
+	padding: 5px;
+	margin : 2px;
 	border-radius: 3px;
+	width : 24px;
+	height : 24px;
 }
-.main-container .sidebar-container svg:hover{
+.main-container .sidebar-container img:hover{
 	background:#ccc;
 }
 .main-container .resize-container{
@@ -41,7 +43,7 @@ html,body{
 }
 .editor-container{
 	position: absolute;
-	left : 60px;
+	left : 38px;
 	right : 400px;
 	top : 30px;
 	bottom : 0px;
