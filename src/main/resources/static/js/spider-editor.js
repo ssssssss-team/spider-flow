@@ -130,7 +130,7 @@ SpiderEditor.prototype.addShape = function(shape,label,element,defaultAdd){
 		model.beginUpdate();
 		var cell;
 		try{
-			cell = _this.graph.insertVertex(parent, null, label, x, y, 32, 32,shape);
+			cell = _this.graph.insertVertex(parent, null, label, x, y, 24, 24,shape);
 			cell.data = new JsonProperty();
 			cell.data.set('shape',shape);
 		}finally{
@@ -145,7 +145,7 @@ SpiderEditor.prototype.addShape = function(shape,label,element,defaultAdd){
 		var model = this.graph.getModel();
 		model.beginUpdate();
 		try{
-			cell = this.graph.insertVertex(parent, null, label, 80, 80, 32, 32,shape);
+			cell = this.graph.insertVertex(parent, null, label, 80, 80, 24, 24,shape);
 			cell.data = new JsonProperty();
 			cell.data.set('shape',shape);
 		}finally{
@@ -181,6 +181,12 @@ SpiderEditor.prototype.getSelectedCell = function(){
 }
 SpiderEditor.prototype.getXML = function(){
 	return mxUtils.getPrettyXml(new mxCodec(mxUtils.createXmlDocument()).encode(this.graph.getModel()));
+}
+SpiderEditor.prototype.setXML = function(xml){
+	var doc = mxUtils.parseXml(xml);
+	var root = doc.documentElement;
+	var dec = new mxCodec(root.ownerDocument);
+	dec.decode(root,this.getModel());
 }
 SpiderEditor.prototype.importFromUrl = function(url){
 	var req = mxUtils.load(url);

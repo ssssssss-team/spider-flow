@@ -1,6 +1,26 @@
 var $ = layui.$;
 var editor;
 $(function(){
+	$.ctrl = function(key, callback, args) {
+	    var isCtrl = false;
+	    $(document).keydown(function(e) {
+	        if(!args) args=[];
+
+	        if(e.ctrlKey) isCtrl = true;
+	        if(e.keyCode == key.charCodeAt(0) && isCtrl) {
+	            callback.apply(this, args);
+	            return false;
+	        }
+	    }).keyup(function(e) {
+	        if(e.ctrlKey) isCtrl = false;
+	    });        
+	};
+	$.ctrl('S', function() {
+		Save();
+	});
+	$.ctrl('Q', function() {
+		$(".btn-test").click();
+	});
 	var resize = $('.resize-container')[0]
 	resize.onmousedown = function(e){
 	    var startX = e.clientX;
@@ -90,8 +110,6 @@ $(function(){
 				loadTemplate(cell,editor.getModel(),serializeForm);
 			}
 		});
-		//绑定快捷键事件
-		//bindKeyAction(editor);
 		//绑定工具条点击事件
 		bindToolbarClickAction(editor);
 		//加载图形
@@ -293,23 +311,16 @@ $(function(){
 			}
 		}
 	}
-	/**
-	 * 绑定快捷键事件
-	 */
-	function bindKeyAction(editor){
-		keyHandler.bindControlKey(83,function(){	// Ctrl+S
-			Save();
-		});
-		keyHandler.bindControlKey(81,function(){	// Ctrl+S
-			$(".btn-test").click();
-		});
-	}
 });
 
 /**
  * 绑定工具条点击事件
  */
 function bindToolbarClickAction(editor){
+	$(".xml-container textarea").bind('input propertychange',function(){
+		editor.setXML($(this).val());
+		editor.onSelectedCell();
+	})
 	$(".toolbar-container").on('click','.btn-delete',function(){
 		editor.deleteSelectCells();
 	}).on("click",".btn-selectAll",function(){
@@ -326,6 +337,15 @@ function bindToolbarClickAction(editor){
 		editor.execute('paste');
 	}).on('click',".btn-console-xml",function(){
 		console.log(editor.getXML());
+	}).on('click',".btn-edit-xml",function(){
+		$(".editor-container").hide();
+		$(".xml-container textarea").val(editor.getXML());
+		$(".xml-container").show();
+	}).on('click',".btn-graphical-xml",function(){
+		$(".editor-container").show();
+		$(".xml-container").hide();
+//		editor.setXML($(".xml-container textarea").val());
+//		editor.onSelectedCell();
 	}).on('click','.btn-test',function(){
 		layui.layer.open({
 			id : 'test-window',
