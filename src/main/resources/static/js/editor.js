@@ -9,6 +9,7 @@ $(function(){
 	        if(e.ctrlKey) isCtrl = true;
 	        if(e.keyCode == key.charCodeAt(0) && isCtrl) {
 	            callback.apply(this, args);
+	            isCtrl = false;
 	            return false;
 	        }
 	    }).keyup(function(e) {
