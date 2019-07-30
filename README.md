@@ -39,7 +39,8 @@
 > 服务器配置较低,如有卡顿请谅解
 
 ### 项目部分截图
-![爬虫测试](https://images.gitee.com/uploads/images/2019/0730/171455_bfe1a97b_1253940.gif "spider-test.gif")
+![GVP项目爬虫测试](https://images.gitee.com/uploads/images/2019/0730/171455_bfe1a97b_1253940.gif "spider-test.gif")
+![北京菜价爬虫测试](https://images.gitee.com/uploads/images/2019/0730/172647_3bce586e_1253940.gif "spider-food-price-test.gif")
 ![xml编辑](https://images.gitee.com/uploads/images/2019/0730/172123_c6df6982_1253940.png "xml-edit.png")
 ![爬虫列表](https://images.gitee.com/uploads/images/2019/0730/172152_64203e24_1253940.png "spider_list.png")
 ![数据展示](https://images.gitee.com/uploads/images/2019/0716/184618_21bce697_297689.png "demo-2.png")
