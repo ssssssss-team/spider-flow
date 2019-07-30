@@ -70,7 +70,7 @@ public class HttpRequest {
 	
 	public HttpRequest data(String key,Object value){
 		if(value != null){
-			return data(key,data.toString());
+			return data(key,value.toString());
 		}
 		return this;
 	}
@@ -114,6 +114,4 @@ public class HttpRequest {
 		Response response = connection.execute();
 		return new HttpResponse(response);
 	}
-	
-
 }

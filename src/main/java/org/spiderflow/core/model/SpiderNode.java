@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import com.alibaba.fastjson.JSONArray;
 
 /**
@@ -52,7 +54,11 @@ public class SpiderNode {
 	}
 
 	public String getStringJsonValue(String key){
-		return (String) this.jsonProperty.get(key);
+		String value = (String) this.jsonProperty.get(key);
+		if(value != null){
+			value = StringEscapeUtils.unescapeHtml4(value);
+		}
+		return value;
 	}
 	
 	public List<Map<String,String>> getListJsonValue(String ... keys){
@@ -73,7 +79,11 @@ public class SpiderNode {
 		for (int i = 0;i < size;i++) {
 			Map<String,String> item = new HashMap<>();
 			for (int j = 0; j < keys.length; j++) {
-				item.put(keys[j],arrays.get(j).getString(i));
+				String val = arrays.get(j).getString(i);
+				if(val != null){
+					val = StringEscapeUtils.unescapeHtml4(val);
+				}
+				item.put(keys[j],val);
 			}
 			result.add(item);
 		}

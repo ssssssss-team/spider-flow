@@ -71,7 +71,7 @@ public class RequestExecutor implements Executor{
 			ExceptionUtils.wrapAndThrow(e);
 		}
 		if(logger.isDebugEnabled()){
-			logger.debug("设置请求url:{}" + url);
+			logger.debug("设置请求url:{}" , url);
 		}
 		context.log(String.format("设置请求url:%s", url));
 		request.url(url);

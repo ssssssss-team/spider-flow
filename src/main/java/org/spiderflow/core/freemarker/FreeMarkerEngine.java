@@ -12,6 +12,7 @@ import org.spiderflow.core.freemarker.functions.FreemarkerTemplateMethodModel;
 import org.spiderflow.core.freemarker.functions.utils.Base64FunctionUtils;
 import org.spiderflow.core.freemarker.functions.utils.DateFunctionUtils;
 import org.spiderflow.core.freemarker.functions.utils.FileFunctionUtils;
+import org.spiderflow.core.freemarker.functions.utils.JsonFunctionUtils;
 import org.spiderflow.core.freemarker.functions.utils.ListFunctionUtils;
 import org.spiderflow.core.freemarker.functions.utils.RandomFunctionUtils;
 import org.spiderflow.core.freemarker.functions.utils.StringFunctionUtils;
@@ -88,6 +89,7 @@ public class FreeMarkerEngine {
 		configuration.setSharedVariable("math", model.get(Math.class.getName()));
 		configuration.setSharedVariable("url", model.get(UrlFunctionUtils.class.getName()));
 		configuration.setSharedVariable("file", model.get(FileFunctionUtils.class.getName()));
+		configuration.setSharedVariable("json", model.get(JsonFunctionUtils.class.getName()));
 	}
 	
 	public Object execute(String expression,Map<String,Object> variables){
