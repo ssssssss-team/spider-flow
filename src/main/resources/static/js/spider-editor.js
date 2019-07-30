@@ -22,6 +22,8 @@ function SpiderEditor(options){
 		this.graph.isHtmlLabel = function(cell){
 			return !this.isSwimlane(cell);
 		}
+		mxConstants.MIN_HOTSPOT_SIZE = 16;
+		mxGraphHandler.prototype.guidesEnabled = true
 		//注册json编码器
 		this.registerJsonCodec();
 		//配置样式
@@ -75,7 +77,7 @@ SpiderEditor.prototype.bindKeyAction = function(){
 SpiderEditor.prototype.configureStylesheet = function(){
 	var style = new Object();
 	style = this.graph.getStylesheet().getDefaultEdgeStyle();
-	style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
+	//style[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
 	style[mxConstants.STYLE_STROKECOLOR] = 'black';
 	style[mxConstants.STYLE_STROKEWIDTH] = '2';
 	style = this.graph.getStylesheet().getDefaultVertexStyle();
@@ -138,7 +140,11 @@ SpiderEditor.prototype.addShape = function(shape,label,element,defaultAdd){
 		}
 		_this.graph.setSelectionCell(cell);
 	}
-	var ds = mxUtils.makeDraggable(element, this.graph, funct, null, 0, 0, true, true);
+	var dragElt = document.createElement('div');
+	dragElt.style.border = 'dashed black 1px';
+	dragElt.style.width = '24px';
+	dragElt.style.height = '24px';
+	var ds = mxUtils.makeDraggable(element, this.graph, funct, dragElt, 0, 0, true, true);
 	ds.setGuidesEnabled(true);
 	if(defaultAdd){
 		var parent = this.graph.getDefaultParent();
