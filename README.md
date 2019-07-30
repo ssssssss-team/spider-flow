@@ -39,7 +39,7 @@
 > 服务器配置较低,如有卡顿请谅解
 
 ### 项目部分截图
-![gif1](https://images.gitee.com/uploads/images/2019/0716/184746_b4b350c7_297689.gif "animate.gif")
+![gif1](https://images.gitee.com/uploads/images/2019/0730/171455_bfe1a97b_1253940.gif "spider-test.gif")
 ![png1](https://images.gitee.com/uploads/images/2019/0716/184606_0aca457c_297689.png "demo-1.png")
 ![png2](https://images.gitee.com/uploads/images/2019/0716/184618_21bce697_297689.png "demo-2.png")
 ![png3](https://images.gitee.com/uploads/images/2019/0722/104134_03c7c8a9_1324601.png "demo-3.png")
