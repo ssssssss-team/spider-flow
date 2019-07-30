@@ -2,8 +2,9 @@
 
 #### 介绍
 新一代爬虫平台，以图形化方式定义爬虫流程，不写代码即可完成爬虫。
+>  **QQ交流群：720832964** 
 
-#### demo
+#### DEMO
 - 妹子图（感谢网友提供）
 - 北京菜价（感谢网友提供）
 - GVP项目
@@ -44,5 +45,3 @@
 ![xml编辑](https://images.gitee.com/uploads/images/2019/0730/172123_c6df6982_1253940.png "xml-edit.png")
 ![爬虫列表](https://images.gitee.com/uploads/images/2019/0730/172152_64203e24_1253940.png "spider_list.png")
 ![数据展示](https://images.gitee.com/uploads/images/2019/0716/184618_21bce697_297689.png "demo-2.png")
-
->  **QQ交流群：720832964** 
