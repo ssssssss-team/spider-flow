@@ -40,7 +40,8 @@
 
 ### 项目部分截图
 ![爬虫测试](https://images.gitee.com/uploads/images/2019/0730/171455_bfe1a97b_1253940.gif "spider-test.gif")
-![png2](https://images.gitee.com/uploads/images/2019/0716/184618_21bce697_297689.png "demo-2.png")
-![png3](https://images.gitee.com/uploads/images/2019/0722/104134_03c7c8a9_1324601.png "demo-3.png")
+![xml编辑](https://images.gitee.com/uploads/images/2019/0730/172123_c6df6982_1253940.png "xml-edit.png")
+![爬虫列表](https://images.gitee.com/uploads/images/2019/0730/172152_64203e24_1253940.png "spider_list.png")
+![数据展示](https://images.gitee.com/uploads/images/2019/0716/184618_21bce697_297689.png "demo-2.png")
 
 >  **QQ交流群：720832964** 
