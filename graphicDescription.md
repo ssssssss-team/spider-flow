@@ -7,6 +7,6 @@
 | ![DB数据源](https://images.gitee.com/uploads/images/2019/0731/112459_17d373de_1324601.png "DB数据源.png")   | DB数据源   |
 | ![执行sql](https://images.gitee.com/uploads/images/2019/0731/112529_9c0ce7a8_1324601.png "执行sql.png")   | 执行SQL   |
 | ![子线程](https://images.gitee.com/uploads/images/2019/0731/112617_0ad53fe1_1324601.png "子线程.png")   | 子线程   |
-| ![reids](https://images.gitee.com/uploads/images/2019/0731/112724_c76e77f8_1324601.png "redis.png")  | redis   |
-| ![mongodb](https://images.gitee.com/uploads/images/2019/0731/112743_62ffb246_1324601.png "mongodb.png")   | mongodb|
+| ![reids](https://images.gitee.com/uploads/images/2019/0731/112724_c76e77f8_1324601.png "redis.png")  | redis缓存  |
+| ![mongodb](https://images.gitee.com/uploads/images/2019/0731/112743_62ffb246_1324601.png "mongodb.png")   | mongodb数据库|
 | ![oss](https://images.gitee.com/uploads/images/2019/0731/112802_ddee905e_1324601.png "oss.png")   | oss   |
