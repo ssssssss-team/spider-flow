@@ -5,15 +5,14 @@ $(function(){
 	    var isCtrl = false;
 	    $(document).keydown(function(e) {
 	        if(!args) args=[];
-
-	        if(e.ctrlKey) isCtrl = true;
+	        if(e.keyCode == 17) isCtrl = true;
 	        if(e.keyCode == key.charCodeAt(0) && isCtrl) {
 	            callback.apply(this, args);
 	            isCtrl = false;
 	            return false;
 	        }
 	    }).keyup(function(e) {
-	        if(e.ctrlKey) isCtrl = false;
+	        if(e.keyCode == 17) isCtrl = false;
 	    });        
 	};
 	$.ctrl('S', function() {
