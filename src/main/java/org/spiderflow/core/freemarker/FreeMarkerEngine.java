@@ -76,6 +76,9 @@ public class FreeMarkerEngine {
 		ObjectWrapper wrapper = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_28).build();
 		builder.setOuterIdentity((obj)->{
 			threadLocal.set(new FreemarkerObject(obj));
+			if(obj instanceof List){
+				return null;
+			}
 			return wrapper.wrap(obj);
 		});
 		BeansWrapper beansWrapper = builder.build();

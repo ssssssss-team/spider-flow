@@ -22,6 +22,7 @@ public class RegxFunction extends FreemarkerTemplateMethodModel{
 			if (args.get(0) != null && args.get(1) != null) {
 		        String content = getStringValue(args.get(0));
 		        String pattern = getStringValue(args.get(1));
+		        System.out.println(content);
 		        return ExtractUtils.getFirstMatcher(content, pattern, true);
 	        }
 		}
