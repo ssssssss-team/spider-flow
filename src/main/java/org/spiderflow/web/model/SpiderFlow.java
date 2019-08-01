@@ -33,6 +33,17 @@ public class SpiderFlow {
 	private Date nextExecuteTime;
 	
 	private Integer executeCount;
+	
+	
+	public SpiderFlow() {
+		super();
+	}
+
+	public SpiderFlow(String id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
 
 	public String getId() {
 		return id;

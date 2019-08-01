@@ -1,6 +1,7 @@
 <div class="layui-tab layui-tab-fixed layui-tab-brief">
   <ul class="layui-tab-title">
     <li class="layui-this">全局配置</li>
+    <li>全局参数</li>
     <li>全局Header</li>
   </ul>
   <div class="layui-tab-content editor-form-node">
@@ -12,7 +13,38 @@
     				<input type="text" name="spiderName" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input" value="{{d.data.object.spiderName || '未定义名称'}}">
     			</div>
     		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">线程数</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="threadCount" placeholder="请输入线程数" autocomplete="off" class="layui-input" value="{{=d.data.object.threadCount}}">
+    			</div>
+    		</div>
     	</form>
+    </div>
+    <div class="layui-tab-item">
+   		<form class="layui-form">
+	    	{{# layui.each(d.data.object['parameter-name'],function(index){ }}
+	    		<div class="layui-form-item layui-form-relative">
+	    			<i class="layui-icon layui-icon-close header-remove"></i>  
+	    			<label class="layui-form-label">参数名</label>
+	    			<div class="layui-input-block">
+	    				<input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array" value="{{=d.data.object['parameter-name'][index]}}">
+	    			</div>
+	    		</div>
+	    		<div class="layui-form-item">
+	    			<label class="layui-form-label">参数值</label>
+	    			<div class="layui-input-block">
+	    				<input type="text" name="parameter-value" placeholder="请输入参数值" autocomplete="off" class="layui-input array" value="{{=d.data.object['parameter-value'][index]}}">
+	    			</div>
+	    		</div>
+	    		<hr>
+	   		{{# }) }}
+	   		<div class="layui-form-item">
+	   			<div class="layui-input-block">
+	    			<button class="layui-btn parameter-add" type="button">添加一个参数</button>
+	    		</div>
+	    	</div>
+	    </form>
     </div>
     <div class="layui-tab-item">
    		<form class="layui-form">

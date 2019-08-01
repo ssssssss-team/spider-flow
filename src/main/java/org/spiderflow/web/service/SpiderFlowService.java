@@ -112,5 +112,13 @@ public class SpiderFlowService {
 	public SpiderFlow get(String id){
 		return repository.getOne(id);
 	}
+	
+	public List<SpiderFlow> selectOtherFlows(String id){
+		return repository.selectOtherFlows(id);
+	}
+	
+	public List<SpiderFlow> selectFlows(){
+		return repository.selectFlows();
+	}
 
 }

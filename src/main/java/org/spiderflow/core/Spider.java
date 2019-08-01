@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.context.SpiderContext;
@@ -44,18 +45,28 @@ public class Spider {
 	public void run(SpiderFlow spiderFlow){
 		SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
 		SpiderContext context = new SpiderContext();
-		execute(8,null,root, context,new HashMap<>());
+		executeRoot(root, context);
 	}
 	
 	public List<SpiderOutput> runWithTest(SpiderNode root,SpiderContext context){
 		//开始不允许设置任何东西
-		execute(8,null,root, context,new HashMap<>());
+		executeRoot(root, context);
 		context.log("测试完毕！");
 		return context.getOutputs();
 	}
 	
-	private void execute(int nThreads,SpiderNode fromNode,SpiderNode node,SpiderContext context,Map<String,Object> variables){
+	private void executeRoot(SpiderNode root,SpiderContext context){
+		int nThreads = NumberUtils.toInt(root.getStringJsonValue(Executor.THREAD_COUNT), 8);
 		ThreadPool pool = ThreadPool.create(nThreads);
+		context.setRootNode(root);
+		context.setThreadPool(pool);
+		executeNode(pool,null,root,context,new HashMap<>());
+		pool.shutdown();
+	}
+	
+	public void execute(int nThreads,SpiderNode fromNode,SpiderNode node,SpiderContext context,Map<String,Object> variables){
+		ThreadPool pool = ThreadPool.create(nThreads);
+		context.setThreadPool(pool);
 		executeNode(pool,fromNode,node,context,variables);
 		pool.shutdown();
 	}
@@ -69,7 +80,12 @@ public class Spider {
 		}
 	}
 	
-	private void executeNode(ThreadPool pool,SpiderNode fromNode,SpiderNode node,SpiderContext context,Map<String,Object> variables){
+	public void executeNode(ThreadPool pool,SpiderNode fromNode,SpiderNode node,SpiderContext context,Map<String,Object> variables){
+		String shape = node.getStringJsonValue("shape");
+		if(StringUtils.isBlank(shape)){
+			executeaNextNodes(pool, node, context, variables);
+			return;
+		}
 		if(!executeCondition(fromNode,node,context,variables)){
 			return;
 		}
@@ -90,7 +106,6 @@ public class Spider {
 			}
 		}
 		if(loopCount > 0){
-			String shape = node.getStringJsonValue("shape");
 			String loopVariableName = node.getStringJsonValue(Executor.LOOP_VARIABLE_NAME);
 			for (Executor executor : executors) {
 				if(executor.supportShape().equals(shape)){

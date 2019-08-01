@@ -1,5 +1,8 @@
 package org.spiderflow.web.controller;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.web.model.SpiderFlow;
 import org.spiderflow.web.service.SpiderFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,14 @@ public class SpiderFlowController {
 	@RequestMapping("/get")
 	public SpiderFlow get(String id){
 		return spiderFlowService.get(id);
+	}
+	
+	@RequestMapping("/other")
+	public List<SpiderFlow> other(String id){
+		if(StringUtils.isBlank(id)){
+			return spiderFlowService.selectFlows();
+		}
+		return spiderFlowService.selectOtherFlows(id);
 	}
 	
 	@RequestMapping("/remove")

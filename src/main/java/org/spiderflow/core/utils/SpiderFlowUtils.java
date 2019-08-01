@@ -22,6 +22,7 @@ public class SpiderFlowUtils {
 		Elements cells = document.getElementsByTag("mxCell");
 		Map<String,SpiderNode> nodeMap = new HashMap<>();
 		SpiderNode root = null;
+		SpiderNode firstNode = null;
 		Map<String,Map<String,String>> edgeMap = new HashMap<>();
 		for (Element element : cells) {
 			Map<String, Object> jsonProperty = getSpiderFlowJsonProperty(element);
@@ -38,6 +39,9 @@ public class SpiderFlowUtils {
 					root = node;
 				}
 			}
+			if("0".equals(nodeId)){
+				firstNode = node;
+			}
 		}
 		//处理连线
 		Set<String> edges = edgeMap.keySet();
@@ -52,7 +56,8 @@ public class SpiderFlowUtils {
 				sourceNode.addNextNode(targetNode);
 			}
 		}
-		return root;
+		firstNode.addNextNode(root);
+		return firstNode;
 	}
 	
 	/**

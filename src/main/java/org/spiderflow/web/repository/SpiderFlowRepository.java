@@ -1,6 +1,7 @@
 package org.spiderflow.web.repository;
 
 import java.util.Date;
+import java.util.List;
 
 import org.spiderflow.web.model.SpiderFlow;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,4 +33,10 @@ public interface SpiderFlowRepository extends JpaRepository<SpiderFlow, String>{
 	@Modifying
 	@Query(value = "update sp_flow set enabled = ?2 where id = ?1",nativeQuery = true)
 	public int resetSpiderStatus(String id,String enabled);
+	
+	@Query(value = "select new SpiderFlow(id,name) from SpiderFlow")
+	public List<SpiderFlow> selectFlows();
+	
+	@Query(value = "select new SpiderFlow(id,name) from SpiderFlow where id != ?1")
+	public List<SpiderFlow> selectOtherFlows(String id);
 }

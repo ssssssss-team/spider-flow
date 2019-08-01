@@ -7,7 +7,9 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.spiderflow.core.model.SpiderNode;
 import org.spiderflow.core.model.SpiderOutput;
+import org.spiderflow.core.utils.ThreadPool;
 /**
  * 爬虫上下文集合
  * @author jmxd
@@ -24,6 +26,10 @@ public class SpiderContext extends HashMap<String, Object>{
 	 * 数据源集合
 	 */
 	private Map<String,DataSource> datasources = new HashMap<>();
+	
+	private ThreadPool threadPool;
+	
+	private SpiderNode rootNode;
 	
 	public List<SpiderOutput> getOutputs() {
 		return outputs;
@@ -45,6 +51,23 @@ public class SpiderContext extends HashMap<String, Object>{
 		this.outputs.add(output);
 	}
 	
+	
+	public ThreadPool getThreadPool() {
+		return threadPool;
+	}
+
+	public void setThreadPool(ThreadPool threadPool) {
+		this.threadPool = threadPool;
+	}
+	
+	public SpiderNode getRootNode() {
+		return rootNode;
+	}
+
+	public void setRootNode(SpiderNode rootNode) {
+		this.rootNode = rootNode;
+	}
+
 	public void log(String message){
 		
 	}

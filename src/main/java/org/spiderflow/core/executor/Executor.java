@@ -15,6 +15,8 @@ public interface Executor {
 	
 	public static final String LOOP_COUNT = "loopCount";
 	
+	public static final String THREAD_COUNT = "threadCount";
+	
 	/**
 	 * 节点形状
 	 * @return 节点形状名称

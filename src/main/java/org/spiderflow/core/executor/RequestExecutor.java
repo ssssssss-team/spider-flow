@@ -60,7 +60,6 @@ public class RequestExecutor implements Executor{
 		}
 		HttpRequest request = HttpRequest.create();
 		
-		List<Map<String, String>> parameters = node.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE);
 		//设置请求url
 		String url = null;
 		try {
@@ -82,45 +81,13 @@ public class RequestExecutor implements Executor{
 			logger.debug("设置请求方法:{}" + method);
 		}
 		context.log(String.format("设置请求方法:%s", method));
+		SpiderNode root = context.getRootNode();
 		//设置请求参数
-		if(parameters != null){
-			for (Map<String,String> nameValue : parameters) {
-				Object value = null;
-				String parameterName = nameValue.get(PARAMETER_NAME);
-				String parameterValue = nameValue.get(PARAMETER_VALUE);
-				try {
-					value = engine.execute(parameterValue, variables);
-					context.log(String.format("设置请求参数:%s=%s", parameterName,value));
-					if(logger.isDebugEnabled()){
-						logger.debug("设置请求参数：%s=%s",parameterName,value);
-					}
-				} catch (Exception e) {
-					context.log(String.format("设置请求参数:%s出错，异常信息：%s", parameterName,ExceptionUtils.getStackTrace(e)));
-					logger.error("设置请求参数：%s出错",parameterName,e);
-				}
-				request.data(parameterName, value);
-			}
-		}
+		setRequestParameter(request,root.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
+		setRequestParameter(request,node.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE),context,variables);
 		//设置请求header
-		List<Map<String,String>> headers = node.getListJsonValue(HEADER_NAME,HEADER_VALUE);
-		if(headers != null){
-			for (Map<String,String> nameValue : headers) {
-				Object value = null;
-				String headerName = nameValue.get(HEADER_NAME);
-				String headerValue = nameValue.get(HEADER_VALUE);
-				try {
-					value = engine.execute(headerValue, variables);
-					context.log(String.format("设置请求Header:%s=%s", headerName,value));
-					if(logger.isDebugEnabled()){
-						logger.debug("设置请求Header：%s=%s",headerName,value);
-					}
-				} catch (Exception e) {
-					context.log(String.format("设置请求Header:%s出错，异常信息：%s", headerName,ExceptionUtils.getStackTrace(e)));
-					logger.error("设置请求Header：%s出错",headerName,e);
-				}
-				request.header(headerName,value);
-			}
-		}
+		setRequestHeader(request, root.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
+		setRequestHeader(request, node.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
 		//设置代理
 		String proxy = node.getStringJsonValue(PROXY);
 		if(proxy != null){
@@ -148,6 +115,48 @@ public class RequestExecutor implements Executor{
 			context.log(String.format("请求%s出错,异常信息:%s", url,ExceptionUtils.getStackTrace(e)));
 			ExceptionUtils.wrapAndThrow(e);
 			
+		}
+	}
+	
+	private void setRequestParameter(HttpRequest request,List<Map<String, String>> parameters,SpiderContext context,Map<String,Object> variables){
+		if(parameters != null){
+			for (Map<String,String> nameValue : parameters) {
+				Object value = null;
+				String parameterName = nameValue.get(PARAMETER_NAME);
+				String parameterValue = nameValue.get(PARAMETER_VALUE);
+				try {
+					value = engine.execute(parameterValue, variables);
+					context.log(String.format("设置请求参数:%s=%s", parameterName,value));
+					if(logger.isDebugEnabled()){
+						logger.debug("设置请求参数：%s=%s",parameterName,value);
+					}
+				} catch (Exception e) {
+					context.log(String.format("设置请求参数:%s出错，异常信息：%s", parameterName,ExceptionUtils.getStackTrace(e)));
+					logger.error("设置请求参数：%s出错",parameterName,e);
+				}
+				request.data(parameterName, value);
+			}
+		}
+	}
+	
+	private void setRequestHeader(HttpRequest request,List<Map<String, String>> headers,SpiderContext context,Map<String,Object> variables){
+		if(headers != null){
+			for (Map<String,String> nameValue : headers) {
+				Object value = null;
+				String headerName = nameValue.get(HEADER_NAME);
+				String headerValue = nameValue.get(HEADER_VALUE);
+				try {
+					value = engine.execute(headerValue, variables);
+					context.log(String.format("设置请求Header:%s=%s", headerName,value));
+					if(logger.isDebugEnabled()){
+						logger.debug("设置请求Header：%s=%s",headerName,value);
+					}
+				} catch (Exception e) {
+					context.log(String.format("设置请求Header:%s出错，异常信息：%s", headerName,ExceptionUtils.getStackTrace(e)));
+					logger.error("设置请求Header：%s出错",headerName,e);
+				}
+				request.header(headerName,value);
+			}
 		}
 	}
 }
