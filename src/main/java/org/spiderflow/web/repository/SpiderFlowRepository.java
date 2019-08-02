@@ -8,6 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+/**
+ * 爬虫资源库 实现爬虫的入库
+ * @author Administrator
+ *
+ */
 public interface SpiderFlowRepository extends JpaRepository<SpiderFlow, String>{
 
 	@Modifying

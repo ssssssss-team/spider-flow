@@ -15,8 +15,18 @@ import org.springframework.util.CollectionUtils;
 
 import com.alibaba.fastjson.JSON;
 
+/**
+ * 爬虫流程图工具类
+ * @author jmxd
+ *
+ */
 public class SpiderFlowUtils {
 	
+	/**
+	 * 加载流程图
+	 * @param xmlString string类型保存的XML流程图
+	 * @return SpiderNode 爬虫的开始节点
+	 */
 	public static SpiderNode loadXMLFromString(String xmlString){
 		Document document = Jsoup.parse(xmlString);
 		Elements cells = document.getElementsByTag("mxCell");

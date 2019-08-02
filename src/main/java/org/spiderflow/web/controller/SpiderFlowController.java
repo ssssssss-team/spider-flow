@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 爬虫Controller
+ * @author Administrator
+ *
+ */
 @RestController
 @RequestMapping("/spider")
 public class SpiderFlowController {
@@ -21,6 +26,12 @@ public class SpiderFlowController {
 	@Autowired
 	private SpiderFlowService spiderFlowService;
 	
+	/**
+	 * 爬虫列表
+	 * @param page 页数
+	 * @param size 每页显示条数
+	 * @return Page<SpiderFlow> 所有爬虫的列表页
+	 */
 	@RequestMapping("/list")
 	public Page<SpiderFlow> list(@RequestParam(name = "page",defaultValue = "1")Integer page,@RequestParam(name = "limit",defaultValue = "1")Integer size){
 		return spiderFlowService.findAll(PageRequest.of(page - 1, size,new Sort(Direction.DESC,"createDate")));

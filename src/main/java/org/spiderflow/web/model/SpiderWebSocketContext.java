@@ -11,6 +11,11 @@ import org.spiderflow.core.model.SpiderOutput;
 
 import com.alibaba.fastjson.JSON;
 
+/**
+ * WebSocket通讯中爬虫的上下文域
+ * @author Administrator
+ *
+ */
 public class SpiderWebSocketContext extends SpiderContext{
 
 	private static final long serialVersionUID = -1205530535069540245L;

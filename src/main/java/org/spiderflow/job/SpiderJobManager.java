@@ -16,6 +16,11 @@ import org.spiderflow.web.model.SpiderFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * 爬虫定时执行管理
+ * @author Administrator
+ *
+ */
 @Component
 public class SpiderJobManager {
 	
@@ -25,6 +30,9 @@ public class SpiderJobManager {
 	
 	public final static String JOB_PARAM_NAME = "SPIDER_FLOW";
 	
+	/**
+	 * 调度器
+	 */
 	@Autowired
 	private Scheduler scheduler;
 	
@@ -32,6 +40,11 @@ public class SpiderJobManager {
 		return JobKey.jobKey(JOB_NAME + id);
 	}
 	
+	/**
+	 * 获取定时任务触发器Cron
+	 * @param id CronTrigger的ID
+	 * @return CronTrigger触发器
+	 */
 	public CronTrigger getCronTrigger(String id) {
         try {
             return (CronTrigger) scheduler.getTrigger(getTriggerKey(id));
@@ -45,6 +58,11 @@ public class SpiderJobManager {
 		return TriggerKey.triggerKey(JOB_NAME + id);
 	}
 	
+	/**
+	 * 新建定时任务
+	 * @param spiderFlow 爬虫流程图
+	 * @return boolean true/false
+	 */
 	public boolean addJob(SpiderFlow spiderFlow){
 		try {
 			JobDetail job = JobBuilder.newJob(SpiderJob.class).withIdentity(getJobKey(spiderFlow.getId())).build();

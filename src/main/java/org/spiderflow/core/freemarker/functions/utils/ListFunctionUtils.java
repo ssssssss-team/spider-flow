@@ -1,8 +1,8 @@
 package org.spiderflow.core.freemarker.functions.utils;
 
 import java.util.ArrayList;
-
 import java.util.List;
+
 /**
  * List 工具类 防止NPE 添加了类似python的split()方法 
  * @author Administrator

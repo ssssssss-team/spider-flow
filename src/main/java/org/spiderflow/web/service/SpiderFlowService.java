@@ -20,6 +20,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+/**
+ * 爬虫流程执行服务
+ * @author Administrator
+ *
+ */
 @Service
 public class SpiderFlowService {
 	
@@ -51,6 +56,12 @@ public class SpiderFlowService {
 	public int executeCountIncrement(String id, Date lastExecuteTime, Date nextExecuteTime){
 		return repository.executeCountIncrement(id, lastExecuteTime, nextExecuteTime);
 	}
+	
+	/**
+	 * 重置定时任务
+	 * @param id 爬虫的ID
+	 * @param cron 定时器
+	 */
 	@Transactional
 	public void resetCornExpression(String id, String cron){
 		CronTrigger trigger = TriggerBuilder.newTrigger()
