@@ -19,6 +19,20 @@
 - 北京菜价（感谢网友提供）
 - GVP项目
 
+### 项目结构
+```
+org.spiderflow
+├── core -- 模版
+|    ├── context
+|    ├── executor -- 图像解析
+|    ├── freemarker -- 内置函数
+|    ├── io -- http请求
+|    ├── model -- 实体类
+|    ├── utils -- 项目工具
+├── job -- 定时执行
+├── web -- 页面层
+```
+
 #### 特性
 - [x] 支持css选择器、正则提取
 - [x] 支持JSON/XML格式
