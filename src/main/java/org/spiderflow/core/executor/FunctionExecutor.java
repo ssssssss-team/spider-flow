@@ -12,6 +12,11 @@ import org.spiderflow.core.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * 函数执行器
+ * @author Administrator
+ *
+ */
 @Component
 public class FunctionExecutor implements Executor{
 	

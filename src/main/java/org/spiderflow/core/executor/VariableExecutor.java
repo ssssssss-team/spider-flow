@@ -12,6 +12,11 @@ import org.spiderflow.core.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * 定义变量执行器
+ * @author Administrator
+ *
+ */
 @Component
 public class VariableExecutor implements Executor{
 	

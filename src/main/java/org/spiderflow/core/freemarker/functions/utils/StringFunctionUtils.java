@@ -6,6 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * String 工具类 防止NPE 
+ * @author Administrator
+ *
+ */
 public class StringFunctionUtils {
 
 	public static String substring(String content, int beginIndex) {
@@ -80,6 +85,10 @@ public class StringFunctionUtils {
 		}
 	}
 	
+	/**
+	 * 生成UUID
+	 * @return String UUID
+	 */
 	public static String uuid() {
 		return UUID.randomUUID().toString().replace("-", "");
 	}

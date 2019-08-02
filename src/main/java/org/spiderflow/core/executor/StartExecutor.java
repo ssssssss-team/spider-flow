@@ -6,6 +6,11 @@ import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.model.SpiderNode;
 import org.springframework.stereotype.Component;
 
+/**
+ * 开始执行器
+ * @author Administrator
+ *
+ */
 @Component
 public class StartExecutor implements Executor{
 

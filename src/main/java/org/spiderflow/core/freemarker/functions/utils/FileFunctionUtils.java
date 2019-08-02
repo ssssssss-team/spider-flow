@@ -8,8 +8,19 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
 
+/**
+ * 文件读写 工具类 防止NPE 
+ * @author Administrator
+ *
+ */
 public class FileFunctionUtils {
 	
+	/**
+	 * 
+	 * @param path 文件路径/名
+	 * @param createDirectory 是否需要创建
+	 * @return File 文件
+	 */
 	private static File getFile(String path,boolean createDirectory){
 		File f = new File(path);
 		if(createDirectory&&!f.getParentFile().exists()){

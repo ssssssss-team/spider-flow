@@ -1,14 +1,25 @@
 package org.spiderflow.core.freemarker.functions.utils;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import java.util.List;
+/**
+ * List 工具类 防止NPE 添加了类似python的split()方法 
+ * @author Administrator
+ *
+ */
 public class ListFunctionUtils {
 
 	public static int length(List<?> list){
 		return list != null ? list.size() : 0;
 	}
 	
+	/**
+	 * 
+	 * @param list 原List
+	 * @param len 按多长进行分割
+	 * @return List<List<?>> 分割后的数组
+	 */
 	public static List<List<?>> split(List<?> list,int len){
 		List<List<?>> result = new ArrayList<>();
 		if (list == null || list.size() == 0 || len < 1) {
