@@ -75,7 +75,9 @@ public class FreeMarkerEngine {
 		BeansWrapperBuilder builder = new BeansWrapperBuilder(Configuration.VERSION_2_3_28);
 		ObjectWrapper wrapper = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_28).build();
 		builder.setOuterIdentity((obj)->{
-			threadLocal.set(new FreemarkerObject(obj));
+			if(!(obj instanceof String)){
+				threadLocal.set(new FreemarkerObject(obj));
+			}
 			if(obj instanceof List){
 				return null;
 			}
@@ -101,10 +103,10 @@ public class FreeMarkerEngine {
 			Template template = new Template(expression, new StringReader(expression),configuration);
 			template.process(variables, out);
 			FreemarkerObject object = threadLocal.get();
+			String value = out.toString();
 			if(object != null){
 				return object.getValue();
 			}
-			String value = out.toString();
 			if(ExtractUtils.isNumber(value)){
 				BigDecimal decimal = new BigDecimal(value);
 				if(value.contains(".")){
