@@ -3,6 +3,7 @@ package org.spiderflow.core;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -138,13 +139,14 @@ public class Spider {
 			if(StringUtils.isNotBlank(condition)){	//判断是否有条件
 				Object result = engine.execute(condition, variables);
 				if(result != null){
-					boolean isContinue = "true".equals(result);
+					boolean isContinue = "true".equals(result) || Objects.equals(result, true);
 					if(logger.isDebugEnabled()){
 						logger.debug("判断{}={}",condition,isContinue);
 					}
 					context.log(String.format("判断%s=%s",condition,isContinue));
 					return isContinue;
 				}
+				return false;
 			}
 		}
 		return true;
