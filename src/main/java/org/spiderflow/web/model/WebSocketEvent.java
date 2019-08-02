@@ -1,5 +1,11 @@
 package org.spiderflow.web.model;
 
+/**
+ * WebSocket事件
+ * @author Administrator
+ *
+ * @param <T>
+ */
 public class WebSocketEvent<T> {
 	
 	private String eventType;

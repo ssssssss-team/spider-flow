@@ -9,6 +9,11 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+/**
+ * 爬虫持久化实体类
+ * @author Administrator
+ *
+ */
 @Entity
 @Table(name = "sp_flow")
 public class SpiderFlow {
@@ -18,10 +23,16 @@ public class SpiderFlow {
 	@GeneratedValue(generator = "uuidGenerator")
 	private String id;
 	
+	/**
+	 * 定时任务表达式
+	 */
 	private String cron;
 	
 	private String name;
 	
+	/**
+	 * xml流程图
+	 */
 	private String xml;
 	
 	private String enabled;
@@ -32,6 +43,9 @@ public class SpiderFlow {
 	
 	private Date nextExecuteTime;
 	
+	/**
+	 * 定时执行的执行次数
+	 */
 	private Integer executeCount;
 	
 	

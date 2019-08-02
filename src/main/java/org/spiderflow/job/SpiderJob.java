@@ -16,6 +16,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
+/**
+ * 爬虫定时执行
+ * @author Administrator
+ *
+ */
 @Component
 public class SpiderJob extends QuartzJobBean{
 	

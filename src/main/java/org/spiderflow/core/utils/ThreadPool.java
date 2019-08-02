@@ -5,6 +5,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 线程池
+ * @author Administrator
+ *
+ */
 public class ThreadPool implements Runnable{
 	
 	private ThreadPoolExecutor executor;
