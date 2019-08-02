@@ -10,8 +10,9 @@ import org.spiderflow.core.context.SpiderContext;
 import org.spiderflow.core.model.SpiderNode;
 import org.spiderflow.core.utils.DataSourceUtils;
 import org.springframework.stereotype.Component;
+
 /**
- * 数据源执行器
+ * 定义数据源执行器
  * @author jmxd
  *
  */

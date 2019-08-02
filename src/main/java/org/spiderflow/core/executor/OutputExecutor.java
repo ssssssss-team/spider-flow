@@ -13,6 +13,11 @@ import org.spiderflow.core.model.SpiderOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * 输出执行器
+ * @author Administrator
+ *
+ */
 @Component
 public class OutputExecutor implements Executor{
 	

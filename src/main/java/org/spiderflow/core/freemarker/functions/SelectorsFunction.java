@@ -9,6 +9,11 @@ import org.springframework.stereotype.Component;
 
 import freemarker.template.TemplateModelException;
 
+/**
+ * 封装多个选择器(Selector)的选择器(Freemarker)方法类
+ * @author Administrator
+ *
+ */
 @Component
 public class SelectorsFunction extends FreemarkerTemplateMethodModel{
 

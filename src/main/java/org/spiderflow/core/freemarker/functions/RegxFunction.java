@@ -7,6 +7,11 @@ import org.springframework.stereotype.Component;
 
 import freemarker.template.TemplateModelException;
 
+/**
+ * 封装正则表达式的选择器方法类
+ * @author Administrator
+ *
+ */
 @Component
 public class RegxFunction extends FreemarkerTemplateMethodModel{
 

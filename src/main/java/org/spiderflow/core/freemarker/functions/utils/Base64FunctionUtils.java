@@ -2,6 +2,11 @@ package org.spiderflow.core.freemarker.functions.utils;
 
 import org.apache.commons.codec.binary.Base64;
 
+/**
+ * 字符串内容和Base64互相转换 工具类 防止NPE
+ * @author Administrator
+ *
+ */
 public class Base64FunctionUtils {
 	
 	public static String encode(byte[] bytes){

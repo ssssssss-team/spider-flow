@@ -5,6 +5,11 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
+/**
+ * url 按指定字符集进行编码/解码 默认字符集(UTF-8) 工具类 防止NPE 
+ * @author Administrator
+ *
+ */
 public class UrlFunctionUtils {
 	
 	public static String encode(String url){

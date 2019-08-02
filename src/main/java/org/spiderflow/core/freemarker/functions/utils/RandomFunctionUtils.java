@@ -2,6 +2,11 @@ package org.spiderflow.core.freemarker.functions.utils;
 
 import org.apache.commons.lang3.RandomUtils;
 
+/**
+ * 随机数/字符串 生成方法 
+ * @author Administrator
+ *
+ */
 public class RandomFunctionUtils {
 	
 	public static int randomInt(int min,int max){
@@ -16,6 +21,12 @@ public class RandomFunctionUtils {
 		return RandomUtils.nextLong(min, max);
 	}
 	
+	/**
+	 * 
+	 * @param chars 字符个数
+	 * @param length 字符范围
+	 * @return String 随机字符串
+	 */
 	public static String string(String chars,int length){
 		if (chars != null) {
 			char[] newChars = new char[length];

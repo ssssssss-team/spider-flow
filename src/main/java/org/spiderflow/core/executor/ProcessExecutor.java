@@ -15,6 +15,11 @@ import org.spiderflow.web.service.SpiderFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * 子流程执行器
+ * @author Administrator
+ *
+ */
 @Component
 public class ProcessExecutor implements Executor{
 	

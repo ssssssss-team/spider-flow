@@ -11,6 +11,11 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 
+/**
+ * 请求对象包装类
+ * @author Administrator
+ *
+ */
 public class HttpRequest {
 	
 	private String url;

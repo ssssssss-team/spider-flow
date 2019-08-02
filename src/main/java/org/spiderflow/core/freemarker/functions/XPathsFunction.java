@@ -9,6 +9,11 @@ import org.springframework.stereotype.Component;
 
 import freemarker.template.TemplateModelException;
 
+/**
+ * 封装多个路径表达式(XML路径语言)的选择器方法类
+ * @author Administrator
+ *
+ */
 @Component
 public class XPathsFunction extends FreemarkerTemplateMethodModel{
 

@@ -6,6 +6,11 @@ import java.util.Date;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
+/**
+ * 时间获取/格式化 工具类 防止NPE 默认格式(yyyy-MM-dd HH:mm:ss)
+ * @author Administrator
+ *
+ */
 public class DateFunctionUtils {
 	
 	private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";

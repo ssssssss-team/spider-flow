@@ -6,6 +6,11 @@ import org.jsoup.Connection.Response;
 
 import com.alibaba.fastjson.JSON;
 
+/**
+ * 响应对象包装类
+ * @author Administrator
+ *
+ */
 public class HttpResponse {
 	
 	private Response response;
