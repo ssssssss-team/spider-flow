@@ -63,6 +63,10 @@ html,body{
 .properties-container .editor-form-node .layui-form-relative{
 	position: relative;
 }
+.properties-container .editor-form-node input,.properties-container .editor-form-node textarea{
+	font-family: 'Consolas';
+	font-size : 14px;
+}
 .properties-container .editor-form-node .layui-form-relative .layui-icon-close{
 	position: absolute;
 	left : 10px;
