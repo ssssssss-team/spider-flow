@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>spider-flow-core</artifactId>
 	<name>spider-flow-core</name>
-	<url>https://gitee.com/jmxd/spider-flow/spider-flow-core</url>
+	<url>https://gitee.com/jmxd/spider-flow/tree/master/spider-flow-core</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
