@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>SpiderFlow-Editor</title>
+		<link rel="stylesheet" href="js/layui/css/layui.css" />
+		<link rel="stylesheet" href="css/layui-blue.css" />
+		<link rel="stylesheet" href="css/editor.css" />
+		<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+		<script>mxBasePath = 'js/mxgraph';</script>
+		<script type="text/javascript" src="js/mxgraph/mxgraph.min.js" ></script>
+		<script type="text/javascript" src="js/common.js" ></script>
+		<script type="text/javascript" src="js/spider-editor.js" ></script>
+		<script type="text/javascript" src="js/editor.js" ></script>
+	</head>
+	<body>
+		<div class="main-container">
+			<div class="toolbar-container">
+				<ul>
+					<li class="btn-return">返回</li>
+					<li class="btn-selectAll" title="Ctrl+A">全选</li>
+					<li class="btn-save" title="Ctrl+S">保存</li>
+					<li class="btn-test" title="Ctrl+Q">测试</li>
+					<li class="btn-console-xml">打印XML</li>
+					<li class="btn-edit-xml">XML编辑</li>
+					<li class="btn-graphical-xml">图形化编辑</li>
+					<li class="btn-copy" title="Ctrl+C">复制</li>
+					<li class="btn-paste" title="Ctrl+V">粘贴</li>
+					<li class="btn-cut" title="Ctrl+X">剪切</li>
+					<li class="btn-undo" title="Ctrl+Z">撤销</li>
+					<li class="btn-redo" title="Ctrl+Y">恢复</li>
+					<li class="btn-delete" title="Delete">删除</li>
+				</ul>
+			</div>
+			<div class="sidebar-container"></div>
+			<div class="xml-container"><textarea></textarea></div>
+			<div class="editor-container"></div>
+			<div class="resize-container"></div>
+			<div class="properties-container"></div>
+		</div>		
+	</body>
+</html>

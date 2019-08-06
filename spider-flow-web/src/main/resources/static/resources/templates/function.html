@@ -1,0 +1,23 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">配置</li>
+  </ul>
+  <div class="layui-tab-content">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form editor-form-node">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">执行函数</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="function" placeholder="执行函数" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.function}}">
+    			</div>
+    		</div>
+    	</form>
+    </div>
+  </div>
+</div>

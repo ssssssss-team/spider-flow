@@ -1,0 +1,51 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">配置</li>
+  </ul>
+  <div class="layui-tab-content">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form editor-form-node">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">循环变量</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="loopVariableName" placeholder="请输入循环变量" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.loopVariableName}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">循环次数</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.loopCount}}">
+    			</div>
+    		</div>
+    		{{# layui.each(d.data.object['output-name'],function(index,output){ }}
+    			<hr>
+	    		<div class="layui-form-item layui-form-relative">
+	    			<i class="layui-icon layui-icon-close output-remove"></i>  
+	    			<label class="layui-form-label">输出项</label>
+	    			<div class="layui-input-block">
+	    				<input type="text" name="output-name" placeholder="输出项" autocomplete="off" class="layui-input array" value="{{=d.data.object['output-name'][index]}}">
+	    			</div>
+	    		</div>
+	    		<div class="layui-form-item">
+	    			<label class="layui-form-label">输出值</label>
+	    			<div class="layui-input-block">
+	    				<input type="text" name="output-value" placeholder="输出值" autocomplete="off" class="layui-input array" value="{{=d.data.object['output-value'][index]}}">
+	    			</div>
+	    		</div>
+    		{{# }) }}
+    		<hr>
+    		<div class="layui-form-item">
+    			<div class="layui-input-block">
+	    			<button class="layui-btn output-add" type="button">添加一个输出项</button>
+	    		</div>
+	    	</div>
+    	</form>
+    </div>
+  </div>
+</div>
