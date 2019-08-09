@@ -1,4 +1,4 @@
-package org.spiderflow.core.executor;
+package org.spiderflow.core.executor.shape;
 
 import java.util.Map;
 
@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.utils.DataSourceUtils;
-import org.spiderflow.executor.Executor;
+import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class DataSourceExecutor implements Executor{
+public class DataSourceExecutor implements ShapeExecutor{
 	
 	public static final String DATASOURCE_TYPE = "datasourceType";
 	

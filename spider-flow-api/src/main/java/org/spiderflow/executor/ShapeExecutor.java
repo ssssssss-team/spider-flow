@@ -10,7 +10,7 @@ import org.spiderflow.model.SpiderNode;
  * @author jmxd
  *
  */
-public interface Executor {
+public interface ShapeExecutor {
 	
 	public static final String LOOP_VARIABLE_NAME = "loopVariableName";
 	

@@ -1,4 +1,4 @@
-package org.spiderflow.core.executor;
+package org.spiderflow.core.executor.shape;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.io.HttpRequest;
 import org.spiderflow.core.io.HttpResponse;
-import org.spiderflow.executor.Executor;
+import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class RequestExecutor implements Executor{
+public class RequestExecutor implements ShapeExecutor{
 	
 	public static final String SLEEP = "sleep";
 	

@@ -1,13 +1,21 @@
-package org.spiderflow.core.freemarker.functions.utils;
+package org.spiderflow.core.executor.function;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.spiderflow.executor.FunctionExecutor;
+import org.springframework.stereotype.Component;
 
 /**
  * 随机数/字符串 生成方法 
  * @author Administrator
  *
  */
-public class RandomFunctionUtils {
+@Component
+public class RandomFunctionExecutor implements FunctionExecutor{
+	
+	@Override
+	public String getFunctionPrefix() {
+		return "random";
+	}
 	
 	public static int randomInt(int min,int max){
 		return RandomUtils.nextInt(min, max);

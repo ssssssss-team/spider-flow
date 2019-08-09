@@ -1,4 +1,4 @@
-package org.spiderflow.core.freemarker.functions.utils;
+package org.spiderflow.core.executor.function;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,13 +7,21 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
+import org.spiderflow.executor.FunctionExecutor;
+import org.springframework.stereotype.Component;
 
 /**
  * 文件读写 工具类 防止NPE 
  * @author Administrator
  *
  */
-public class FileFunctionUtils {
+@Component
+public class FileFunctionExecutor implements FunctionExecutor{
+	
+	@Override
+	public String getFunctionPrefix() {
+		return "file";
+	}
 	
 	/**
 	 * 
@@ -34,7 +42,7 @@ public class FileFunctionUtils {
 	}
 	
 	public static void write(String path,String content,String charset,boolean append) throws IOException{
-		write(path,StringFunctionUtils.bytes(content, charset),append);
+		write(path,StringFunctionExecutor.bytes(content, charset),append);
 	}
 	
 	public static void write(String path,byte[] bytes,boolean append) throws IOException{
@@ -63,11 +71,11 @@ public class FileFunctionUtils {
 	}
 	
 	public static String string(String path,String charset) throws IOException{
-		return StringFunctionUtils.newString(bytes(path), charset);
+		return StringFunctionExecutor.newString(bytes(path), charset);
 	}
 	
 	public static String string(String path) throws IOException{
-		return StringFunctionUtils.newString(bytes(path), Charset.defaultCharset().name());
+		return StringFunctionExecutor.newString(bytes(path), Charset.defaultCharset().name());
 	}
 	
 }

@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.service.SpiderFlowService;
-import org.spiderflow.executor.Executor;
+import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.Shape;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SpiderFlowController {
 	
 	@Autowired
-	private List<Executor> executors;
+	private List<ShapeExecutor> executors;
 	
 	@Autowired
 	private SpiderFlowService spiderFlowService;

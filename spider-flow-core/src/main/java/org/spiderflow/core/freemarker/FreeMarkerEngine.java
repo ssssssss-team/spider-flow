@@ -8,17 +8,13 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.ExpressionEngine;
+import org.spiderflow.ExpressionHolder;
 import org.spiderflow.core.freemarker.functions.FreemarkerTemplateMethodModel;
-import org.spiderflow.core.freemarker.functions.utils.Base64FunctionUtils;
-import org.spiderflow.core.freemarker.functions.utils.DateFunctionUtils;
-import org.spiderflow.core.freemarker.functions.utils.FileFunctionUtils;
-import org.spiderflow.core.freemarker.functions.utils.JsonFunctionUtils;
-import org.spiderflow.core.freemarker.functions.utils.ListFunctionUtils;
-import org.spiderflow.core.freemarker.functions.utils.RandomFunctionUtils;
-import org.spiderflow.core.freemarker.functions.utils.StringFunctionUtils;
-import org.spiderflow.core.freemarker.functions.utils.UrlFunctionUtils;
 import org.spiderflow.core.utils.ExtractUtils;
+import org.spiderflow.executor.FunctionExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +33,10 @@ import freemarker.template.TemplateModelException;
  */
 @Component
 public class FreeMarkerEngine implements ExpressionEngine{
+	
+	
+	private static Logger logger = LoggerFactory.getLogger(FreeMarkerEngine.class);
+	
 	/**
 	 * 生成指定版本配置的模板模型
 	 */
@@ -46,6 +46,9 @@ public class FreeMarkerEngine implements ExpressionEngine{
 	 */
 	@Autowired
 	private List<FreemarkerTemplateMethodModel> customMethods;
+	
+	@Autowired
+	private List<FunctionExecutor> functionExecutors;
 	/**
 	 * 线程内共享的选择器目标对象
 	 */
@@ -86,19 +89,14 @@ public class FreeMarkerEngine implements ExpressionEngine{
 		});
 		BeansWrapper beansWrapper = builder.build();
 		TemplateHashModel model = beansWrapper.getStaticModels();
-		configuration.setSharedVariable("string", model.get(StringFunctionUtils.class.getName()));
-		configuration.setSharedVariable("date", model.get(DateFunctionUtils.class.getName()));
-		configuration.setSharedVariable("random", model.get(RandomFunctionUtils.class.getName()));
-		configuration.setSharedVariable("base64", model.get(Base64FunctionUtils.class.getName()));
-		configuration.setSharedVariable("list", model.get(ListFunctionUtils.class.getName()));
-		//Math采用jdk自带的类
-		configuration.setSharedVariable("math", model.get(Math.class.getName()));
-		configuration.setSharedVariable("url", model.get(UrlFunctionUtils.class.getName()));
-		configuration.setSharedVariable("file", model.get(FileFunctionUtils.class.getName()));
-		configuration.setSharedVariable("json", model.get(JsonFunctionUtils.class.getName()));
+		for (FunctionExecutor executor : functionExecutors) {
+			logger.info("注册方法{}:{}",executor.getFunctionPrefix(),executor.getClass().getName());
+			configuration.setSharedVariable(executor.getFunctionPrefix(), model.get(executor.getClass().getName()));
+		}
 	}
 	
 	public Object execute(String expression,Map<String,Object> variables){
+		ExpressionHolder.setVariables(variables);
 		StringWriter out = new StringWriter();
 		try {
 			Template template = new Template(expression, new StringReader(expression),configuration);
@@ -120,6 +118,7 @@ public class FreeMarkerEngine implements ExpressionEngine{
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally{
+			ExpressionHolder.remove();
 			threadLocal.remove();
 		}
 		return null;

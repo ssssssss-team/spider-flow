@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -17,6 +18,8 @@ import org.spiderflow.utils.ThreadPool;
  *
  */
 public class SpiderContext extends HashMap<String, Object>{
+	
+	private String id = UUID.randomUUID().toString().replace("-", "");
 	
 	private static final long serialVersionUID = 8379177178417619790L;
 	/**
@@ -67,6 +70,10 @@ public class SpiderContext extends HashMap<String, Object>{
 
 	public void setRootNode(SpiderNode rootNode) {
 		this.rootNode = rootNode;
+	}
+	
+	public String getId() {
+		return id;
 	}
 
 	public void log(String message){

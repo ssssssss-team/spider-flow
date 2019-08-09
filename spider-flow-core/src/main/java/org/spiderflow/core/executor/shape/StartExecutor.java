@@ -1,9 +1,9 @@
-package org.spiderflow.core.executor;
+package org.spiderflow.core.executor.shape;
 
 import java.util.Map;
 
 import org.spiderflow.context.SpiderContext;
-import org.spiderflow.executor.Executor;
+import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class StartExecutor implements Executor{
+public class StartExecutor implements ShapeExecutor{
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {

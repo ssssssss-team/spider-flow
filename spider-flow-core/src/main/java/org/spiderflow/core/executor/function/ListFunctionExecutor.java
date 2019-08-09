@@ -1,14 +1,23 @@
-package org.spiderflow.core.freemarker.functions.utils;
+package org.spiderflow.core.executor.function;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.spiderflow.executor.FunctionExecutor;
+import org.springframework.stereotype.Component;
 
 /**
  * List 工具类 防止NPE 添加了类似python的split()方法 
  * @author Administrator
  *
  */
-public class ListFunctionUtils {
+@Component
+public class ListFunctionExecutor implements FunctionExecutor{
+	
+	@Override
+	public String getFunctionPrefix() {
+		return "list";
+	}
 
 	public static int length(List<?> list){
 		return list != null ? list.size() : 0;

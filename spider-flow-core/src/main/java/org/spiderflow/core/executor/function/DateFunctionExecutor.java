@@ -1,17 +1,25 @@
-package org.spiderflow.core.freemarker.functions.utils;
+package org.spiderflow.core.executor.function;
 
 import java.text.ParseException;
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.spiderflow.executor.FunctionExecutor;
+import org.springframework.stereotype.Component;
 
 /**
  * 时间获取/格式化 工具类 防止NPE 默认格式(yyyy-MM-dd HH:mm:ss)
  * @author Administrator
  *
  */
-public class DateFunctionUtils {
+@Component
+public class DateFunctionExecutor implements FunctionExecutor{
+	
+	@Override
+	public String getFunctionPrefix() {
+		return "date";
+	}
 	
 	private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 

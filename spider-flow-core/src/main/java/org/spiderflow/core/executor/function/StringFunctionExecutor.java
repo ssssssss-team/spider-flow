@@ -1,4 +1,4 @@
-package org.spiderflow.core.freemarker.functions.utils;
+package org.spiderflow.core.executor.function;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -6,12 +6,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.spiderflow.executor.FunctionExecutor;
+import org.springframework.stereotype.Component;
+
 /**
  * String 工具类 防止NPE 
  * @author Administrator
  *
  */
-public class StringFunctionUtils {
+@Component
+public class StringFunctionExecutor implements FunctionExecutor{
+	
+	@Override
+	public String getFunctionPrefix() {
+		return "string";
+	}
 
 	public static String substring(String content, int beginIndex) {
 		return content != null ? content.substring(beginIndex) : null;

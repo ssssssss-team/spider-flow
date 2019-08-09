@@ -141,8 +141,4 @@ public class ExtractUtils {
         return compile("^(\\-|\\+)?\\d+(\\.\\d+)?$").matcher(str).matches();  
 	}
 	
-	public static void main(String[] args) {
-		String sql = "select * from xxx where xxx = #xxx# and qqq = #xxx#";
-		System.out.println(sql.replaceAll("#(.*?)#", "?"));
-	}
 }

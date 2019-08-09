@@ -1,4 +1,4 @@
-package org.spiderflow.core.executor;
+package org.spiderflow.core.executor.shape;
 
 import java.util.Map;
 
@@ -11,7 +11,7 @@ import org.spiderflow.core.Spider;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.service.SpiderFlowService;
 import org.spiderflow.core.utils.SpiderFlowUtils;
-import org.spiderflow.executor.Executor;
+import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class ProcessExecutor implements Executor{
+public class ProcessExecutor implements ShapeExecutor{
 	
 	public static final String FLOW_ID = "flowId";
 	

@@ -13,7 +13,8 @@ import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.utils.SpiderFlowUtils;
-import org.spiderflow.executor.Executor;
+import org.spiderflow.executor.ShapeExecutor;
+import org.spiderflow.listener.SpiderListener;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
 import org.spiderflow.utils.Maps;
@@ -34,12 +35,17 @@ public class Spider {
 	 * 节点执行器列表 当前爬虫的全部流程
 	 */
 	@Autowired
-	private List<Executor> executors;
+	private List<ShapeExecutor> executors;
 	/**
 	 * 选择器
 	 */
 	@Autowired
 	private FreeMarkerEngine engine;
+	
+	
+	@Autowired(required = false)
+	private List<SpiderListener> listeners;
+	
 	/**
 	 * 
 	 * @param spiderFlow
@@ -58,12 +64,21 @@ public class Spider {
 	}
 	
 	private void executeRoot(SpiderNode root,SpiderContext context){
-		int nThreads = NumberUtils.toInt(root.getStringJsonValue(Executor.THREAD_COUNT), 8);
+		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), 8);
 		ThreadPool pool = ThreadPool.create(nThreads);
 		context.setRootNode(root);
 		context.setThreadPool(pool);
-		executeNode(pool,null,root,context,new HashMap<>());
-		pool.shutdown();
+		if(listeners != null){
+			listeners.forEach(listener->listener.beforeStart(context));
+		}
+		try {
+			executeNode(pool,null,root,context,new HashMap<>());
+			pool.shutdown();
+		} finally {
+			if(listeners != null){
+				listeners.forEach(listener->listener.afterEnd(context));
+			}
+		}
 	}
 	
 	public void execute(int nThreads,SpiderNode fromNode,SpiderNode node,SpiderContext context,Map<String,Object> variables){
@@ -96,7 +111,7 @@ public class Spider {
 		}
 		context.log(String.format("执行节点[%s:%s]", node.getNodeName(),node.getNodeId()));
 		int loopCount = 1;
-		String loopCountStr = node.getStringJsonValue(Executor.LOOP_COUNT);
+		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
 		if(StringUtils.isNotBlank(loopCountStr)){
 			Object result = engine.execute(loopCountStr, variables);
 			if(result != null){
@@ -108,8 +123,8 @@ public class Spider {
 			}
 		}
 		if(loopCount > 0){
-			String loopVariableName = node.getStringJsonValue(Executor.LOOP_VARIABLE_NAME);
-			for (Executor executor : executors) {
+			String loopVariableName = node.getStringJsonValue(ShapeExecutor.LOOP_VARIABLE_NAME);
+			for (ShapeExecutor executor : executors) {
 				if(executor.supportShape().equals(shape)){
 					for (int i = 0; i < loopCount; i++) {
 						//存入下标变量
