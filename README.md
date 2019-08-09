@@ -44,6 +44,7 @@ spider-flow
 - [ ] 支持HTTP接口
 
 #### 插件列表
+- [x] Selenium插件
 - [ ] Redis插件
 - [ ] Mongodb插件
 - [ ] Hbase插件
