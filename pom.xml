@@ -33,5 +33,6 @@
 		<module>spider-flow-api</module>
 		<module>spider-flow-core</module>
 		<module>spider-flow-web</module>
+    	<module>spider-flow-selenium</module>
   </modules>
 </project>

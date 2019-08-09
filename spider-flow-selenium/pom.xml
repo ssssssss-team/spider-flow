@@ -6,26 +6,28 @@
 		<artifactId>spider-flow</artifactId>
 		<version>0.0.1</version>
 	</parent>
-	<artifactId>spider-flow-web</artifactId>
-	<name>spider-flow-web</name>
-	<url>https://gitee.com/jmxd/spider-flow/tree/master/spider-flow-web</url>
+	<artifactId>spider-flow-selenium</artifactId>
+	<name>spider-flow-selenium</name>
+	<url>https://gitee.com/jmxd/spider-flow/tree/master/spider-flow-selenium</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
-		<dependency>  
-           <groupId>org.springframework.boot</groupId>  
-           <artifactId>spring-boot-starter-websocket</artifactId>  
-       	</dependency>
 		<dependency>
 			<groupId>org.spiderflow</groupId>
-			<artifactId>spider-flow-core</artifactId>
+			<artifactId>spider-flow-api</artifactId>
 			<version>0.0.1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.spiderflow</groupId>
-			<artifactId>spider-flow-selenium</artifactId>
-			<version>0.0.1</version>
+		    <groupId>org.seleniumhq.selenium</groupId>
+		    <artifactId>selenium-java</artifactId>
+		    <version>3.141.59</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.seleniumhq.selenium</groupId>
+		    <artifactId>htmlunit-driver</artifactId>
+		    <version>2.35.1</version>
 		</dependency>
 	</dependencies>
 </project>
