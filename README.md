@@ -21,16 +21,11 @@
 
 ### 项目结构
 ```
-org.spiderflow
-├── core -- 模版
-|    ├── context
-|    ├── executor -- 图像解析
-|    ├── freemarker -- 内置函数
-|    ├── io -- http请求
-|    ├── model -- 实体类
-|    ├── utils -- 项目工具
-├── job -- 定时执行
-├── web -- 页面层
+spider-flow
+├── spider-flow-api -- 插件开发的依赖
+├── spider-flow-core -- 核心包
+├── spider-flow-web -- web界面
+├── spider-flow-selenium -- selenium插件
 ```
 
 #### 特性
@@ -38,13 +33,13 @@ org.spiderflow
 - [x] 支持JSON/XML格式
 - [x] 支持Xpath/JsonPath提取
 - [x] 支持多数据源、SQL select/insert/update/delete
-- [ ] 支持爬取JS动态渲染的页面
+- [x] 支持爬取JS动态渲染的页面
 - [x] 支持代理
 - [x] 支持二进制格式
 - [x] 支持保存/读取文件(csv、xls、jpg等)
 - [x] 常用字符串、日期、文件、加解密等函数
-- [ ] 支持流程嵌套
-- [ ] 支持插件扩展(自定义执行器，自定义函数）
+- [x] 支持流程嵌套
+- [x] 支持插件扩展(自定义执行器，自定义函数）
 - [ ] 任务监控
 - [ ] 支持HTTP接口
 
