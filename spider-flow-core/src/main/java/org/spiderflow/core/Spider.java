@@ -46,24 +46,29 @@ public class Spider {
 	@Autowired(required = false)
 	private List<SpiderListener> listeners;
 	
-	/**
-	 * 
-	 * @param spiderFlow
-	 */
-	public void run(SpiderFlow spiderFlow){
+	
+	public List<SpiderOutput> run(SpiderFlow spiderFlow,Map<String,Object> variables){
+		if(variables == null){
+			variables = new HashMap<>();
+		}
 		SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
 		SpiderContext context = new SpiderContext();
-		executeRoot(root, context);
+		executeRoot(root, context,variables);
+		return context.getOutputs();
+	}
+	
+	public List<SpiderOutput> run(SpiderFlow spiderFlow){
+		return run(spiderFlow,new HashMap<>());
 	}
 	
 	public List<SpiderOutput> runWithTest(SpiderNode root,SpiderContext context){
 		//开始不允许设置任何东西
-		executeRoot(root, context);
+		executeRoot(root, context,new HashMap<>());
 		context.log("测试完毕！");
 		return context.getOutputs();
 	}
 	
-	private void executeRoot(SpiderNode root,SpiderContext context){
+	private void executeRoot(SpiderNode root,SpiderContext context,Map<String,Object> variables){
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), 8);
 		ThreadPool pool = ThreadPool.create(nThreads);
 		context.setRootNode(root);
@@ -72,7 +77,7 @@ public class Spider {
 			listeners.forEach(listener->listener.beforeStart(context));
 		}
 		try {
-			executeNode(pool,null,root,context,new HashMap<>());
+			executeNode(pool,null,root,context,variables);
 			pool.shutdown();
 		} finally {
 			if(listeners != null){
