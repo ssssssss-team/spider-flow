@@ -19,6 +19,8 @@ function SpiderEditor(options){
 		this.editor.setGraphContainer(options.element);
 		this.graph = this.editor.graph;
 		this.graph.setConnectable(true);
+		this.graph.setMultigraph(false);	//禁止重复连接
+		this.graph.setAllowLoops(true);		//允许自己连自己
 		this.graph.isHtmlLabel = function(cell){
 			return !this.isSwimlane(cell);
 		}
