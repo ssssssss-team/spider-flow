@@ -46,12 +46,12 @@ public class ExecuteSQLExecutor implements ShapeExecutor{
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
-		if(StringUtils.isNotBlank(node.getStringJsonValue(DATASOURCE_ID))){
+		if(!StringUtils.isNotBlank(node.getStringJsonValue(DATASOURCE_ID))){
 			context.log("数据源ID为空！");
 			if(logger.isDebugEnabled()){
 				logger.debug("数据库ID为空！");	
 			}
-		}else if(StringUtils.isNotBlank(node.getStringJsonValue(SQL))){
+		}else if(!StringUtils.isNotBlank(node.getStringJsonValue(SQL))){
 			context.log("sql为空！");
 			if(logger.isDebugEnabled()){
 				logger.debug("sql为空！");	
