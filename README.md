@@ -5,10 +5,8 @@
 >  **QQ交流群：720832964** 
 
 #### 使用说明
-[点击跳转](https://gitee.com/jmxd/spider-flow/blob/master/document.md)
+[点击跳转](https://www.spiderflow.org)
 
-#### 图像说明
-[点击跳转](https://gitee.com/jmxd/spider-flow/blob/master/graphicDescription.md)
 
 #### 演示站点
 [点击跳转](http://39.105.125.219:8088/)
