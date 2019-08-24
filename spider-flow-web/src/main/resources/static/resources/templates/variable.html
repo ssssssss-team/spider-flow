@@ -11,6 +11,18 @@
     				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
     			</div>
     		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">循环变量</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="loopVariableName" placeholder="请输入循环变量" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.loopVariableName}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">循环次数</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.loopCount}}">
+    			</div>
+    		</div>
     		{{# layui.each(d.data.object['variable-name'],function(index,variable){ }}
     			<hr>
 	    		<div class="layui-form-item layui-form-relative">

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.seimicrawler.xpath.JXDocument;
@@ -59,54 +58,66 @@ public class ExtractUtils {
 		return getFirstMatcher(url, "(?<=//|)((\\w)+\\.)+\\w+", false);
 	}
 	
-	public static String getFirstHTMLBySelector(Document document,String selector){
-		return document.selectFirst(selector).html();
+	public static String getFirstHTMLBySelector(Element element,String selector){
+		element = getFirstElement(element,selector);
+		return element == null ? null : element.html();
 	}
 	
-	public static String getFirstOuterHTMLBySelector(Document document,String selector){
-		return document.selectFirst(selector).outerHtml();
+	public static String getFirstOuterHTMLBySelector(Element element,String selector){
+		element = getFirstElement(element,selector);
+		return element == null ? null : element.outerHtml();
 	}
 	
-	public static String getFirstTextBySelector(Document document,String selector){
-		return document.selectFirst(selector).text();
+	public static String getFirstTextBySelector(Element element,String selector){
+		element = getFirstElement(element,selector);
+		return element == null ? null : element.text();
 	}
 	
-	public static String getFirstAttrBySelector(Document document,String selector,String attr){
-		return document.selectFirst(selector).attr(attr);
+	public static String getFirstAttrBySelector(Element element,String selector,String attr){
+		element = getFirstElement(element,selector);
+		return element == null ? null : element.attr(attr);
 	}
 	
-	public static List<String> getHTMLBySelector(Document document,String selector){
-		Elements elements = document.select(selector);
+	public static Element getFirstElement(Element element,String selector){
+		return element.selectFirst(selector);
+	}
+	
+	public static List<Element> getElements(Element element,String selector){
+		return element.select(selector);
+	}
+	
+	public static List<String> getHTMLBySelector(Element element,String selector){
+		Elements elements = element.select(selector);
 		List<String> result = new ArrayList<>();
-		for (Element element : elements) {
-			result.add(element.html());
+		for (Element elem : elements) {
+			result.add(elem.html());
 		}
 		return result;
 	}
 	
-	public static List<String> getOuterHTMLBySelector(Document document,String selector){
-		Elements elements = document.select(selector);
+	public static List<String> getOuterHTMLBySelector(Element element,String selector){
+		Elements elements = element.select(selector);
 		List<String> result = new ArrayList<>();
-		for (Element element : elements) {
-			result.add(element.outerHtml());
+		for (Element elem : elements) {
+			result.add(elem.outerHtml());
 		}
 		return result;
 	}
 	
-	public static List<String> getTextBySelector(Document document,String selector){
-		Elements elements = document.select(selector);
+	public static List<String> getTextBySelector(Element element,String selector){
+		Elements elements = element.select(selector);
 		List<String> result = new ArrayList<>();
-		for (Element element : elements) {
-			result.add(element.text());
+		for (Element elem : elements) {
+			result.add(elem.text());
 		}
 		return result;
 	}
 	
-	public static List<String> getAttrBySelector(Document document,String selector,String attr){
-		Elements elements = document.select(selector);
+	public static List<String> getAttrBySelector(Element element,String selector,String attr){
+		Elements elements = element.select(selector);
 		List<String> result = new ArrayList<>();
-		for (Element element : elements) {
-			result.add(element.attr(attr));
+		for (Element elem : elements) {
+			result.add(elem.attr(attr));
 		}
 		return result;
 	}
@@ -115,8 +126,8 @@ public class ExtractUtils {
 		return JSONPath.eval(root, jsonPath);
 	}
 	
-	public static List<String> getValuesByXPath(Document document,String xpath){
-		JXDocument jXdocument = JXDocument.create(document);
+	public static List<String> getValuesByXPath(Element element,String xpath){
+		JXDocument jXdocument = JXDocument.create(new Elements(element));
 		List<JXNode> nodes = jXdocument.selN(xpath);
 		if(nodes != null){
 			List<String> result = new ArrayList<>();
@@ -128,8 +139,8 @@ public class ExtractUtils {
 		return Collections.emptyList();
 	}
 	
-	public static String getValueByXPath(Document document,String xpath){
-		JXDocument jXdocument = JXDocument.create(document);
+	public static String getValueByXPath(Element element,String xpath){
+		JXDocument jXdocument = JXDocument.create(new Elements(element));
 		JXNode node = jXdocument.selNOne(xpath);
 		if(node != null){
 			return node.asString();

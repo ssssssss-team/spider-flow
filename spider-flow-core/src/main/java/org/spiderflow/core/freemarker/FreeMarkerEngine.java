@@ -62,6 +62,7 @@ public class FreeMarkerEngine implements ExpressionEngine{
 		configuration.setDefaultEncoding("UTF-8");
 		//设置兼容性 经典兼容性
 		configuration.setClassicCompatible(true);
+		configuration.setNumberFormat("0.###############");
 		//如果自定义方法不为空 就将自定义方法列表中的方法循环添加到模板模型
 		if(customMethods != null){
 			for (FreemarkerTemplateMethodModel method : customMethods) {

@@ -5,7 +5,9 @@ import java.util.List;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.freemarker.FreemarkerObject;
 
+import freemarker.ext.beans.StringModel;
 import freemarker.ext.util.WrapperTemplateModel;
+import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateScalarModel;
@@ -66,6 +68,18 @@ public abstract class FreemarkerTemplateMethodModel implements TemplateMethodMod
 		}
 		return null;
 	}
+	
+	protected boolean canGetStringValue(Object value){
+		try {
+			if(value instanceof SimpleScalar){
+				return true;
+			}
+			return false;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
 	/**
 	 * 流程
 	 * @param args 泛型参数列表 
