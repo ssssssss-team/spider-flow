@@ -46,7 +46,7 @@ spider-flow
 - [ ] Redis插件
 - [ ] Mongodb插件
 - [ ] Hbase插件
-- [ ] IP代理池插件
+- [x] IP代理池插件
 - [ ] OCR识别插件
 
 ### 项目部分截图

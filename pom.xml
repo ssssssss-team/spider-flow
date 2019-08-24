@@ -34,5 +34,6 @@
 		<module>spider-flow-core</module>
 		<module>spider-flow-web</module>
     	<module>spider-flow-selenium</module>
+    <module>spider-flow-proxypool</module>
   </modules>
 </project>
