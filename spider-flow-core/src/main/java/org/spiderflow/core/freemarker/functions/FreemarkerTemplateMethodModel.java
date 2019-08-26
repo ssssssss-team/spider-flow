@@ -5,7 +5,6 @@ import java.util.List;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.freemarker.FreemarkerObject;
 
-import freemarker.ext.beans.StringModel;
 import freemarker.ext.util.WrapperTemplateModel;
 import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateMethodModelEx;

@@ -62,4 +62,8 @@ public class OutputExecutor implements ShapeExecutor{
 		return "output";
 	}
 
+	@Override
+	public boolean isThread() {
+		return false;
+	}
 }

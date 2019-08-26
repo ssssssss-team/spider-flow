@@ -35,4 +35,8 @@ public interface ShapeExecutor {
 	 * @param variables 节点流程的全部变量的集合
 	 */
 	public void execute(SpiderNode node,SpiderContext context,Map<String,Object> variables);
+	
+	default boolean isThread(){
+		return true;
+	}
 }

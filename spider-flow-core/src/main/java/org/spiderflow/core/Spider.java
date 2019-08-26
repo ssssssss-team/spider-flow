@@ -134,7 +134,7 @@ public class Spider {
 					for (int i = 0; i < loopCount; i++) {
 						//存入下标变量
 						Map<String, Object> nVariables = Maps.add(variables, loopVariableName, i);
-						pool.submit(()->{
+						Runnable runnable = ()->{
 							try {
 								executor.execute(node, context,nVariables);
 							} catch (Exception e) {
@@ -147,7 +147,13 @@ public class Spider {
 								//递归执行下一级
 								executeaNextNodes(pool, node, context, nVariables);
 							}
-						});
+						};
+						if(executor.isThread()){
+							pool.submit(runnable);
+						}else{
+							runnable.run();
+						}
+						
 					}
 				}
 			}

@@ -56,5 +56,10 @@ public class VariableExecutor implements ShapeExecutor{
 	public String supportShape() {
 		return "variable";
 	}
+	
+	@Override
+	public boolean isThread() {
+		return false;
+	}
 
 }
