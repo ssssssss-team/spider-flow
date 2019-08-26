@@ -1,8 +1,8 @@
 package org.spiderflow.websocket;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 
-import javax.sql.DataSource;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
@@ -51,8 +51,8 @@ public class WebSocketEditorServer {
 				String password = dsConfig.getString("password");
 				Connection connection = null;
 				try{
-					DataSource ds = DataSourceUtils.createDataSource(className, url, username, password);
-					connection = ds.getConnection();
+					Class.forName(className);
+					connection = DriverManager.getConnection(url,username,password);
 					context.write(new WebSocketEvent<>("success", "测试连接成功！"));
 				}catch(Exception e){
 					context.write(new WebSocketEvent<>("error", "连接失败," + e.getMessage()));
