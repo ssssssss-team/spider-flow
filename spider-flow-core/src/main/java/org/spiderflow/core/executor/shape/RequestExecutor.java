@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
@@ -42,6 +43,8 @@ public class RequestExecutor implements ShapeExecutor{
 	
 	public static final String HEADER_VALUE = "header-value";
 	
+	public static final String TIMEOUT = "timeout";
+	
 	private static Logger logger = LoggerFactory.getLogger(RequestExecutor.class);
 	
 	@Autowired
@@ -65,7 +68,12 @@ public class RequestExecutor implements ShapeExecutor{
 			}
 		}
 		HttpRequest request = HttpRequest.create();
-		
+		int timeout = NumberUtils.toInt(node.getStringJsonValue(TIMEOUT), 60000);
+		if(logger.isDebugEnabled()){
+			logger.debug("设置请求超时时间:{}" , timeout);
+		}
+		context.log(String.format("设置请求超时时间:%s", timeout));
+		request.timeout(timeout);
 		//设置请求url
 		String url = null;
 		try {

@@ -92,6 +92,11 @@ public class HttpRequest {
 		return this;
 	}
 	
+	public HttpRequest timeout(int timeout){
+		this.timeout = timeout;
+		return this;
+	}
+	
 	public HttpRequest proxy(String host,int port){
 		this.proxy = new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(host, port));
 		return this;
