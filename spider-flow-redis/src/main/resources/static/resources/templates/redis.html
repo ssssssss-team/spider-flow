@@ -1,0 +1,96 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">基本配置</li>
+  </ul>
+  <div class="layui-tab-content editor-form-node">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">host</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="host" placeholder="请输入redis host" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.host}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">port</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="port" placeholder="请输入redis port" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.port}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">密码</label>
+    			<div class="layui-input-block">
+    				<input type="password" name="password" placeholder="请输入redis password,没有则留空" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.password}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">数据库索引</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="database" placeholder="请输入redis 数据库索引,默认为0" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.database}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">最大连接数</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="poolMaxActive" placeholder="请输入最大连接数,默认为8" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.poolMaxActive}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">最大空闲连接</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="poolMaxIdle" placeholder="请输入最大空闲连接,默认为8" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.poolMaxIdle}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">最小空闲连接</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="poolMinIdle" placeholder="请输入最小空闲连接,默认为0" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.poolMinIdle}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<div class="layui-input-block">
+    				<button class="layui-btn btn-redis-datasource-test" type="button">测试连接</button>
+    			</div>
+    		</div>
+    	</form>
+    </div>
+  </div>
+</div>
+<script>
+	$('.layui-form').on('click','.btn-redis-datasource-test',function(){
+		var $form = $('.layui-form');
+		var host = $form.find('input[name=host]').val();
+		var port = $form.find('input[name=port]').val();
+		var password = $form.find('input[name=password]').val();
+		var database = $form.find('input[name=database]').val();
+		$.ajax({
+			url : 'redis/test',
+			data : {
+				host : host || '127.0.0.1',
+				port : port || 6379,
+				password : password,
+				database : database || 0
+			},
+			type : 'post',
+			dataType : 'json',
+			success : function(json){
+				if(json.code == 1){
+					layui.layer.msg('测试成功');
+				}else{
+					layui.layer.alert('测试失败,' + json.message || '',{
+						icon : 2
+					})
+				}
+			},
+			error : function(){
+				layui.layer.msg('测试失败');
+			}
+		})
+	});
+</script>

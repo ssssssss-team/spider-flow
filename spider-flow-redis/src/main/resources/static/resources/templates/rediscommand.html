@@ -1,0 +1,50 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">基本配置</li>
+  </ul>
+  <div class="layui-tab-content editor-form-node">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">数据源</label>
+    			<div class="layui-input-block">
+    				<select name="datasourceId">
+    					{{# for(var datasourceIndex in d.model.cells){ }}
+    						{{# var cell = d.model.cells[datasourceIndex] }}
+    						{{# if(cell.data&&cell.data.get('shape') == 'redis'){ }}
+    							<option value="{{=datasourceIndex}}" {{datasourceIndex == d.data.object.datasourceId ? 'selected': ''}}>{{cell.value}}</option>
+    						{{# } }}
+    					{{# } }}
+    				</select>
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">命令类型</label>
+    			<div class="layui-input-block">
+    				<select name="operationType">
+ 						<option value="value" {{d.data.object.operationType == 'value' ? 'selected': ''}}>value</option>
+ 						<option value="keys" {{d.data.object.operationType == 'keys' ? 'selected': ''}}>keys</option>
+ 						<option value="list" {{d.data.object.operationType == 'list' ? 'selected': ''}}>list</option>
+ 						<option value="hash" {{d.data.object.operationType == 'hash' ? 'selected': ''}}>hash</option>
+ 						<option value="set" {{d.data.object.operationType == 'set' ? 'selected': ''}}>set</option>
+ 						<option value="zset" {{d.data.object.operationType == 'zset' ? 'selected': ''}}>zset</option>
+ 						<option value="hyperLogLog" {{d.data.object.operationType == 'hyperLogLog' ? 'selected': ''}}>hyperLogLog</option>
+    				</select>
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">Redis命令</label>
+    			<div class="layui-input-block">
+    				<textarea class="layui-input" style="height:200px" name="command">{{=d.data.object.command}}</textarea>
+    			</div>
+    		</div>
+    	</form>
+    </div>
+  </div>
+</div>
