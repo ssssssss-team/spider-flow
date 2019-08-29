@@ -7,7 +7,7 @@
 		<version>0.0.1</version>
 	</parent>
 	<artifactId>spider-flow-redis</artifactId>
-	<name>spider-flow-selenium</name>
+	<name>spider-flow-redis</name>
 	<url>https://gitee.com/jmxd/spider-flow/tree/master/spider-flow-redis</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
