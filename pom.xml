@@ -34,7 +34,7 @@
 		<module>spider-flow-core</module>
 		<module>spider-flow-web</module>
     	<module>spider-flow-selenium</module>
-    <module>spider-flow-proxypool</module>
-    <module>spider-flow-redis</module>
+    	<module>spider-flow-proxypool</module>
+    	<module>spider-flow-redis</module>
   </modules>
 </project>

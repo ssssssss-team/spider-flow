@@ -314,9 +314,15 @@ $(function(){
 			url : 'spider/shapes',
 			type : 'post',
 			dataType : 'json',
+			async :false,
 			success : function(shapeExts){
 				for(var i =0,len = shapeExts.length;i<len;i++){
-					addShape(shapeExts[i]);
+					var shape = shapeExts[i];
+					addShape(shape);
+					var image = new Image();
+					image.src = shape.image;
+					image.title = shape.title;
+					editor.addShape(shape.name,shape.title || 'Label',image,false);
 				}
 			}
 		})
