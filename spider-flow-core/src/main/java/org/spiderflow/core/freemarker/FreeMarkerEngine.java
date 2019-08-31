@@ -21,10 +21,12 @@ import org.springframework.stereotype.Component;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
+import freemarker.template.DefaultArrayAdapter;
 import freemarker.template.DefaultObjectWrapperBuilder;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateHashModel;
+import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 /**
  * 选择器
@@ -86,7 +88,11 @@ public class FreeMarkerEngine implements ExpressionEngine{
 			if(obj instanceof List){
 				return null;
 			}
-			return wrapper.wrap(obj);
+			Object ret = wrapper.wrap(obj);
+			if(ret instanceof DefaultArrayAdapter){
+				return null;
+			}
+			return (TemplateModel) ret;
 		});
 		BeansWrapper beansWrapper = builder.build();
 		TemplateHashModel model = beansWrapper.getStaticModels();

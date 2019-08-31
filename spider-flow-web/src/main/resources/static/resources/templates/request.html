@@ -3,7 +3,7 @@
     <li class="layui-this">基本配置</li>
     <li>参数</li>
     <li>Header</li>
-    <li>代理</li>
+    <li>Body</li>
   </ul>
   <div class="layui-tab-content editor-form-node">
     <div class="layui-tab-item layui-show">
@@ -44,6 +44,12 @@
     				<input type="text" name="url" placeholder="请输入起始url" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.url}}">
     			</div>
     		</div>
+    		<div class="layui-form-item">
+	   			<label class="layui-form-label">代理</label>
+	   			<div class="layui-input-block">
+	   				<input type="text" name="proxy" placeholder="host:port" value="{{=d.data.object.proxy}}" autocomplete="off" class="layui-input input-default">
+	   			</div>
+	   		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">请求方法</label>
     			<div class="layui-input-block">
@@ -111,15 +117,139 @@
 	    	</div>
 	    </form>
     </div>
-    <div class="layui-tab-item">
+  	
+  	<div class="layui-tab-item">
     	<form class="layui-form">
-	    	<div class="layui-form-item">
-	   			<label class="layui-form-label">代理</label>
-	   			<div class="layui-input-block">
-	   				<input type="text" name="proxy" placeholder="host:port" value="{{=d.data.object.proxy}}" autocomplete="off" class="layui-input input-default">
-	   			</div>
-	   		</div>
-	   	</form>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">类型</label>
+    			<div class="layui-input-block">
+    				<select name="body-type" lay-filter="bodyType">
+	    				<option value="none" {{d.data.object['body-type'] == 'none' ? 'selected':''}}>none</option>
+	   					<option value="form-data" {{d.data.object['body-type'] == 'form-data' ? 'selected':''}}>form-data</option>
+	   					<option value="raw" {{d.data.object['body-type'] == 'raw' ? 'selected':''}}>raw</option>
+   					</select>
+    			</div>
+    		</div>
+    		<div  class="form-body-raw" {{d.data.object['body-type'] != 'raw' ? 'style="display:none;"':''}}>
+	    		<div class="layui-form-item">
+	    			<label class="layui-form-label">Content-Type</label>
+	    			<div class="layui-input-block">
+	    				<select name="body-content-type">
+		    				<option value="text/plain" {{d.data.object['body-content-type'] == 'text/plain' ? 'selected':''}}>text/plain</option>
+		   					<option value="application/json" {{d.data.object['body-content-type'] == 'application/json' ? 'selected':''}}>application/json</option>
+	   					</select>
+	    			</div>
+	    		</div>
+	    		<div class="layui-form-item">
+	    			<label class="layui-form-label">内容</label>
+	    			<div class="layui-input-block">
+	    				<textarea class="layui-input" style="height:200px" name="request-body">{{=d.data.object['request-body']}}</textarea>
+	    			</div>
+	    		</div>
+    		</div>
+    		<div class="form-body-form-data" {{d.data.object['body-type'] != 'form-data' ? 'style="display:none;"':''}}>
+    			{{# layui.each(d.data.object['parameter-form-name'],function(index){ }}
+    				<div class="layui-form-item layui-form-relative">
+						<i class="layui-icon layui-icon-close parameter-form-remove"></i>
+						<label class="layui-form-label">参数名</label>
+						<div class="layui-input-block">
+							<input type="text" name="parameter-form-name" placeholder="请输入参数名" value="{{=d.data.object['parameter-form-name'][index]}}" autocomplete="off" class="layui-input array">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">参数类型</label>
+						<div class="layui-input-block">
+							<select name="parameter-form-type" lay-filter="formType" class="array">
+								<option value="text" {{d.data.object['parameter-form-type'][index] == 'text' ? 'selected': '' }}">text</option>
+								<option value="file" {{d.data.object['parameter-form-type'][index] == 'file' ? 'selected': '' }}>file</option>
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item" {{d.data.object['parameter-form-type'][index] == 'file' ? '': 'style="display:none;"' }}>
+						<label class="layui-form-label">文件名</label>
+						<div class="layui-input-block">
+							<input type="text" name="parameter-form-filename" placeholder="请输入文件名" value="{{=d.data.object['parameter-form-filename'][index]}}" autocomplete="off" class="layui-input array">
+						</div>
+					</div>
+						<div class="layui-form-item">
+						<label class="layui-form-label">参数值</label>
+						<div class="layui-input-block">
+							<input type="text" name="parameter-form-value" placeholder="请输入参数值" value="{{=d.data.object['parameter-form-value'][index]}}" autocomplete="off" class="layui-input array">
+						</div>
+					</div>
+					<hr>
+    			{{# }) }}
+	    		<div class="layui-form-item">
+		   			<div class="layui-input-block">
+		    			<button class="layui-btn parameter-form-add" type="button">添加一个参数</button>
+		    		</div>
+		    	</div>
+    		</div>
+	    </form>
     </div>
   </div>
 </div>
+<script>
+$("body").on("click",".parameter-form-add",function(){
+	var html = '';
+	html+='<div class="layui-form-item layui-form-relative">';
+	html+=	'<i class="layui-icon layui-icon-close parameter-form-remove"></i>';
+	html+=	'<label class="layui-form-label">参数名</label>';
+	html+=	'<div class="layui-input-block">';
+	html+=		'<input type="text" name="parameter-form-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array">';
+	html+=	'</div>';
+	html+='</div>';
+	html+='<div class="layui-form-item">';
+	html+=	'<label class="layui-form-label">参数类型</label>';
+	html+=	'<div class="layui-input-block">';
+	html+=		'<select name="parameter-form-type" lay-filter="formType" class="array">';
+	html+=			'<option value="text">text</option>';
+	html+=			'<option value="file">file</option>';
+	html+=		'</select>';
+	html+=	'</div>';
+	html+='</div>';
+	html+='<div class="layui-form-item" style="display:none;">';
+	html+=	'<label class="layui-form-label">文件名</label>';
+	html+=	'<div class="layui-input-block">';
+	html+=		'<input type="text" name="parameter-form-filename" placeholder="请输入文件名" autocomplete="off" class="layui-input array">';
+	html+=	'</div>';
+	html+='</div>';
+	html+='<div class="layui-form-item">';
+	html+=	'<label class="layui-form-label">参数值</label>';
+	html+=	'<div class="layui-input-block">';
+	html+=		'<input type="text" name="parameter-form-value" placeholder="请输入参数值" autocomplete="off" class="layui-input array">';
+	html+=	'</div>';
+	html+='</div>';
+	html+='<hr>';
+	$(this).parent().parent().before(html);
+	layui.form.render();
+}).on("click",".parameter-form-remove",function(){
+	var $dom = $(this).parent();
+	$dom.next().remove();
+	$dom.next().remove();
+	$dom.next().remove();
+	$dom.next().remove();
+	$dom.remove();
+	serializeForm();
+});
+layui.form.on('select(bodyType)',function(e){
+	var bodyType = $(e.elem).val();
+	$(".form-body-raw,.form-body-form-data").hide();
+	if(bodyType == 'raw'){
+		$(".form-body-raw").show();
+	}
+	if(bodyType == 'form-data'){
+		$(".form-body-form-data").show();
+	}
+	serializeForm();
+});
+layui.form.on('select(formType)',function(e){
+	var $select = $(e.elem);
+	if($select.val() == 'file'){
+		$select.parents(".layui-form-item").next().show();
+	}else{
+		$select.parents(".layui-form-item").next().hide();
+	}
+	serializeForm();
+})
+</script>

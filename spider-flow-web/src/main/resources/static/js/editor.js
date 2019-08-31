@@ -1,6 +1,23 @@
 var $ = layui.$;
 var editor;
 var flows;
+function serializeForm(){
+	var cell = editor.getSelectedCell();
+	var shape = cell.data.get('shape');
+	cell.data.reset({});
+	$.each($(".properties-container form").serializeArray(),function(index,item){
+		var name = item.name;
+		var value = item.value;
+		if($(".properties-container form *[name="+name+"].array").length > 0){
+			var array = cell.data.get(name) || [];
+			array.push(value);
+			cell.data.set(name,array);
+		}else{
+			cell.data.set(name,value);	
+		}
+	});
+	cell.data.set('shape',shape);
+}
 $(function(){
 	$.ajax({
 		url : 'spider/other',
@@ -59,23 +76,6 @@ $(function(){
 	    resize.setCapture && resize.setCapture();
 	    return false;
 	  }
-	function serializeForm(){
-		var cell = editor.getSelectedCell();
-		var shape = cell.data.get('shape');
-		cell.data.reset({});
-		$.each($(".properties-container form").serializeArray(),function(index,item){
-			var name = item.name;
-			var value = item.value;
-			if($(".properties-container form *[name="+name+"].array").length > 0){
-				var array = cell.data.get(name) || [];
-				array.push(value);
-				cell.data.set(name,array);
-			}else{
-				cell.data.set(name,value);	
-			}
-		});
-		cell.data.set('shape',shape);
-	}
 	var templateCache = {};
 	function loadTemplate(cell,model,callback){
 		var cells = model.cells;
