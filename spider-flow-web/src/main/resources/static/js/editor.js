@@ -81,7 +81,6 @@ function renderCodeMirror(){
 									while((tmp = regx.exec(prefix)) != null){
 										keyword = tmp[1];
 									}
-									console.log(regx,prefix,keyword);
 									var array = grammerVariables;
 									if(keyword != null&&grammers[keyword]){
 										array = grammers[keyword].functions.concat(grammers[keyword].attributes);

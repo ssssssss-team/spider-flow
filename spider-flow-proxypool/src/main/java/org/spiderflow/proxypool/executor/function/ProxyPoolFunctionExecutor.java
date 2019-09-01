@@ -1,13 +1,19 @@
 package org.spiderflow.proxypool.executor.function;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
 import org.spiderflow.proxypool.ProxyPoolManager;
 import org.spiderflow.proxypool.model.Proxy;
+import org.spiderflow.utils.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProxyPoolFunctionExecutor implements FunctionExecutor{
+public class ProxyPoolFunctionExecutor implements FunctionExecutor,Grammer{
 	
 	private static ProxyPoolManager proxyPoolManager;
 
@@ -49,5 +55,8 @@ public class ProxyPoolFunctionExecutor implements FunctionExecutor{
 	public void setProxyPoolManager(ProxyPoolManager proxyPoolManager) {
 		ProxyPoolFunctionExecutor.proxyPoolManager = proxyPoolManager;
 	}
-	
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("proxypool", Arrays.asList("http","https","add"));
+	}
 }

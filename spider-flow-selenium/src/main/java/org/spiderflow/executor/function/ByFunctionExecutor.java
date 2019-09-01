@@ -1,11 +1,17 @@
 package org.spiderflow.executor.function;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.openqa.selenium.By;
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ByFunctionExecutor implements FunctionExecutor{
+public class ByFunctionExecutor implements FunctionExecutor,Grammer{
 
 	@Override
 	public String getFunctionPrefix() {
@@ -35,6 +41,9 @@ public class ByFunctionExecutor implements FunctionExecutor{
 	public static By name(String name){
 		return By.name(name);
 	}
-
-
+	
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("By", Arrays.asList("id","name","tagName","className","css","xpath"));
+	}
 }
