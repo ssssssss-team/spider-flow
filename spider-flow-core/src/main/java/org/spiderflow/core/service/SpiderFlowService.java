@@ -54,7 +54,11 @@ public class SpiderFlowService {
 	
 	@Transactional
 	public int executeCountIncrement(String id, Date lastExecuteTime, Date nextExecuteTime){
-		return repository.executeCountIncrement(id, lastExecuteTime, nextExecuteTime);
+		if(nextExecuteTime == null){
+			return repository.executeCountIncrement(id, lastExecuteTime);
+		}
+		return repository.executeCountIncrementAndExecuteTime(id, lastExecuteTime, nextExecuteTime);
+		
 	}
 	
 	/**
@@ -111,6 +115,11 @@ public class SpiderFlowService {
 		spiderJobManager.addJob(spiderFlow);
 		repository.resetSpiderStatus(id,"1");
 	}
+	@Transactional
+	public void run(String id){
+		spiderJobManager.run(id);
+	}
+	
 	@Transactional
 	public void resetExecuteCount(String id){
 		repository.resetExecuteCount(id);

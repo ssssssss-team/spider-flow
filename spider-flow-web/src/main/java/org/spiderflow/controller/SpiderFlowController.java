@@ -107,6 +107,11 @@ public class SpiderFlowController {
 		spiderFlowService.stop(id);
 	}
 	
+	@RequestMapping("/run")
+	public void run(String id){
+		spiderFlowService.run(id);
+	}
+	
 	@RequestMapping("/cron")
 	public void cron(String id,String cron){
 		spiderFlowService.resetCornExpression(id, cron);

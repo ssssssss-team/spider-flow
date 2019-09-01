@@ -3,7 +3,6 @@ package org.spiderflow.core.job;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
-import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -29,6 +28,9 @@ public class SpiderJobManager {
 	private final static String JOB_NAME = "SPIDER_TASK_";
 	
 	public final static String JOB_PARAM_NAME = "SPIDER_FLOW";
+	
+	@Autowired
+	private SpiderJob spioderJob;
 	
 	/**
 	 * 调度器
@@ -98,16 +100,10 @@ public class SpiderJobManager {
 		}
 	}
 	
-	public boolean run(SpiderFlow spiderFlow){
-		try {
-			JobDataMap dataMap = new JobDataMap();
-			dataMap.put(JOB_PARAM_NAME, spiderFlow);
-			scheduler.triggerJob(getJobKey(spiderFlow.getId()),dataMap);
-			return true;
-		} catch (SchedulerException e) {
-			logger.error("执行定时任务失败",e);
-			return false;
-		}
+	public void run(String id){
+		new Thread(()->{
+			spioderJob.run(id);
+		}).start();
 	}
 	
 	public boolean remove(String id){

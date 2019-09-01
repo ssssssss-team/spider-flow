@@ -28,8 +28,12 @@ public interface SpiderFlowRepository extends JpaRepository<SpiderFlow, String>{
 	public int resetExecuteCount(String id);
 	
 	@Modifying
-	@Query(value = "update sp_flow set execute_count = execute_count + 1,last_execute_time = ?2,next_execute_time = ?3 where id = ?1",nativeQuery = true)
-	public int executeCountIncrement(String id,Date lastExecuteTime,Date nextExecuteTime);
+	@Query(value = "update sp_flow set execute_count = ifnull(execute_count,0) + 1,last_execute_time = ?2,next_execute_time = ?3 where id = ?1",nativeQuery = true)
+	public int executeCountIncrementAndExecuteTime(String id,Date lastExecuteTime,Date nextExecuteTime);
+	
+	@Modifying
+	@Query(value = "update sp_flow set execute_count = ifnull(execute_count,0) + 1,last_execute_time = ?2 where id = ?1",nativeQuery = true)
+	public int executeCountIncrement(String id,Date lastExecuteTime);
 	
 	@Modifying
 	@Query(value = "update sp_flow set cron = ?2,next_execute_time = ?3 where id = ?1",nativeQuery = true)

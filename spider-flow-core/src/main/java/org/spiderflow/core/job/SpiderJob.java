@@ -38,15 +38,21 @@ public class SpiderJob extends QuartzJobBean{
 		if(!spiderJobEnable){
 			return;
 		}
-		Date now = new Date();
-		//下次执行时间
-		Date nextExecuteTime = context.getNextFireTime();
 		JobDataMap dataMap = context.getMergedJobDataMap();
 		SpiderFlow spiderFlow = (SpiderFlow) dataMap.get(SpiderJobManager.JOB_PARAM_NAME);
+		run(spiderFlow,context.getNextFireTime());
+	}
+	
+	public void run(String id){
+		run(spiderFlowService.get(id),null);
+	}
+	
+	public void run(SpiderFlow spiderFlow,Date nextExecuteTime){
+		Date now = new Date();
 		try {
 			logger.info("开始执行任务{}",spiderFlow.getName());
 			spider.run(spiderFlow);
-			logger.info("执行任务{}完毕，下次执行时间：{}",spiderFlow.getName(),DateFormatUtils.format(nextExecuteTime, "yyyy-MM-dd HH:mm:ss"));
+			logger.info("执行任务{}完毕，下次执行时间：{}",spiderFlow.getName(),nextExecuteTime == null ? null: DateFormatUtils.format(nextExecuteTime, "yyyy-MM-dd HH:mm:ss"));
 		} catch (Exception e) {
 			logger.error("执行任务{}出错",spiderFlow.getName(),e);
 		}
