@@ -1,6 +1,12 @@
 package org.spiderflow.core.executor.function;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -11,7 +17,7 @@ import com.alibaba.fastjson.JSON;
  *
  */
 @Component
-public class JsonFunctionExecutor implements FunctionExecutor{
+public class JsonFunctionExecutor implements FunctionExecutor,Grammer{
 	
 	@Override
 	public String getFunctionPrefix() {
@@ -26,4 +32,8 @@ public class JsonFunctionExecutor implements FunctionExecutor{
 		return object != null ? JSON.toJSONString(object) : null;
 	}
 	
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("json", Arrays.asList("parse","stringify"));
+	}
 }

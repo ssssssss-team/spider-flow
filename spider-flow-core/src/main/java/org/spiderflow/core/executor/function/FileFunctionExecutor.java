@@ -5,9 +5,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,7 +21,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class FileFunctionExecutor implements FunctionExecutor{
+public class FileFunctionExecutor implements FunctionExecutor,Grammer{
 	
 	@Override
 	public String getFunctionPrefix() {
@@ -76,6 +81,11 @@ public class FileFunctionExecutor implements FunctionExecutor{
 	
 	public static String string(String path) throws IOException{
 		return StringFunctionExecutor.newString(bytes(path), Charset.defaultCharset().name());
+	}
+	
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("file", Arrays.asList("bytes","string","write"));
 	}
 	
 }

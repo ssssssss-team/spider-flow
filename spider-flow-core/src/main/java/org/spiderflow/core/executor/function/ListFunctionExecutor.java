@@ -1,9 +1,13 @@
 package org.spiderflow.core.executor.function;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,7 +16,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class ListFunctionExecutor implements FunctionExecutor{
+public class ListFunctionExecutor implements FunctionExecutor,Grammer{
 	
 	@Override
 	public String getFunctionPrefix() {
@@ -45,6 +49,10 @@ public class ListFunctionExecutor implements FunctionExecutor{
 	
 	public static List<?> sublist(List<?> list,int fromIndex,int toIndex){
 		return list!= null ? list.subList(fromIndex, toIndex) : new ArrayList<>();
+	}
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("list", Arrays.asList("length","split","subList"));
 	}
 	
 }

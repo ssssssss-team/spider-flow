@@ -1,7 +1,13 @@
 package org.spiderflow.core.executor.function;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.codec.binary.Base64;
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,7 +16,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class Base64FunctionExecutor implements FunctionExecutor{
+public class Base64FunctionExecutor implements FunctionExecutor,Grammer{
 	
 	@Override
 	public String getFunctionPrefix() {
@@ -59,6 +65,11 @@ public class Base64FunctionExecutor implements FunctionExecutor{
 	
 	public static String decodeString(byte[] base64,String charset){
 		return base64  != null ? StringFunctionExecutor.newString(Base64.decodeBase64(base64),charset) :null;
+	}
+
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("base64", Arrays.asList("decode","decodeString","encode","encodeBytes"));
 	}
 	
 }

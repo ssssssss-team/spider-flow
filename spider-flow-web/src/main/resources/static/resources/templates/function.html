@@ -19,15 +19,11 @@
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">循环次数</label>
-    			<div class="layui-input-block">
-    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.loopCount}}">
-    			</div>
+    			<div class="layui-input-block" codemirror="loopCount" placeholder="请输入循环次数" data-value="{{=d.data.object.loopCount}}"></div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">执行函数</label>
-    			<div class="layui-input-block">
-    				<input type="text" name="function" placeholder="执行函数" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.function}}">
-    			</div>
+    			<div class="layui-input-block" codemirror="function" placeholder="执行函数" data-value="{{=d.data.object.function}}"></div>
     		</div>
     	</form>
     </div>

@@ -34,9 +34,7 @@
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">SQL语句</label>
-    			<div class="layui-input-block">
-    				<textarea class="layui-input" style="height:200px" name="sql">{{d.data.object.sql||''}}</textarea>
-    			</div>
+    			<div class="layui-input-block" style="height:200px;" codemirror="sql" data-value="{{d.data.object.sql||''}}"></div>
     		</div>
     	</form>
     </div>

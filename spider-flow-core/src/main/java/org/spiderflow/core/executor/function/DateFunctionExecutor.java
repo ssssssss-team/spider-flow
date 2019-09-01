@@ -1,11 +1,16 @@
 package org.spiderflow.core.executor.function;
 
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,7 +19,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class DateFunctionExecutor implements FunctionExecutor{
+public class DateFunctionExecutor implements FunctionExecutor,Grammer{
 	
 	@Override
 	public String getFunctionPrefix() {
@@ -77,6 +82,11 @@ public class DateFunctionExecutor implements FunctionExecutor{
 	
 	public static Date addSeconds(Date date,int amount){
 		return DateUtils.addSeconds(date, amount);
+	}
+
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("date", Arrays.asList("format","now","parse","addYears","addMonths","addMinutes","addHours","addDays"));
 	}
 
 }

@@ -1,10 +1,14 @@
 package org.spiderflow.core.freemarker.functions;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.spiderflow.Grammer;
 import org.spiderflow.core.utils.ExtractUtils;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 import freemarker.template.TemplateModelException;
@@ -15,7 +19,7 @@ import freemarker.template.TemplateModelException;
  *
  */
 @Component
-public class SelectorFunction extends FreemarkerTemplateMethodModel{
+public class SelectorFunction extends FreemarkerTemplateMethodModel implements Grammer{
 
 	@Override
 	public Object process(List<?> args) throws TemplateModelException {
@@ -50,6 +54,11 @@ public class SelectorFunction extends FreemarkerTemplateMethodModel{
 	@Override
 	public String getFunctionName() {
 		return "selector";
+	}
+	
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("selector", Collections.emptyList());
 	}
 
 }

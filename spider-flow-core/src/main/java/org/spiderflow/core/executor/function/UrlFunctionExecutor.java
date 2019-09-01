@@ -4,8 +4,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,7 +19,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class UrlFunctionExecutor implements FunctionExecutor{
+public class UrlFunctionExecutor implements FunctionExecutor,Grammer{
 	
 	@Override
 	public String getFunctionPrefix() {
@@ -43,5 +48,9 @@ public class UrlFunctionExecutor implements FunctionExecutor{
 		} catch (UnsupportedEncodingException e) {
 			return null;
 		}
+	}
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("url", Arrays.asList("decode","encode"));
 	}
 }

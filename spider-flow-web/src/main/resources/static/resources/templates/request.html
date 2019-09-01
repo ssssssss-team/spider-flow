@@ -22,9 +22,7 @@
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">循环次数</label>
-    			<div class="layui-input-block">
-    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.loopCount}}">
-    			</div>
+    			<div class="layui-input-block" codemirror="loopCount" placeholder="请输入循环次数" data-value="{{=d.data.object.loopCount}}"></div>
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">延迟时间</label>
@@ -40,15 +38,11 @@
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">URL</label>
-    			<div class="layui-input-block">
-    				<input type="text" name="url" placeholder="请输入起始url" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.url}}">
-    			</div>
+    			<div class="layui-input-block" codemirror="url" data-value="{{=d.data.object.url}}"></div>
     		</div>
     		<div class="layui-form-item">
 	   			<label class="layui-form-label">代理</label>
-	   			<div class="layui-input-block">
-	   				<input type="text" name="proxy" placeholder="host:port" value="{{=d.data.object.proxy}}" autocomplete="off" class="layui-input input-default">
-	   			</div>
+	   			<div class="layui-input-block" placeholder="host:port" codemirror="proxy" data-value="{{=d.data.object.proxy}}"></div>
 	   		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">请求方法</label>
@@ -79,9 +73,7 @@
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">参数值</label>
-	    			<div class="layui-input-block">
-	    				<input type="text" name="parameter-value" placeholder="请输入参数值" autocomplete="off" class="layui-input array" value="{{=d.data.object['parameter-value'][index]}}">
-	    			</div>
+	    			<div class="layui-input-block array" placeholder="请输入参数值" codemirror="parameter-value" data-value="{{=d.data.object['parameter-value'][index]}}"></div>
 	    		</div>
 	    		<hr>
 	   		{{# }) }}
@@ -104,9 +96,7 @@
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">header值</label>
-	    			<div class="layui-input-block">
-	    				<input type="text" name="header-value" placeholder="请输入header值" autocomplete="off" class="layui-input array" value="{{=d.data.object['header-value'][index]}}">
-	    			</div>
+	    			<div class="layui-input-block array" placeholder="请输入header值" codemirror="header-value" data-value="{{=d.data.object['header-value'][index]}}"></div>
 	    		</div>
 	    		<hr>
 	   		{{# }) }}
@@ -142,9 +132,7 @@
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">内容</label>
-	    			<div class="layui-input-block">
-	    				<textarea class="layui-input" style="height:200px" name="request-body">{{=d.data.object['request-body']}}</textarea>
-	    			</div>
+	    			<div class="layui-input-block array" style="height:200px;" placeholder="请输入内容" codemirror="request-body" data-value="{{=d.data.object['request-body']}}"></div>
 	    		</div>
     		</div>
     		<div class="form-body-form-data" {{d.data.object['body-type'] != 'form-data' ? 'style="display:none;"':''}}>
@@ -167,15 +155,11 @@
 					</div>
 					<div class="layui-form-item" {{d.data.object['parameter-form-type'][index] == 'file' ? '': 'style="display:none;"' }}>
 						<label class="layui-form-label">文件名</label>
-						<div class="layui-input-block">
-							<input type="text" name="parameter-form-filename" placeholder="请输入文件名" value="{{=d.data.object['parameter-form-filename'][index]}}" autocomplete="off" class="layui-input array">
-						</div>
+						<div class="layui-input-block array" placeholder="请输入文件名" codemirror="parameter-form-filename" data-value="{{=d.data.object['parameter-form-filename']['index']}}"></div>
 					</div>
 						<div class="layui-form-item">
 						<label class="layui-form-label">参数值</label>
-						<div class="layui-input-block">
-							<input type="text" name="parameter-form-value" placeholder="请输入参数值" value="{{=d.data.object['parameter-form-value'][index]}}" autocomplete="off" class="layui-input array">
-						</div>
+						<div class="layui-input-block array" placeholder="请输入参数值" codemirror="parameter-form-value" data-value="{{=d.data.object['parameter-form-value'][index]}}"></div>
 					</div>
 					<hr>
     			{{# }) }}
@@ -189,67 +173,3 @@
     </div>
   </div>
 </div>
-<script>
-$("body").on("click",".parameter-form-add",function(){
-	var html = '';
-	html+='<div class="layui-form-item layui-form-relative">';
-	html+=	'<i class="layui-icon layui-icon-close parameter-form-remove"></i>';
-	html+=	'<label class="layui-form-label">参数名</label>';
-	html+=	'<div class="layui-input-block">';
-	html+=		'<input type="text" name="parameter-form-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array">';
-	html+=	'</div>';
-	html+='</div>';
-	html+='<div class="layui-form-item">';
-	html+=	'<label class="layui-form-label">参数类型</label>';
-	html+=	'<div class="layui-input-block">';
-	html+=		'<select name="parameter-form-type" lay-filter="formType" class="array">';
-	html+=			'<option value="text">text</option>';
-	html+=			'<option value="file">file</option>';
-	html+=		'</select>';
-	html+=	'</div>';
-	html+='</div>';
-	html+='<div class="layui-form-item" style="display:none;">';
-	html+=	'<label class="layui-form-label">文件名</label>';
-	html+=	'<div class="layui-input-block">';
-	html+=		'<input type="text" name="parameter-form-filename" placeholder="请输入文件名" autocomplete="off" class="layui-input array">';
-	html+=	'</div>';
-	html+='</div>';
-	html+='<div class="layui-form-item">';
-	html+=	'<label class="layui-form-label">参数值</label>';
-	html+=	'<div class="layui-input-block">';
-	html+=		'<input type="text" name="parameter-form-value" placeholder="请输入参数值" autocomplete="off" class="layui-input array">';
-	html+=	'</div>';
-	html+='</div>';
-	html+='<hr>';
-	$(this).parent().parent().before(html);
-	layui.form.render();
-}).on("click",".parameter-form-remove",function(){
-	var $dom = $(this).parent();
-	$dom.next().remove();
-	$dom.next().remove();
-	$dom.next().remove();
-	$dom.next().remove();
-	$dom.remove();
-	serializeForm();
-});
-layui.form.on('select(bodyType)',function(e){
-	var bodyType = $(e.elem).val();
-	$(".form-body-raw,.form-body-form-data").hide();
-	if(bodyType == 'raw'){
-		$(".form-body-raw").show();
-	}
-	if(bodyType == 'form-data'){
-		$(".form-body-form-data").show();
-	}
-	serializeForm();
-});
-layui.form.on('select(formType)',function(e){
-	var $select = $(e.elem);
-	if($select.val() == 'file'){
-		$select.parents(".layui-form-item").next().show();
-	}else{
-		$select.parents(".layui-form-item").next().hide();
-	}
-	serializeForm();
-})
-</script>

@@ -1,13 +1,19 @@
 package org.spiderflow.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
+import org.spiderflow.Grammer;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.service.SpiderFlowService;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.Shape;
+import org.spiderflow.utils.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +36,31 @@ public class SpiderFlowController {
 	private List<ShapeExecutor> executors;
 	
 	@Autowired
+	private List<Grammer> grammers;
+	
+	private Map<String,Map<String,List<String>>> keywords = new HashMap<>();
+	
+	@Autowired
 	private SpiderFlowService spiderFlowService;
+	
+	@PostConstruct
+	private void init(){
+		for (Grammer grammer : grammers) {
+			Map<String, List<String>> functions = grammer.getFunctionMap();
+			if(functions != null){
+				functions.entrySet().stream().forEach(e->{
+					keywords.put(e.getKey(), Maps.newMap("functions", e.getValue()));
+				});
+			}
+			Map<String, List<String>> attributes = grammer.getAttributeMap();
+			if(attributes != null){
+				attributes.entrySet().stream().forEach(e->{
+					keywords.put(e.getKey(), Maps.newMap("attributes", e.getValue()));
+				});
+			}
+			
+		}
+	}
 	
 	/**
 	 * 爬虫列表
@@ -90,5 +120,9 @@ public class SpiderFlowController {
 	@RequestMapping("/shapes")
 	public List<Shape> shapes(){
 		return executors.stream().filter(e-> e.shape() !=null).map(executor -> executor.shape()).collect(Collectors.toList());
+	}
+	@RequestMapping("/grammers")
+	public Map<String,Map<String,List<String>>> grammers(){
+		return this.keywords;
 	}
 }

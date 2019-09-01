@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,12 +14,14 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spiderflow.Grammer;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.io.HttpRequest;
 import org.spiderflow.core.io.HttpResponse;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
+import org.spiderflow.utils.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +31,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class RequestExecutor implements ShapeExecutor{
+public class RequestExecutor implements ShapeExecutor,Grammer{
 	
 	public static final String SLEEP = "sleep";
 	
@@ -270,5 +273,9 @@ public class RequestExecutor implements ShapeExecutor{
 				request.header(headerName,value);
 			}
 		}
+	}
+	@Override
+	public Map<String, List<String>> getAttributeMap() {
+		return Maps.newMap("resp", Arrays.asList("json","html","statusCode","cookies","headers","bytes","contentType"));
 	}
 }

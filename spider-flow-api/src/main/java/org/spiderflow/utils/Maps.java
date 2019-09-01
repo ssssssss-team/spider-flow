@@ -12,6 +12,12 @@ public class Maps {
 		return destMap;
 	}
 	
+	public static <K,V> Map<K,V> newMap(K key,V value){
+		HashMap<K, V> map = new HashMap<>();
+		map.put(key, value);
+		return map;
+	}
+	
 	public static <K,V> Map<K,V> add(Map<K,V> srcMap,List<K> ks,List<V> vs){
 		HashMap<K, V> destMap = new HashMap<>(srcMap);
 		if(ks != null && vs != null && ks.size() == vs.size()){

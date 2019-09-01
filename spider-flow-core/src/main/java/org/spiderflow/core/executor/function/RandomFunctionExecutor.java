@@ -1,7 +1,13 @@
 package org.spiderflow.core.executor.function;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.RandomUtils;
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,7 +16,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class RandomFunctionExecutor implements FunctionExecutor{
+public class RandomFunctionExecutor implements FunctionExecutor,Grammer{
 	
 	@Override
 	public String getFunctionPrefix() {
@@ -45,6 +51,11 @@ public class RandomFunctionExecutor implements FunctionExecutor{
 			return new String(newChars);
 		}
 		return null;
+	}
+	
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("random", Arrays.asList("randomInt","randomDouble","randomLong","string"));
 	}
 	
 }

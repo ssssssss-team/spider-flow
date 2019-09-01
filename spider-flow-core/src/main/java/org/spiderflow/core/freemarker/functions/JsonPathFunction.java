@@ -1,8 +1,12 @@
 package org.spiderflow.core.freemarker.functions;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.spiderflow.Grammer;
 import org.spiderflow.core.utils.ExtractUtils;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 import freemarker.template.TemplateModelException;
@@ -12,7 +16,7 @@ import freemarker.template.TemplateModelException;
  *
  */
 @Component
-public class JsonPathFunction extends FreemarkerTemplateMethodModel{
+public class JsonPathFunction extends FreemarkerTemplateMethodModel implements Grammer{
 
 	@Override
 	public Object process(List<?> args) throws TemplateModelException {
@@ -30,5 +34,9 @@ public class JsonPathFunction extends FreemarkerTemplateMethodModel{
 	public String getFunctionName() {
 		return "jsonpath";
 	}
-
+	
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("jsonpath", Collections.emptyList());
+	}
 }

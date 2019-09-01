@@ -4,9 +4,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,7 +18,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class StringFunctionExecutor implements FunctionExecutor{
+public class StringFunctionExecutor implements FunctionExecutor,Grammer{
 	
 	@Override
 	public String getFunctionPrefix() {
@@ -114,4 +117,8 @@ public class StringFunctionExecutor implements FunctionExecutor{
 		return ids;
 	}
 	
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("string", Arrays.asList("bytes","equals","indexOf","length","lower","upper","newString","replace","replaceAll","replaceFirst","split","substring","trim","uuid","uuids"));
+	}
 }

@@ -33,9 +33,7 @@
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">参数值</label>
-	    			<div class="layui-input-block">
-	    				<input type="text" name="parameter-value" placeholder="请输入参数值" autocomplete="off" class="layui-input array" value="{{=d.data.object['parameter-value'][index]}}">
-	    			</div>
+	    			<div class="layui-input-block array" placeholder="请输入参数值" codemirror="parameter-value" data-value="{{=d.data.object['parameter-value'][index]}}"></div>
 	    		</div>
 	    		<hr>
 	   		{{# }) }}
@@ -58,9 +56,7 @@
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">header值</label>
-	    			<div class="layui-input-block">
-	    				<input type="text" name="header-value" placeholder="请输入header值" autocomplete="off" class="layui-input array" value="{{=d.data.object['header-value'][index]}}">
-	    			</div>
+	    			<div class="layui-input-block array" placeholder="请输入header值" codemirror="header-value" data-value="{{=d.data.object['header-value'][index]}}"></div>
 	    		</div>
 	    		<hr>
 	   		{{# }) }}

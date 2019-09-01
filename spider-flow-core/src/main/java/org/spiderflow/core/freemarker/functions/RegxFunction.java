@@ -1,8 +1,12 @@
 package org.spiderflow.core.freemarker.functions;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.spiderflow.Grammer;
 import org.spiderflow.core.utils.ExtractUtils;
+import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 import freemarker.template.TemplateModelException;
@@ -13,7 +17,7 @@ import freemarker.template.TemplateModelException;
  *
  */
 @Component
-public class RegxFunction extends FreemarkerTemplateMethodModel{
+public class RegxFunction extends FreemarkerTemplateMethodModel implements Grammer{
 
 	@Override
 	public String getFunctionName() {
@@ -31,6 +35,11 @@ public class RegxFunction extends FreemarkerTemplateMethodModel{
 	        }
 		}
 		return null;
+	}
+	
+	@Override
+	public Map<String, List<String>> getFunctionMap() {
+		return Maps.newMap("regx", Collections.emptyList());
 	}
 
 }

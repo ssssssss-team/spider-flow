@@ -19,9 +19,7 @@
     		</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">循环次数</label>
-    			<div class="layui-input-block">
-    				<input type="text" name="loopCount" placeholder="请输入循环次数" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.loopCount}}">
-    			</div>
+    			<div class="layui-input-block" codemirror="loopCount" placeholder="请输入循环次数" data-value="{{=d.data.object.loopCount}}"></div>
     		</div>
     		{{# layui.each(d.data.object['output-name'],function(index,output){ }}
     			<hr>
@@ -34,9 +32,7 @@
 	    		</div>
 	    		<div class="layui-form-item">
 	    			<label class="layui-form-label">输出值</label>
-	    			<div class="layui-input-block">
-	    				<input type="text" name="output-value" placeholder="输出值" autocomplete="off" class="layui-input array" value="{{=d.data.object['output-value'][index]}}">
-	    			</div>
+	    			<div class="layui-input-block array" codemirror="output-value" placeholder="输出值" data-value="{{=d.data.object['output-value'][index]}}"></div>
 	    		</div>
     		{{# }) }}
     		<hr>

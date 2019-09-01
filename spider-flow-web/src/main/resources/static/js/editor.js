@@ -1,6 +1,118 @@
 var $ = layui.$;
 var editor;
 var flows;
+var cms = [];
+var grammers = {};
+var grammerVariables = [];
+function initGrammers(){
+	$.ajax({
+		url : 'spider/grammers',
+		dataType : 'json',
+		success : function(gms){
+			grammers = gms;
+			for(var key in grammers){
+				grammerVariables.push(key);
+				grammers[key].functions = (grammers[key].functions || []).sort();
+				grammers[key].attributes = (grammers[key].attributes || []).sort();
+			}
+		}
+	})
+}
+function renderCodeMirror(){
+	cms = [];
+	$('[codemirror]').each(function(){
+		var $dom = $(this);
+		if($dom.attr("rendered") == 'true'){
+			return;
+		}
+		$dom.attr("rendered",true)
+		var cm = CodeMirror(this,{
+			mode : 'spiderflow',	//语法
+			theme : 'idea',	//设置样式
+			placeholder : $dom.attr("placeholder"),
+			value : $dom.attr('data-value') || '',
+			scrollbarStyle : 'null',	//隐藏滚动条
+			hintOptions : {
+				completeSingle : false,
+				hint : function(codeeditor){
+					var cur = codeeditor.getCursor();
+					var curLine = codeeditor.getLine(cur.line);
+					var token = cm.getTokenAt(cur);
+					var end = cur.ch;
+					var start = end;
+					var list = [];
+					var str1 = curLine.charAt(start - 2);
+					var str2 = curLine.charAt(start - 1);
+					if(token.type=='string'){
+						return {
+							list: [], 
+							from: CodeMirror.Pos(cur.line, start), 
+							to: CodeMirror.Pos(cur.line, end)
+						}
+					}
+					if(str1 == '$' && str2 == '{'){
+						return {
+							list: grammerVariables || [], 
+							from: CodeMirror.Pos(cur.line, start), 
+							to: CodeMirror.Pos(cur.line, end)
+						}
+					}else{
+						var prefix = curLine.substring(0,end);
+						var regx = /[^\w]([\w]+?)[\.]/g;
+						var keyword = null;
+						var tmp = null;
+						while((tmp = regx.exec(prefix)) !== null){
+							keyword = tmp[1];
+						}
+						if(str2 == '.'){
+							return {
+								list: grammers[keyword]&&grammers[keyword].functions.concat(grammers[keyword].attributes).sort()||[], 
+								from: CodeMirror.Pos(cur.line, start), 
+								to: CodeMirror.Pos(cur.line, end)
+							}
+						}else{
+							var arr = prefix.split(/[^\w]/);
+							if(arr.length > 0){
+								var str = arr[arr.length - 1];
+								if(str){
+									regx = new RegExp('[^\\w]+([\\w]+?)[\\.]['+str+']','g');
+									var keyword = null;
+									var tmp = null;
+									while((tmp = regx.exec(prefix)) != null){
+										keyword = tmp[1];
+									}
+									console.log(regx,prefix,keyword);
+									var array = grammerVariables;
+									if(keyword != null&&grammers[keyword]){
+										array = grammers[keyword].functions.concat(grammers[keyword].attributes);
+									}
+									for(var i =0,len = array.length;i<len;i++){
+										var s = array[i];
+										if(s!=str&&s.indexOf(str) === 0){
+											list.push(array[i]);
+										}
+									}
+								}
+							}
+						}
+						return {
+							list: list, 
+							from: CodeMirror.Pos(cur.line, token.start), 
+							to: CodeMirror.Pos(cur.line, token.end)
+						}
+					}
+				}
+			}
+		});
+		cm.on('change',function(){
+			cm.closeHint();
+			cm.showHint();
+			$dom.attr('data-value',cm.getValue());
+			serializeForm();
+		});
+		cms.push(cm);
+	});
+}
 function serializeForm(){
 	var cell = editor.getSelectedCell();
 	var shape = cell.data.get('shape');
@@ -16,9 +128,22 @@ function serializeForm(){
 			cell.data.set(name,value);	
 		}
 	});
+	$(".properties-container form [codemirror]").each(function(){
+		var $dom = $(this);
+		var name = $dom.attr('codemirror');
+		var value = $dom.attr('data-value');
+		if($dom.hasClass("array")){
+			var array = cell.data.get(name) || [];
+			array.push(value);
+			cell.data.set(name,array);
+		}else{
+			cell.data.set(name,value);
+		}
+	});
 	cell.data.set('shape',shape);
 }
 $(function(){
+	initGrammers();
 	$.ajax({
 		url : 'spider/other',
 		type : 'post',
@@ -103,6 +228,7 @@ $(function(){
 			},function(html){
 				$(".properties-container").html(html);
 				layui.form.render();
+				renderCodeMirror();
 				callback&&callback();
 			})
 		}
@@ -157,7 +283,8 @@ $(function(){
 				serializeForm();
 			}
 		}).on("click",".editor-form-node .variable-add",function(){
-			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close variable-remove"></i><label class="layui-form-label">变量名</label><div class="layui-input-block"><input type="text" name="variable-name" placeholder="变量名称" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">变量值</label><div class="layui-input-block"><input type="text" name="variable-value" placeholder="请输入变量值" autocomplete="off" class="layui-input array"></div></div><hr>');
+			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close variable-remove"></i><label class="layui-form-label">变量名</label><div class="layui-input-block"><input type="text" name="variable-name" placeholder="变量名称" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">变量值</label><div class="layui-input-block array" codemirror="variable-value" placeholder="请输入变量值"></div></div><hr>');
+			renderCodeMirror();
 		}).on("click",".editor-form-node .header-remove,.editor-form-node .parameter-remove,.editor-form-node .variable-remove,.editor-form-node .output-remove",function(){	//移除多行
 			var $dom = $(this).parent();
 			$dom.prev().remove();
@@ -165,11 +292,14 @@ $(function(){
 			$dom.remove();
 			serializeForm();
 		}).on("click",".editor-form-node .header-add",function(){
-			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close header-remove"></i><label class="layui-form-label">header名</label><div class="layui-input-block"><input type="text" name="header-name" placeholder="header key" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">header值</label><div class="layui-input-block"><input type="text" name="header-value" placeholder="请输入header value" autocomplete="off" class="layui-input array"></div></div><hr>');
+			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close header-remove"></i><label class="layui-form-label">header名</label><div class="layui-input-block"><input type="text" name="header-name" placeholder="header key" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">header值</label><div class="layui-input-block array" codemirror="header-value" placeholder="请输入header value"></div></div><hr>');
+			renderCodeMirror();
 		}).on("click",".editor-form-node .parameter-add",function(){
-			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close parameter-remove"></i><label class="layui-form-label">参数名</label><div class="layui-input-block"><input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">参数值</label><div class="layui-input-block"><input type="text" name="parameter-value" placeholder="请输入参数值" autocomplete="off" class="layui-input array"></div></div><hr>');
+			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close parameter-remove"></i><label class="layui-form-label">参数名</label><div class="layui-input-block"><input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">参数值</label><div class="layui-input-block array" codemirror="parameter-value" placeholder="请输入参数值"></div></div><hr>');
+			renderCodeMirror();
 		}).on("click",".editor-form-node .output-add",function(){
-			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close output-remove"></i><label class="layui-form-label">输出项</label><div class="layui-input-block"><input type="text" name="output-name" placeholder="请输入输出项" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">输出值</label><div class="layui-input-block"><input type="text" name="output-value" placeholder="请输入输出值" autocomplete="off" class="layui-input array"></div></div><hr>');
+			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close output-remove"></i><label class="layui-form-label">输出项</label><div class="layui-input-block"><input type="text" name="output-name" placeholder="请输入输出项" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">输出值</label><div class="layui-input-block array" codemirror="output-value" placeholder="请输入输出值"></div></div><hr>');
+			renderCodeMirror();
 		}).on('click','.btn-datasource-test',function(){
 			var type = $("select[name=datasourceType]").val();
 			var url = $("input[name=datasourceUrl]").val();
@@ -200,6 +330,73 @@ $(function(){
 					}
 				}
 			});
+		}).on("click",".parameter-form-add",function(){
+			var html = '';
+			html+='<div class="layui-form-item layui-form-relative">';
+			html+=	'<i class="layui-icon layui-icon-close parameter-form-remove"></i>';
+			html+=	'<label class="layui-form-label">参数名</label>';
+			html+=	'<div class="layui-input-block">';
+			html+=		'<input type="text" name="parameter-form-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array">';
+			html+=	'</div>';
+			html+='</div>';
+			html+='<div class="layui-form-item">';
+			html+=	'<label class="layui-form-label">参数类型</label>';
+			html+=	'<div class="layui-input-block">';
+			html+=		'<select name="parameter-form-type" lay-filter="formType" class="array">';
+			html+=			'<option value="text">text</option>';
+			html+=			'<option value="file">file</option>';
+			html+=		'</select>';
+			html+=	'</div>';
+			html+='</div>';
+			html+='<div class="layui-form-item" style="display:none;">';
+			html+=	'<label class="layui-form-label">文件名</label>';
+			html+=	'<div class="layui-input-block array" codemirror="parameter-form-filename" placeholder="请输入文件名">';
+			html+=	'</div>';
+			html+='</div>';
+			html+='<div class="layui-form-item">';
+			html+=	'<label class="layui-form-label">参数值</label>';
+			html+=	'<div class="layui-input-block array" codemirror="parameter-form-value" placeholder="请输入参数值">';
+			html+=	'</div>';
+			html+='</div>';
+			html+='<hr>';
+			$(this).parent().parent().before(html);
+			renderCodeMirror();
+			layui.form.render();
+		}).on("click",".parameter-form-remove",function(){
+			var $dom = $(this).parent();
+			$dom.next().remove();
+			$dom.next().remove();
+			$dom.next().remove();
+			$dom.next().remove();
+			$dom.remove();
+			serializeForm();
+		});
+		layui.form.on('select(bodyType)',function(e){
+			var bodyType = $(e.elem).val();
+			$(".form-body-raw,.form-body-form-data").hide();
+			if(bodyType == 'raw'){
+				$(".form-body-raw").show();
+			}
+			if(bodyType == 'form-data'){
+				$(".form-body-form-data").show();
+			}
+			renderCodeMirror();
+			serializeForm();
+		});
+		layui.form.on('select(formType)',function(e){
+			var $select = $(e.elem);
+			if($select.val() == 'file'){
+				$select.parents(".layui-form-item").next().show();
+			}else{
+				$select.parents(".layui-form-item").next().hide();
+			}
+			renderCodeMirror();
+			serializeForm();
+		})
+		layui.element.on('tab',function(){
+			for(var i=0;i<cms.length;i++){
+				cms[i].refresh();
+			}
 		})
 		layui.form.on('select',serializeForm);
 		//loadTemplate('root',graph.getModel().getRoot(),graph);
