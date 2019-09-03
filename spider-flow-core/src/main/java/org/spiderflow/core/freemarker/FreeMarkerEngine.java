@@ -18,10 +18,13 @@ import org.spiderflow.executor.FunctionExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import freemarker.core.NonStringException;
+import freemarker.core.NonStringOrTemplateOutputException;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultArrayAdapter;
+import freemarker.template.DefaultMapAdapter;
 import freemarker.template.DefaultObjectWrapperBuilder;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.Template;
@@ -55,6 +58,12 @@ public class FreeMarkerEngine implements ExpressionEngine{
 	 * 线程内共享的选择器目标对象
 	 */
 	private static ThreadLocal<FreemarkerObject> threadLocal = new ThreadLocal<FreemarkerObject>();
+	
+	/**
+	 * 线程内共享的选择器目标对象
+	 */
+	private static ThreadLocal<Object> threadResultLocal = new ThreadLocal<Object>();
+	
 	/**
 	 * 初始化方法
 	 * @throws TemplateModelException 模板模型异常 由loadStaticFunctions()方法抛出
@@ -71,6 +80,7 @@ public class FreeMarkerEngine implements ExpressionEngine{
 				configuration.setSharedVariable(method.getFunctionName(), method);
 			}
 		}
+		configuration.setObjectWrapper(new FreemarkerObjectWrapper());
 		//加载静态方法
 		loadStaticFunctions();
 	}
@@ -90,6 +100,8 @@ public class FreeMarkerEngine implements ExpressionEngine{
 			}
 			Object ret = wrapper.wrap(obj);
 			if(ret instanceof DefaultArrayAdapter){
+				return null;
+			}else if(ret instanceof DefaultMapAdapter){
 				return null;
 			}
 			return (TemplateModel) ret;
@@ -122,16 +134,26 @@ public class FreeMarkerEngine implements ExpressionEngine{
 				}
 			}
 			return value;
+		}catch(NonStringOrTemplateOutputException | NonStringException e){
+			Object value = threadResultLocal.get();
+			if(value != null && value != variables){
+				return value;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally{
 			ExpressionHolder.remove();
 			threadLocal.remove();
+			threadResultLocal.remove();
 		}
 		return null;
 	}
 	
 	public static void setFreemarkerObjectValue(FreemarkerObject object){
 		threadLocal.set(object);
+	}
+	
+	public static void setFreemarkerObjectValue(Object object){
+		threadResultLocal.set(object);
 	}
 }
