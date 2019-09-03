@@ -228,7 +228,7 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 							}
 						}
 					}else{
-						request.data(parameterName, parameterValue);
+						request.data(parameterName, value);
 						context.log(String.format("设置请求参数:%s=%s", parameterName,value));
 						if(logger.isDebugEnabled()){
 							logger.debug("设置请求参数：{}={}",parameterName,value);
