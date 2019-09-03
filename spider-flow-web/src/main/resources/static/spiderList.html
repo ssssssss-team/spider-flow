@@ -1,174 +1,161 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title>SpiderFlow</title>
-		<link rel="stylesheet" href="js/layui/css/layui.css" />
-		<link rel="stylesheet" href="css/layui-blue.css" />
-		<script type="text/javascript" src="js/layui/layui.all.js" ></script>
-	</head>
-	<body style="padding:5px;">
-		<a class="layui-btn layui-btn-sm layui-btn-normal" href="editor.html"><i class="layui-icon">&#xe654;</i> 添加爬虫</a>
-		<hr>
-		<table class="layui-table" id="table" lay-filter="table"></table>
-		<script>
-			var $ = layui.$;
-			var $table = layui.table.render({
-				id : 'table',
-				elem : '#table',
-				url : 'spider/list',
-				page : true,
-				parseData : function(resp){
-					return {
-						code : 0,
-						data : resp.content,
-						count : resp.totalElements
-					}
+<head>
+	<meta charset="UTF-8">
+	<title>SpiderFlow</title>
+	<link rel="stylesheet" href="js/layui/css/layui.css" />
+	<link rel="stylesheet" href="css/layui-blue.css" />
+	<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+</head>
+<body style="padding:5px;">
+<a class="layui-btn layui-btn-sm layui-btn-normal" href="editor.html"><i class="layui-icon">&#xe654;</i> 添加爬虫</a>
+<hr>
+<table class="layui-table" id="table" lay-filter="table"></table>
+<script>
+	var $ = layui.$;
+	var $table = layui.table.render({
+		id : 'table',
+		elem : '#table',
+		url : 'spider/list',
+		page : true,
+		parseData : function(resp){
+			return {
+				code : 0,
+				data : resp.content,
+				count : resp.totalElements
+			}
+		},
+		cols : [[{
+			title : '序号',
+			width : 60,
+			type : 'numbers',
+			align : 'center'
+		},{
+			title : '爬虫名称',
+			field : 'name',
+			templet : function(row){
+				return '<a class="layui-btn layui-btn-sm" href="editor.html?id='+row.id+'">'+row.name+'</a>';
+			}
+		},{
+			title : 'cron表达式',
+			field : 'cron',
+			width : 100,
+			templet : function(row){
+				return '<a class="layui-btn layui-btn-sm btn-edit-cron" data-id="'+row.id+'" data-cron="'+row.cron+'">'+(row.cron || '编辑cron')+'</a>';
+			}
+		},{
+			title : '启用',
+			field : 'enabled',
+			width : 80,
+			templet : function(row){
+				return '<input type="checkbox" data-cron="'+(row.cron||'')+'" name="switch" lay-skin="switch" value="'+row.id+'" '+(row.enabled == 1 ? 'checked':'')+'>';
+			}
+		},{
+			title : '创建时间',
+			width : 160,
+			field : 'createDate',
+			align : 'center'
+		},{
+			title : '上次执行时间',
+			width : 160,
+			field : 'lastExecuteTime',
+			align : 'center'
+		},{
+			title : '已执行',
+			width : 100,
+			field : 'executeCount',
+			align : 'center'
+		},{
+			title : '下次执行时间',
+			width : 160,
+			field : 'nextExecuteTime',
+			align : 'center'
+		},{
+			title : '操作',
+			width : 120,
+			align : 'center',
+			templet : '#buttons'
+		}]]
+	})
+	layui.form.on('switch',function(e){
+		if(e.elem.checked && !$(e.elem).data('cron')){
+			layui.layer.msg('cron表达式不能为空！');
+			e.elem.checked = false;
+			layui.form.render();
+			return;
+		}
+		$.ajax({
+			url : 'spider/' + (e.elem.checked ? 'start': 'stop'),
+			data : {
+				id : e.value
+			},
+			success : function(){
+				layui.layer.msg((e.elem.checked ? '启用': '禁用') + '成功');
+			},
+			error : function(){
+				layui.layer.msg((e.elem.checked ? '启用': '禁用') + '成功');
+			}
+		})
+	})
+	$("body").on('click','.btn-remove',function(){
+		var id = $(this).data('id');
+		layui.layer.confirm('您确定要删除此爬虫吗？',{
+			title : '删除'
+		},function(index){
+			$table.reload();
+			$.ajax({
+				url : 'spider/remove',
+				data : {
+					id : id
 				},
-				cols : [[{
-					title : '序号',
-					width : 60,
-					type : 'numbers',
-					align : 'center'
-				},{
-					title : '爬虫名称',
-					field : 'name',
-					templet : function(row){
-						return '<a class="layui-btn layui-btn-sm" href="editor.html?id='+row.id+'">'+row.name+'</a>';
-					}
-				},{
-					title : 'cron表达式',
-					field : 'cron',
-					width : 100,
-					templet : function(row){
-						return '<a class="layui-btn layui-btn-sm btn-edit-cron" data-id="'+row.id+'" data-cron="'+row.cron+'">'+(row.cron || '编辑cron')+'</a>';
-					}
-				},{
-					title : '启用',
-					field : 'enabled',
-					width : 80,
-					templet : function(row){
-						return '<input type="checkbox" data-cron="'+(row.cron||'')+'" name="switch" lay-skin="switch" value="'+row.id+'" '+(row.enabled == 1 ? 'checked':'')+'>';
-					}
-				},{
-					title : '创建时间',
-					width : 160,
-					field : 'createDate',
-					align : 'center'
-				},{
-					title : '上次执行时间',
-					width : 160,
-					field : 'lastExecuteTime',
-					align : 'center'
-				},{
-					title : '已执行',
-					width : 100,
-					field : 'executeCount',
-					align : 'center'
-				},{
-					title : '下次执行时间',
-					width : 160,
-					field : 'nextExecuteTime',
-					align : 'center'
-				},{
-					title : '操作',
-					width : 120,
-					align : 'center',
-					templet : '#buttons'
-				}]]
-			})
-			layui.form.on('switch',function(e){
-				if(e.elem.checked && !$(e.elem).data('cron')){
-					layui.layer.msg('cron表达式不能为空！');
-					e.elem.checked = false;
-					layui.form.render();
-					return;
+				success : function(){
+					layui.layer.msg('删除成功',{time : 500},function(){
+						$table.reload();
+					})
+				},
+				error : function(){
+					layui.layer.msg('删除失败')
 				}
-				$.ajax({
-					url : 'spider/' + (e.elem.checked ? 'start': 'stop'),
-					data : {
-						id : e.value
-					},
-					success : function(){
-						layui.layer.msg((e.elem.checked ? '启用': '禁用') + '成功');
-					},
-					error : function(){
-						layui.layer.msg((e.elem.checked ? '启用': '禁用') + '成功');
-					}
-				})		
 			})
-			$("body").on('click','.btn-remove',function(){
-				var id = $(this).data('id');
-				layui.layer.confirm('您确定要删除此爬虫吗？',{
-					title : '删除'
-				},function(index){
-					$table.reload();
-					$.ajax({
-						url : 'spider/remove',
-						data : {
-							id : id
-						},
-						success : function(){
-							layui.layer.msg('删除成功',{time : 500},function(){
-								$table.reload();
-							})	
-						},
-						error : function(){
-							layui.layer.msg('删除失败')	
-						}
+			layui.layer.close(index);
+		})
+	}).on('click','.btn-run',function(){
+		var id = $(this).data('id');
+		layui.layer.confirm('您确定要手动运行一次该爬虫吗？',{
+			title : '运行任务'
+		},function(index){
+			$table.reload();
+			$.ajax({
+				url : 'spider/run',
+				data : {
+					id : id
+				},
+				success : function(){
+					layui.layer.msg('手动运行成功,后台运行中',{time : 500},function(){
+						$table.reload();
 					})
-					layui.layer.close(index);
-				})
-			}).on('click','.btn-run',function(){
-				var id = $(this).data('id');
-				layui.layer.confirm('您确定要手动运行一次该爬虫吗？',{
-					title : '运行任务'
-				},function(index){
-					$table.reload();
-					$.ajax({
-						url : 'spider/run',
-						data : {
-							id : id
-						},
-						success : function(){
-							layui.layer.msg('手动运行成功,后台运行中',{time : 500},function(){
-								$table.reload();
-							})	
-						},
-						error : function(){
-							layui.layer.msg('手动运行失败')	
-						}
-					})
-					layui.layer.close(index);
-				})
-			}).on('click','.btn-edit-cron',function(){
-				var id = $(this).data('id');
-				layui.layer.prompt({
-					title : '请输入cron表达式',
-					value : $(this).data('cron') || ''
-				},function(value,index){
-					$.ajax({
-						url : 'spider/cron',
-						data : {
-							id : id,
-							cron : value
-						},
-						success : function(){
-							layui.layer.msg('修改成功',{time : 500},function(){
-								$table.reload();
-							})	
-						},
-						error : function(){
-							layui.layer.msg('修改失败')	
-						}
-					})
-					layui.layer.close(index);
-				})
+				},
+				error : function(){
+					layui.layer.msg('手动运行失败')
+				}
 			})
-		</script>
-		<script type="text/html" id="buttons">
-			<a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}">手动运行</a>
-			<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
-		</script>
-	</body>
+			layui.layer.close(index);
+		})
+	}).on('click','.btn-edit-cron',function(){
+		var id = $(this).data('id');
+		var value = $(this).data('cron') || '';
+		layer.open({
+			type: 2,
+			area: ['830px', '646px'],
+			fixed: false, //不固定
+			maxmin: true,
+			content: 'editCron.html?id=' + id + '&cron=' + value
+		});
+	})
+</script>
+<script type="text/html" id="buttons">
+	<a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}">手动运行</a>
+	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
+</script>
+</body>
 </html>

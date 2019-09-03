@@ -1,12 +1,5 @@
 package org.spiderflow.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.Grammer;
 import org.spiderflow.core.model.SpiderFlow;
@@ -19,9 +12,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 爬虫Controller
@@ -69,7 +69,7 @@ public class SpiderFlowController {
 	 * @return Page<SpiderFlow> 所有爬虫的列表页
 	 */
 	@RequestMapping("/list")
-	public Page<SpiderFlow> list(@RequestParam(name = "page",defaultValue = "1")Integer page,@RequestParam(name = "limit",defaultValue = "1")Integer size){
+	public Page<SpiderFlow> list(@RequestParam(name = "page",defaultValue = "1")Integer page, @RequestParam(name = "limit",defaultValue = "1")Integer size){
 		return spiderFlowService.findAll(PageRequest.of(page - 1, size,new Sort(Direction.DESC,"createDate")));
 	}
 	
@@ -129,5 +129,10 @@ public class SpiderFlowController {
 	@RequestMapping("/grammers")
 	public Map<String,Map<String,List<String>>> grammers(){
 		return this.keywords;
+	}
+
+	@GetMapping("/recent5TriggerTime")
+	public List<String> getRecent5TriggerTime(String cron){
+		return spiderFlowService.getRecentTriggerTime(cron,5);
 	}
 }

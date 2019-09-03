@@ -1,16 +1,11 @@
 package org.spiderflow.core.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
-
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerUtils;
+import org.quartz.spi.OperableTrigger;
 import org.spiderflow.core.job.SpiderJobManager;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.repository.SpiderFlowRepository;
@@ -19,6 +14,14 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 爬虫流程执行服务
@@ -139,6 +142,31 @@ public class SpiderFlowService {
 	
 	public List<SpiderFlow> selectFlows(){
 		return repository.selectFlows();
+	}
+
+    /**
+     * 根据表达式获取最近几次运行时间
+	 * @param cron 表达式
+	 * @param numTimes 几次
+	 * @return
+     */
+	public List<String> getRecentTriggerTime(String cron,int numTimes) {
+		List<String> list = new ArrayList<String>();
+		CronTrigger trigger = null;
+		try {
+			trigger = TriggerBuilder.newTrigger()
+					.withSchedule(CronScheduleBuilder.cronSchedule(cron))
+					.build();
+		}catch (Exception e) {
+			list.add("cron表达式 "+cron+" 有误：" + e.getCause());
+			return list;
+		}
+		List<Date> dates = TriggerUtils.computeFireTimes((OperableTrigger) trigger, null, numTimes);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		for (Date date : dates) {
+			list.add(dateFormat.format(date));
+		}
+		return list;
 	}
 
 }
