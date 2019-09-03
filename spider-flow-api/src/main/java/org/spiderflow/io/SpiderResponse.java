@@ -22,5 +22,7 @@ public interface SpiderResponse {
 	
 	public String getContentType();
 	
-
+	default void setCharset(String charset){
+		
+	}
 }

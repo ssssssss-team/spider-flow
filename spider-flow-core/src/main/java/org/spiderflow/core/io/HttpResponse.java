@@ -61,4 +61,9 @@ public class HttpResponse implements SpiderResponse{
 		return response.contentType();
 	}
 
+	@Override
+	public void setCharset(String charset) {
+		this.response.charset(charset);
+	}
+
 }

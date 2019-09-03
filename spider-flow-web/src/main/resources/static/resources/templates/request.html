@@ -41,6 +41,12 @@
     			<div class="layui-input-block" codemirror="url" data-value="{{=d.data.object.url}}"></div>
     		</div>
     		<div class="layui-form-item">
+    			<label class="layui-form-label">页面编码</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="response-charset" placeholder="请输入页面编码" autocomplete="off" class="layui-input input-default" value="{{=d.data.object['response-charset']}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
 	   			<label class="layui-form-label">代理</label>
 	   			<div class="layui-input-block" placeholder="host:port" codemirror="proxy" data-value="{{=d.data.object.proxy}}"></div>
 	   		</div>

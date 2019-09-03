@@ -65,6 +65,8 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 	
 	public static final String TIMEOUT = "timeout";
 	
+	public static final String RESPONSE_CHARSET = "response-charset";
+	
 	private static Logger logger = LoggerFactory.getLogger(RequestExecutor.class);
 	
 	@Autowired
@@ -165,6 +167,14 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 		}
 		try {
 			HttpResponse response = request.execute();
+			String charset = node.getStringJsonValue(RESPONSE_CHARSET);
+			if(StringUtils.isNotBlank(charset)){
+				response.setCharset(charset);
+				if(logger.isDebugEnabled()){
+					logger.debug("设置response charset:{}" + charset);
+				}
+				context.log(String.format("设置response charset:%s", charset));
+			}
 			//结果存入变量
 			variables.put("resp", response);
 		} catch (IOException e) {
