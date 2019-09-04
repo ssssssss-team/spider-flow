@@ -561,13 +561,13 @@ function bindToolbarClickAction(editor){
 	}).on('click','.btn-test',function(){
 		layui.layer.open({
 			id : 'test-window',
-			content : '<div class="test-window-container"><div class="output-container"></div><div class="log-container"><textarea class="layui-input" resize="no"></textarea></div></div>',
+			content : '<div class="test-window-container"><div class="output-container"></div><div class="log-container"></div></div>',
 			area : ["1000px","600px"],
 			shade : 0,
 			title : '测试窗口',
 			success : function(){
 				var tableMap = {};
-				var $textarea = $(".test-window-container .log-container textarea")
+				var logElement = $(".test-window-container .log-container")[0];
 				var socket = createWebSocket({
 					onopen : function(){
 						socket.send(JSON.stringify({
@@ -617,9 +617,41 @@ function bindToolbarClickAction(editor){
 								})
 							}
 						}else if(eventType == 'log'){
-							var dom = $textarea[0];
-							$textarea.append(message +'\r\n');
-							dom.scrollTop = dom.scrollHeight;
+							var fragment = document.createDocumentFragment();
+							var div = document.createElement('div');
+							var levelElement = document.createElement('span');
+							levelElement.className = 'level';
+							levelElement.innerHTML = message.level;
+							div.appendChild(levelElement);
+							var timestampElement = document.createElement('span');
+							timestampElement.className = 'timestamp';
+							timestampElement.innerHTML = event.timestamp;
+							div.appendChild(timestampElement);
+							var messageElement = document.createElement('span');
+							messageElement.className = 'message';
+							var msg = message.message;
+							if(message.variables){
+								for(var i=0,len=message.variables.length;i<len;i++){
+									var object = message.variables[i];
+									var variableType = '';
+									var displayText = object;
+									if(Array.isArray(object)){
+										variableType = 'array';
+										displayText = JSON.stringify(displayText);
+									}else{
+										variableType = typeof object;
+										if(variableType == 'object'){
+											displayText = JSON.stringify(displayText);	
+										}
+									}
+									msg = msg.replace('{}','</span><span class="variable variable-'+variableType+'">' + displayText + '</span><span>')
+								}
+							}
+							messageElement.innerHTML = msg;
+							div.appendChild(messageElement);
+							fragment.appendChild(div);
+							logElement.appendChild(fragment);
+							logElement.scrollTop = logElement.scrollHeight;
 						}
 					}
 				});
@@ -630,6 +662,15 @@ function bindToolbarClickAction(editor){
 	}).on('click','.btn-save',function(){
 		Save();
 	})
+	$('body').on('click','.log-container .variable',function(){
+		var msg = $(this).html();
+		layer.open({
+		  type : 1,
+		  title : '日志内容',
+		  content: msg,
+		  shade : 0
+		}); 
+	});
 }
 function createWebSocket(options){
 	options = options || {};

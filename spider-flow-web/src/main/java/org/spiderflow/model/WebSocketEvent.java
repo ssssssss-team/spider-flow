@@ -10,11 +10,28 @@ public class WebSocketEvent<T> {
 	
 	private String eventType;
 	
+	private String timestamp;
+	
 	private T message;
+	
+	public String getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(String timestamp) {
+		this.timestamp = timestamp;
+	}
 
 	public WebSocketEvent(String eventType, T message) {
 		super();
 		this.eventType = eventType;
+		this.message = message;
+	}
+	
+	public WebSocketEvent(String eventType, String timestamp, T message) {
+		super();
+		this.eventType = eventType;
+		this.timestamp = timestamp;
 		this.message = message;
 	}
 

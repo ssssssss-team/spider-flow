@@ -7,8 +7,6 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.model.SpiderFlow;
@@ -30,7 +28,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class Spider {
 	
-	private static Logger logger = LoggerFactory.getLogger(Spider.class);
 	/**
 	 * 节点执行器列表 当前爬虫的全部流程
 	 */
@@ -64,7 +61,7 @@ public class Spider {
 	public List<SpiderOutput> runWithTest(SpiderNode root,SpiderContext context){
 		//开始不允许设置任何东西
 		executeRoot(root, context,new HashMap<>());
-		context.log("测试完毕！");
+		context.info("测试完毕！");
 		return context.getOutputs();
 	}
 	
@@ -111,19 +108,13 @@ public class Spider {
 		if(!executeCondition(fromNode,node,context,variables)){
 			return;
 		}
-		if(logger.isDebugEnabled()){
-			logger.debug("执行节点[{}:{}]",node.getNodeName(),node.getNodeId());
-		}
-		context.log(String.format("执行节点[%s:%s]", node.getNodeName(),node.getNodeId()));
+		context.debug("执行节点[{}:{}]", node.getNodeName(),node.getNodeId());
 		int loopCount = 1;
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
 		if(StringUtils.isNotBlank(loopCountStr)){
 			Object result = engine.execute(loopCountStr, variables);
 			if(result != null){
-				if(logger.isDebugEnabled()){
-					logger.debug("获取循环次数{}={}",loopCountStr,result);
-				}
-				context.log(String.format("获取循环次数%s=%s",loopCountStr,result));
+				context.debug("获取循环次数{}={}",loopCountStr,result);
 				loopCount = ((Long)result).intValue();
 			}
 		}
@@ -138,12 +129,9 @@ public class Spider {
 							try {
 								executor.execute(node, context,nVariables);
 							} catch (Exception e) {
-								logger.error("执行节点[{}:{}]出错",node.getNodeName(),node.getNodeId(),e);
+								context.error("执行节点[{}:{}]出错,异常信息：{}",node.getNodeName(),node.getNodeId(),e);
 							} finally{
-								if(logger.isDebugEnabled()){
-									logger.debug("执行节点[{}:{}]完毕",node.getNodeName(),node.getNodeId());
-								}
-								context.log(String.format("执行节点[%s:%s]完毕", node.getNodeName(),node.getNodeId()));
+								context.debug("执行节点[{}:{}]完毕",node.getNodeName(),node.getNodeId());
 								//递归执行下一级
 								executeaNextNodes(pool, node, context, nVariables);
 							}
@@ -167,10 +155,7 @@ public class Spider {
 				Object result = engine.execute(condition, variables);
 				if(result != null){
 					boolean isContinue = "true".equals(result) || Objects.equals(result, true);
-					if(logger.isDebugEnabled()){
-						logger.debug("判断{}={}",condition,isContinue);
-					}
-					context.log(String.format("判断%s=%s",condition,isContinue));
+					context.debug("判断{}={}",condition,isContinue);
 					return isContinue;
 				}
 				return false;

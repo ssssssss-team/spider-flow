@@ -3,8 +3,6 @@ package org.spiderflow.redis.executor.shape;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.executor.ShapeExecutor;
@@ -16,8 +14,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RedisCommandExecutor implements ShapeExecutor{
-	
-	private static Logger logger = LoggerFactory.getLogger(RedisCommandExecutor.class);
 	
 	public static final String DATASOURCE_ID = "datasourceId";
 	
@@ -52,20 +48,11 @@ public class RedisCommandExecutor implements ShapeExecutor{
 		String command = node.getStringJsonValue(REDIS_COMMAND);
 		String operationType = node.getStringJsonValue(REDIS_OPERATION_TYPE);
 		if(!StringUtils.isNotBlank(datasourceId)){
-			context.log("Redis数据源ID为空！");
-			if(logger.isDebugEnabled()){
-				logger.debug("Redis数据源ID为空！");	
-			}
+			context.debug("Redis数据源ID为空！");
 		}else if(!StringUtils.isNotBlank(command)){
-			context.log("redis命令为空！");
-			if(logger.isDebugEnabled()){
-				logger.debug("redis命令为空！");	
-			}
+			context.debug("redis命令为空！");
 		}else if(!StringUtils.isNotBlank(operationType)){
-			context.log("redis命令类型为空！");
-			if(logger.isDebugEnabled()){
-				logger.debug("redis命令类型为空！");	
-			}
+			context.debug("redis命令类型为空！");
 		}else{
 			StringRedisTemplate redisTemplate = (StringRedisTemplate) context.get(RedisExecutor.REDIS_CONTEXT_KEY + datasourceId);
 			Object operation = getOperations(redisTemplate, operationType);

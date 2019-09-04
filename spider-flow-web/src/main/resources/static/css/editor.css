@@ -95,7 +95,10 @@ html,body{
     overflow: auto;
 }
 .test-window-container .log-container{
-	height : 100px;
+	max-height: 100px;
+    overflow: auto;
+	border: 1px solid #ccc;
+    padding: 0 10px;
 }
 .test-window-container .log-container textarea{
 	width : 100%;
@@ -124,4 +127,43 @@ html,body{
 	-moz-border-radius: 2em;
 	border-radius:2em;
 }
-
+.log-container span{
+	display:inline-block;
+	vertical-align: middle;
+}
+.log-container > div > span{
+	height:24px;
+	line-height:24px;
+	float : left;
+	font-family: 'Consolas';
+}
+.log-container > div{
+	height:24px;
+	line-height:24px;
+	width:100%;
+	clear:both;
+}
+.log-container span.level{
+	text-align:center;
+	width:60px;
+}
+.log-container span.timestamp{
+	margin-right:5px;
+}
+.log-container span.variable{
+	margin:0 2px;
+	max-width: 300px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor:pointer;
+}
+.log-container span.variable-object,.log-container span.variable-array{
+	color : #2a00ff;
+}
+.log-container span.variable.variable-boolean{
+	color : #7f0055
+}
+.log-container span.variable.variable-number{
+	color : #2a00ff;
+}

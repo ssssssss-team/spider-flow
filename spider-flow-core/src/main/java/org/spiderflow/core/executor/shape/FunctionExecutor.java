@@ -3,9 +3,6 @@ package org.spiderflow.core.executor.shape;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.executor.ShapeExecutor;
@@ -23,8 +20,6 @@ public class FunctionExecutor implements ShapeExecutor{
 	
 	public static final String FUNCTION = "function";
 	
-	private static Logger logger = LoggerFactory.getLogger(FunctionExecutor.class);
-	
 	@Autowired
 	private FreeMarkerEngine engine;
 
@@ -35,8 +30,7 @@ public class FunctionExecutor implements ShapeExecutor{
 			try {
 				engine.execute(function, variables);
 			} catch (Exception e) {
-				logger.error("执行函数{}失败",function,e);
-				context.log(String.format("执行函数%s失败,异常信息:%s",function,ExceptionUtils.getStackTrace(e)));
+				context.error("执行函数%s失败,异常信息:{}",e);
 			}
 		}
 	}

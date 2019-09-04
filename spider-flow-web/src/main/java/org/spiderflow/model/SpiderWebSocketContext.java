@@ -31,17 +31,16 @@ public class SpiderWebSocketContext extends SpiderContext{
 		super.addOutput(output);
 		this.write(new WebSocketEvent<>("output", output));
 	}
-	
 	@Override
-	public void log(String message) {
-		super.log(message);
-		write(new WebSocketEvent<>("log", String.format("%s  %s", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),message)));
+	public void log(SpiderLog log) {
+		write(new WebSocketEvent<>("log", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), log));
 	}
 	
 	public <T> void write(WebSocketEvent<T> event){
 		synchronized (session) {
 			if (session.isOpen()) {
 				try {
+					System.out.println(JSON.toJSONString(event));
 					session.getBasicRemote().sendText(JSON.toJSONString(event));
 				} catch (IOException e) {
 					//忽略异常

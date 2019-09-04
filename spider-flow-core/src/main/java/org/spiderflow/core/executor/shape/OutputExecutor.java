@@ -3,9 +3,6 @@ package org.spiderflow.core.executor.shape;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.executor.ShapeExecutor;
@@ -28,8 +25,6 @@ public class OutputExecutor implements ShapeExecutor{
 	
 	@Autowired
 	private FreeMarkerEngine engine;
-	
-	private static Logger logger = LoggerFactory.getLogger(OutputExecutor.class);
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
@@ -43,14 +38,9 @@ public class OutputExecutor implements ShapeExecutor{
 			String outputName = item.get(OUTPUT_NAME);
 			try {
 				value = engine.execute(outputValue, variables);
-				if(logger.isDebugEnabled()){
-					logger.debug("输出{}={}",outputName,value);
-				}
-				context.log(String.format("输出%s=%s", outputName,value));
+				context.debug("输出{}={}", outputName,value);
 			} catch (Exception e) {
-				logger.error("输出{}出错，异常信息：",outputName,e);
-				context.log(String.format("输出%s出错,异常信息：%s", outputName,ExceptionUtils.getStackTrace(e)));
-				ExceptionUtils.wrapAndThrow(e);
+				context.debug("输出{}出错，异常信息：", outputName,e);
 			}
 			output.addOutput(outputName, value);
 		}

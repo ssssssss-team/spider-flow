@@ -4,8 +4,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.executor.ShapeExecutor;
@@ -28,15 +26,10 @@ public class DataSourceExecutor implements ShapeExecutor{
 	
 	public static final String DATASOURCE_PASSWORD = "datasourcePassword";
 	
-	private static Logger logger = LoggerFactory.getLogger(DataSourceExecutor.class);
-
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		if(node.getStringJsonValue(DATASOURCE_TYPE) == null){
-			context.log("数据库类型为空！");
-			if(logger.isDebugEnabled()){
-				logger.debug("数据库类型为空！");
-			}
+			context.debug("数据库类型为空！");
 		}else{
 			String className = DataSourceUtils.getDriverClassByDataBaseType(node.getStringJsonValue(DATASOURCE_TYPE));
 			String username = node.getStringJsonValue(DATASOURCE_USERNAME);
@@ -44,10 +37,7 @@ public class DataSourceExecutor implements ShapeExecutor{
 			String url = node.getStringJsonValue(DATASOURCE_URL);
 			DataSource datasource = DataSourceUtils.createDataSource(className, url, username, password);
 			context.addDataSource(node.getNodeId(), datasource);
-			context.log(String.format("定义数据源%s成功", node.getNodeName()));
-			if(logger.isDebugEnabled()){
-				logger.debug("创建数据源{}成功！",node.getNodeName());
-			}
+			context.debug("创建数据源{}成功！", node.getNodeName());
 		}
 	}
 

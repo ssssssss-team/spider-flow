@@ -68,8 +68,7 @@ public class SeleniumExecutor implements ShapeExecutor{
 				sProxy.setHttpProxy(proxy);
 				capabilities.setCapability(CapabilityType.PROXY, sProxy);
 			} catch (Exception e) {
-				context.log("设置代理出错，异常信息：" + ExceptionUtils.getStackTrace(e));
-				logger.error("设置代理出错",e);
+				context.error("设置代理出错，异常信息：{}",e);
 			}
 		}
 		//设置请求url
@@ -87,8 +86,7 @@ public class SeleniumExecutor implements ShapeExecutor{
 			//结果存入变量
 			variables.put("resp", new SeleniumResponse(driver));
 		} catch (Exception e) {
-			context.log("设置请求url出错，异常信息：" + ExceptionUtils.getStackTrace(e));
-			logger.error("设置请求url出错",e);
+			logger.error("设置请求url出错，异常信息：{}",e);
 			ExceptionUtils.wrapAndThrow(e);
 		}
 		if(logger.isDebugEnabled()){

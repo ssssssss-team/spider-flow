@@ -12,8 +12,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spiderflow.Grammer;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
@@ -67,8 +65,6 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 	
 	public static final String RESPONSE_CHARSET = "response-charset";
 	
-	private static Logger logger = LoggerFactory.getLogger(RequestExecutor.class);
-	
 	@Autowired
 	private FreeMarkerEngine engine;
 
@@ -95,30 +91,20 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 		try {
 			url = engine.execute(node.getStringJsonValue(URL), variables).toString();
 		} catch (Exception e) {
-			context.log("设置请求url出错，异常信息：" + ExceptionUtils.getStackTrace(e));
-			logger.error("设置请求url出错",e);
+			context.debug("设置请求url出错，异常信息：{}", e);
 			ExceptionUtils.wrapAndThrow(e);
 		}
-		if(logger.isDebugEnabled()){
-			logger.debug("设置请求url:{}" , url);
-		}
-		context.log(String.format("设置请求url:%s", url));
+		context.debug("设置请求url:{}", url);
 		request.url(url);
 		//设置请求超时时间
 		int timeout = NumberUtils.toInt(node.getStringJsonValue(TIMEOUT), 60000);
-		if(logger.isDebugEnabled()){
-			logger.debug("设置请求超时时间:{}" , timeout);
-		}
-		context.log(String.format("设置请求超时时间:%s", timeout));
+		context.debug("设置请求超时时间:{}", timeout);
 		request.timeout(timeout);
 		
 		String method = Objects.toString(node.getStringJsonValue(REQUEST_METHOD), "GET");
 		//设置请求方法
 		request.method(method);
-		if(logger.isDebugEnabled()){
-			logger.debug("设置请求方法:{}" + method);
-		}
-		context.log(String.format("设置请求方法:%s", method));
+		context.debug("设置请求方法:{}", method);
 		SpiderNode root = context.getRootNode();
 		//设置请求header
 		setRequestHeader(request, root.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
@@ -131,13 +117,9 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 			try {
 				Object requestBody = engine.execute(node.getStringJsonValue(REQUEST_BODY), variables);
 				request.data(requestBody);
-				if(logger.isDebugEnabled()){
-					logger.debug("设置请求Body:{}" + requestBody);
-				}
-				context.log(String.format("设置请求Body:%s", requestBody));
+				context.debug("设置请求Body:{}", requestBody);
 			} catch (Exception e) {
-				context.log("设置请求Body出错，异常信息：" + ExceptionUtils.getStackTrace(e));
-				logger.error("设置请求Body出错",e);
+				context.debug("设置请求Body出错:{}", e);
 			}
 		}else if("form-data".equals(bodyType)){
 			List<Map<String, String>> formParameters = node.getListJsonValue(PARAMETER_FORM_NAME,PARAMETER_FORM_VALUE,PARAMETER_FORM_TYPE,PARAMETER_FORM_FILENAME);
@@ -155,14 +137,10 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 				String[] proxyArr = proxy.split(":");
 				if(proxyArr != null && proxyArr.length == 2){
 					request.proxy(proxyArr[0], Integer.parseInt(proxyArr[1]));
-					context.log(String.format("设置代理：%s", proxy));
-					if(logger.isDebugEnabled()){
-						logger.debug("设置代理：{}",proxy);
-					}
+					context.debug("设置代理：{}",proxy);
 				}
 			} catch (Exception e) {
-				context.log("设置代理出错，异常信息：" + ExceptionUtils.getStackTrace(e));
-				logger.error("设置代理出错",e);
+				context.debug("设置代理出错，异常信息:{}",e);
 			}
 		}
 		try {
@@ -170,16 +148,12 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 			String charset = node.getStringJsonValue(RESPONSE_CHARSET);
 			if(StringUtils.isNotBlank(charset)){
 				response.setCharset(charset);
-				if(logger.isDebugEnabled()){
-					logger.debug("设置response charset:{}" + charset);
-				}
-				context.log(String.format("设置response charset:%s", charset));
+				context.debug("设置response charset:{}",charset);
 			}
 			//结果存入变量
 			variables.put("resp", response);
 		} catch (IOException e) {
-			logger.error("请求{}出错",url,e);
-			context.log(String.format("请求%s出错,异常信息:%s", url,ExceptionUtils.getStackTrace(e)));
+			context.debug("请求{}出错,异常信息:{}",url,e);
 			ExceptionUtils.wrapAndThrow(e);
 		} finally{
 			if(streams != null){
@@ -217,26 +191,16 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 						if(stream != null){
 							streams.add(stream);
 							request.data(parameterName, parameterFilename, stream);
-							context.log(String.format("设置请求参数:%s=%s", parameterName,parameterFilename));
-							if(logger.isDebugEnabled()){
-								logger.debug("设置请求参数：{}={}",parameterName,parameterFilename);
-							}
+							context.debug("设置请求参数：{}={}",parameterName,parameterFilename);
 						}else{
-							context.log(String.format("设置请求参数:%s失败,无二进制内容", parameterName));
-							if(logger.isDebugEnabled()){
-								logger.debug("设置请求参数：{}失败，无二进制内容",parameterName);
-							}
+							context.debug("设置请求参数：{}失败，无二进制内容",parameterName);
 						}
 					}else{
 						request.data(parameterName, value);
-						context.log(String.format("设置请求参数:%s=%s", parameterName,value));
-						if(logger.isDebugEnabled()){
-							logger.debug("设置请求参数：{}={}",parameterName,value);
-						}
+						context.debug("设置请求参数：{}={}",parameterName,value);
 					}
 				} catch (Exception e) {
-					context.log(String.format("设置请求参数:%s出错，异常信息：%s", parameterName,ExceptionUtils.getStackTrace(e)));
-					logger.error("设置请求参数：{}出错",parameterName,e);
+					context.error("设置请求参数：{}出错,异常信息:{}",parameterName,e);
 				}
 			}
 		}
@@ -251,13 +215,9 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 				String parameterValue = nameValue.get(PARAMETER_VALUE);
 				try {
 					value = engine.execute(parameterValue, variables);
-					context.log(String.format("设置请求参数:%s=%s", parameterName,value));
-					if(logger.isDebugEnabled()){
-						logger.debug("设置请求参数：{}={}",parameterName,value);
-					}
+					context.debug("设置请求参数：{}={}",parameterName,value);
 				} catch (Exception e) {
-					context.log(String.format("设置请求参数:%s出错，异常信息：%s", parameterName,ExceptionUtils.getStackTrace(e)));
-					logger.error("设置请求参数：{}出错",parameterName,e);
+					context.error("设置请求参数：{}出错,异常信息：{}",parameterName,e);
 				}
 				request.data(parameterName, value);
 			}
@@ -272,13 +232,9 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 				String headerValue = nameValue.get(HEADER_VALUE);
 				try {
 					value = engine.execute(headerValue, variables);
-					context.log(String.format("设置请求Header:%s=%s", headerName,value));
-					if(logger.isDebugEnabled()){
-						logger.debug("设置请求Header：{}={}",headerName,value);
-					}
+					context.debug("设置请求Header：{}={}",headerName,value);
 				} catch (Exception e) {
-					context.log(String.format("设置请求Header:%s出错，异常信息：%s", headerName,ExceptionUtils.getStackTrace(e)));
-					logger.error("设置请求Header：{}出错",headerName,e);
+					context.error("设置请求Header：{}出错,异常信息：{}",headerName,e);
 				}
 				request.header(headerName,value);
 			}

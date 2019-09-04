@@ -3,9 +3,6 @@ package org.spiderflow.core.executor.shape;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.executor.ShapeExecutor;
@@ -25,8 +22,6 @@ public class VariableExecutor implements ShapeExecutor{
 	
 	private static final String VARIABLE_VALUE = "variable-value";
 	
-	private static Logger logger = LoggerFactory.getLogger(VariableExecutor.class);
-	
 	@Autowired
 	private FreeMarkerEngine engine;
 
@@ -39,14 +34,9 @@ public class VariableExecutor implements ShapeExecutor{
 			String variableValue = nameValue.get(VARIABLE_VALUE);
 			try {
 				value = engine.execute(variableValue, variables);
-				context.log(String.format("设置变量%s=%s", variableName,value));
-				if (logger.isDebugEnabled()) {
-					logger.debug("设置变量{}={}",variableName,value);
-				}
+				context.debug("设置变量{}={}",variableName,value);
 			} catch (Exception e) {
-				logger.error("设置变量{}出错，异常信息：",variableName,e);
-				context.log(String.format("设置变量%s出错,异常信息：%s", variableName,ExceptionUtils.getStackTrace(e)));
-				ExceptionUtils.wrapAndThrow(e);
+				context.error("设置变量{}出错，异常信息：{}",variableName,e);
 			}
 			variables.put(variableName, value);
 		}
