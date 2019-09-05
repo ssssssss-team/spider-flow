@@ -140,7 +140,7 @@ public class FreeMarkerEngine implements ExpressionEngine{
 				return value;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} finally{
 			ExpressionHolder.remove();
 			threadLocal.remove();

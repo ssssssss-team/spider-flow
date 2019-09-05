@@ -40,7 +40,6 @@ public class SpiderWebSocketContext extends SpiderContext{
 		synchronized (session) {
 			if (session.isOpen()) {
 				try {
-					System.out.println(JSON.toJSONString(event));
 					session.getBasicRemote().sendText(JSON.toJSONString(event));
 				} catch (IOException e) {
 					//忽略异常

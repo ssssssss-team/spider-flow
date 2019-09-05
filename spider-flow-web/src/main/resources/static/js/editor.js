@@ -565,6 +565,47 @@ function bindToolbarClickAction(editor){
 			area : ["1000px","600px"],
 			shade : 0,
 			title : '测试窗口',
+			btn : ['关闭','显示/隐藏输出','显示/隐藏日志'],
+			btn2 : function(){
+				var $output = $(".test-window-container .output-container");
+				var $log = $(".test-window-container .log-container");
+				if($output.is(":hidden")){
+					$output.show();
+					$output.css({
+						height : $log.is(":hidden") ? '420px' : '320px'
+					})
+					$log.css({
+						maxHeight : '100px'
+					})
+				}else{
+					$output.hide();
+					$log.css({
+						maxHeight : '420px'
+					})
+				}
+				return false;
+			},
+			btn3 : function(){
+				var $output = $(".test-window-container .output-container");
+				var $log = $(".test-window-container .log-container");
+				if($log.is(":hidden")){
+					$log.show();
+					$log.css({
+						maxHeight : $output.is(":hidden") ? '420px' : '100px'
+					})
+					$output.css({
+						height : '320px'
+					})
+				}else{
+					$log.hide();
+					$output.css({
+						height : '420px'
+					})
+				}
+				var logElement = $(".test-window-container .log-container")[0];
+				logElement.scrollTop = logElement.scrollHeight;
+				return false;
+			},
 			success : function(){
 				var tableMap = {};
 				var logElement = $(".test-window-container .log-container")[0];
@@ -619,6 +660,7 @@ function bindToolbarClickAction(editor){
 						}else if(eventType == 'log'){
 							var fragment = document.createDocumentFragment();
 							var div = document.createElement('div');
+							div.className = 'test-log log-' + message.level;
 							var levelElement = document.createElement('span');
 							levelElement.className = 'level';
 							levelElement.innerHTML = message.level;
@@ -664,11 +706,31 @@ function bindToolbarClickAction(editor){
 	})
 	$('body').on('click','.log-container .variable',function(){
 		var msg = $(this).html();
+		var json;
+		try{
+			json = JSON.parse(msg);
+			if(!(Array.isArray(json) || typeof json == 'object')){
+				json = null;
+			}
+		}catch(e){
+			
+		}
 		layer.open({
 		  type : 1,
 		  title : '日志内容',
-		  content: msg,
-		  shade : 0
+		  content: '<div class="message-content" style="padding:10px;'+(json ? '':'font-weight:bold;')+'"></div>',
+		  shade : 0,
+		  area : json ? ['700px','500px'] : 'auto',
+		  maxmin : true,
+		  success : function(dom,index){
+			 var $dom = $(dom).find(".message-content");
+			 if(json){
+				 jsonTree.create(json,$dom[0]);
+			 }else{
+				 $dom.html(msg.replace(/\n/g,'<br>'));
+			 }
+			 
+		  }
 		}); 
 	});
 }

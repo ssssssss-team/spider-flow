@@ -152,7 +152,12 @@ public class Spider {
 		if(fromNode != null){
 			String condition = node.getCondition(fromNode.getNodeId());
 			if(StringUtils.isNotBlank(condition)){	//判断是否有条件
-				Object result = engine.execute(condition, variables);
+				Object result = null;
+				try {
+					result = engine.execute(condition, variables);
+				} catch (Exception e) {
+					context.error("判断{}出错,异常信息：{}",condition,e);
+				}
 				if(result != null){
 					boolean isContinue = "true".equals(result) || Objects.equals(result, true);
 					context.debug("判断{}={}",condition,isContinue);

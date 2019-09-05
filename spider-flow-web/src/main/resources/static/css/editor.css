@@ -130,18 +130,22 @@ html,body{
 .log-container span{
 	display:inline-block;
 	vertical-align: middle;
+	font-weight: bold;
 }
-.log-container > div > span{
+.log-container .test-log > span{
 	height:24px;
 	line-height:24px;
 	float : left;
 	font-family: 'Consolas';
 }
-.log-container > div{
+.log-container .test-log{
 	height:24px;
 	line-height:24px;
 	width:100%;
 	clear:both;
+}
+.log-container .test-log.log-error{
+	color : red;
 }
 .log-container span.level{
 	text-align:center;
@@ -152,18 +156,25 @@ html,body{
 }
 .log-container span.variable{
 	margin:0 2px;
-	max-width: 300px;
+	max-width: 230px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	cursor:pointer;
+	color: #025900;
 }
 .log-container span.variable-object,.log-container span.variable-array{
 	color : #2a00ff;
 }
 .log-container span.variable.variable-boolean{
-	color : #7f0055
+	color : #600100;
 }
 .log-container span.variable.variable-number{
-	color : #2a00ff;
+	color : #000E59;
+}
+.jsontree_value-wrapper{
+	overflow: unset !important;
+}
+.jsontree_value_string,.jsontree_node{
+	white-space: nowrap;
 }
