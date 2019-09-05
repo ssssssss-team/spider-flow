@@ -5,12 +5,10 @@ import java.util.List;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.freemarker.FreemarkerObject;
 
-import freemarker.template.SimpleHash;
 import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateScalarModel;
-import freemarker.template.WrappingTemplateModel;
 /**
  * 选择器模版方法模型抽象类
  * @author jmxd
