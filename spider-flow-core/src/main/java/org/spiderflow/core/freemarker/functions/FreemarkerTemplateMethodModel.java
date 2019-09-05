@@ -5,11 +5,12 @@ import java.util.List;
 import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.freemarker.FreemarkerObject;
 
-import freemarker.ext.util.WrapperTemplateModel;
+import freemarker.template.SimpleHash;
 import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateScalarModel;
+import freemarker.template.WrappingTemplateModel;
 /**
  * 选择器模版方法模型抽象类
  * @author jmxd
@@ -57,9 +58,11 @@ public abstract class FreemarkerTemplateMethodModel implements TemplateMethodMod
 	protected Object getObjectValue(Object value){
 		if(value != null){
 			try {
-				if(value instanceof WrapperTemplateModel){
-					WrapperTemplateModel model = (WrapperTemplateModel) value;
+				if(value instanceof freemarker.ext.util.WrapperTemplateModel){
+					freemarker.ext.util.WrapperTemplateModel model = (freemarker.ext.util.WrapperTemplateModel) value;
 					return model.getWrappedObject();
+				}else if(value instanceof freemarker.template.WrappingTemplateModel){
+					return FreeMarkerEngine.getFreemarkerResultObjectValue();
 				}
 			} catch (Exception e) {
 				return null;
@@ -78,6 +81,7 @@ public abstract class FreemarkerTemplateMethodModel implements TemplateMethodMod
 			return false;
 		}
 	}
+	
 	
 	/**
 	 * 流程

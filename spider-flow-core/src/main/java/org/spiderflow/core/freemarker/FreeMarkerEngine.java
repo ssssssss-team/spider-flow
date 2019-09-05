@@ -153,6 +153,10 @@ public class FreeMarkerEngine implements ExpressionEngine{
 		threadLocal.set(object);
 	}
 	
+	public static Object getFreemarkerResultObjectValue(){
+		return threadResultLocal.get();
+	}
+	
 	public static void setFreemarkerObjectValue(Object object){
 		threadResultLocal.set(object);
 	}
