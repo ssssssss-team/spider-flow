@@ -682,6 +682,12 @@ function bindToolbarClickAction(editor){
 										variableType = typeof object;
 										if(variableType == 'object'){
 											displayText = JSON.stringify(displayText);	
+										}else{
+											var temp = document.createElement('div');
+											(temp.textContent != null) ? (temp.textContent = displayText) : (temp.innerText = displayText);
+											displayText = temp.innerHTML;
+											temp = null;
+											
 										}
 									}
 									msg = msg.replace('{}','</span><span class="variable variable-'+variableType+'">' + displayText + '</span><span>')
@@ -716,18 +722,17 @@ function bindToolbarClickAction(editor){
 		layer.open({
 		  type : 1,
 		  title : '日志内容',
-		  content: '<div class="message-content" style="padding:10px;'+(json ? '':'font-weight:bold;')+'"></div>',
+		  content: '<div class="message-content" style="padding:10px;'+(json ? '':'font-weight:bold;')+'">'+(json ? '' : msg.replace(/\n/g,'<br>'))+'</div>',
 		  shade : 0,
 		  area : json ? ['700px','500px'] : 'auto',
 		  maxmin : true,
+		  maxWidth : json ? undefined : 700,
+		  maxHeight : json ? undefined : 500,
 		  success : function(dom,index){
 			 var $dom = $(dom).find(".message-content");
 			 if(json){
 				 jsonTree.create(json,$dom[0]);
-			 }else{
-				 $dom.html(msg.replace(/\n/g,'<br>'));
 			 }
-			 
 		  }
 		}); 
 	});
