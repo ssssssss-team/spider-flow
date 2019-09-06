@@ -173,34 +173,37 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 			for (Map<String,String> nameValue : parameters) {
 				Object value = null;
 				String parameterName = nameValue.get(PARAMETER_FORM_NAME);
-				String parameterValue = nameValue.get(PARAMETER_FORM_VALUE);
-				String parameterType = nameValue.get(PARAMETER_FORM_TYPE);
-				String parameterFilename = nameValue.get(PARAMETER_FORM_FILENAME);
-				boolean hasFile = "file".equals(parameterType);
-				try {
-					value = engine.execute(parameterValue, variables);
-					if(hasFile){
-						InputStream stream = null;
-						if(value instanceof byte[]){
-							stream = new ByteArrayInputStream((byte[]) value);
-						}else if(value instanceof String){
-							stream = new ByteArrayInputStream(((String)value).getBytes());
-						}else if(value instanceof InputStream){
-							stream = (InputStream) value;
-						}
-						if(stream != null){
-							streams.add(stream);
-							request.data(parameterName, parameterFilename, stream);
-							context.debug("设置请求参数：{}={}",parameterName,parameterFilename);
+				if(StringUtils.isNotBlank(parameterName)){
+					String parameterValue = nameValue.get(PARAMETER_FORM_VALUE);
+					String parameterType = nameValue.get(PARAMETER_FORM_TYPE);
+					String parameterFilename = nameValue.get(PARAMETER_FORM_FILENAME);
+					boolean hasFile = "file".equals(parameterType);
+					try {
+						value = engine.execute(parameterValue, variables);
+						if(hasFile){
+							InputStream stream = null;
+							if(value instanceof byte[]){
+								stream = new ByteArrayInputStream((byte[]) value);
+							}else if(value instanceof String){
+								stream = new ByteArrayInputStream(((String)value).getBytes());
+							}else if(value instanceof InputStream){
+								stream = (InputStream) value;
+							}
+							if(stream != null){
+								streams.add(stream);
+								request.data(parameterName, parameterFilename, stream);
+								context.debug("设置请求参数：{}={}",parameterName,parameterFilename);
+							}else{
+								context.debug("设置请求参数：{}失败，无二进制内容",parameterName);
+							}
 						}else{
-							context.debug("设置请求参数：{}失败，无二进制内容",parameterName);
+							request.data(parameterName, value);
+							context.debug("设置请求参数：{}={}",parameterName,value);
 						}
-					}else{
-						request.data(parameterName, value);
-						context.debug("设置请求参数：{}={}",parameterName,value);
+						
+					} catch (Exception e) {
+						context.error("设置请求参数：{}出错,异常信息:{}",parameterName,e);
 					}
-				} catch (Exception e) {
-					context.error("设置请求参数：{}出错,异常信息:{}",parameterName,e);
 				}
 			}
 		}
@@ -212,14 +215,16 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 			for (Map<String,String> nameValue : parameters) {
 				Object value = null;
 				String parameterName = nameValue.get(PARAMETER_NAME);
-				String parameterValue = nameValue.get(PARAMETER_VALUE);
-				try {
-					value = engine.execute(parameterValue, variables);
-					context.debug("设置请求参数：{}={}",parameterName,value);
-				} catch (Exception e) {
-					context.error("设置请求参数：{}出错,异常信息：{}",parameterName,e);
+				if(StringUtils.isNotBlank(parameterName)){
+					String parameterValue = nameValue.get(PARAMETER_VALUE);
+					try {
+						value = engine.execute(parameterValue, variables);
+						context.debug("设置请求参数：{}={}",parameterName,value);
+					} catch (Exception e) {
+						context.error("设置请求参数：{}出错,异常信息：{}",parameterName,e);
+					}
+					request.data(parameterName, value);
 				}
-				request.data(parameterName, value);
 			}
 		}
 	}
@@ -229,14 +234,16 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 			for (Map<String,String> nameValue : headers) {
 				Object value = null;
 				String headerName = nameValue.get(HEADER_NAME);
-				String headerValue = nameValue.get(HEADER_VALUE);
-				try {
-					value = engine.execute(headerValue, variables);
-					context.debug("设置请求Header：{}={}",headerName,value);
-				} catch (Exception e) {
-					context.error("设置请求Header：{}出错,异常信息：{}",headerName,e);
+				if(StringUtils.isNotBlank(headerName)){
+					String headerValue = nameValue.get(HEADER_VALUE);
+					try {
+						value = engine.execute(headerValue, variables);
+						context.debug("设置请求Header：{}={}",headerName,value);
+					} catch (Exception e) {
+						context.error("设置请求Header：{}出错,异常信息：{}",headerName,e);
+					}
+					request.header(headerName,value);
 				}
-				request.header(headerName,value);
 			}
 		}
 	}
