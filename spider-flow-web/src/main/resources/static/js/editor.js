@@ -644,9 +644,7 @@ function bindToolbarClickAction(editor){
 							}
 							tableMap[tableId].data.unshift(row);
 							if(tableMap[tableId].instance){
-								tableMap[tableId].instance.reload({
-									data : tableMap[tableId].data
-								})
+								$('[lay-id="'+tableId+'"] .layui-laypage-btn').trigger('click');
 							}else{
 								tableMap[tableId].instance = layui.table.render({
 									elem : '#' + tableId,
