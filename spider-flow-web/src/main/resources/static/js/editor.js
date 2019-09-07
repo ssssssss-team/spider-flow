@@ -559,9 +559,11 @@ function bindToolbarClickAction(editor){
 //		editor.setXML($(".xml-container textarea").val());
 //		editor.onSelectedCell();
 	}).on('click','.btn-test',function(){
+		var LogViewer;
+		var tableMap = {};
 		layui.layer.open({
 			id : 'test-window',
-			content : '<div class="test-window-container"><div class="output-container"></div><div class="log-container"></div></div>',
+			content : '<div class="test-window-container"><div class="output-container"></div><canvas class="log-container" width="960" height="100"></canvas></div>',
 			area : ["1000px","600px"],
 			shade : 0,
 			title : '测试窗口',
@@ -571,17 +573,19 @@ function bindToolbarClickAction(editor){
 				var $log = $(".test-window-container .log-container");
 				if($output.is(":hidden")){
 					$output.show();
-					$output.css({
-						height : $log.is(":hidden") ? '420px' : '320px'
-					})
-					$log.css({
-						maxHeight : '100px'
-					})
+					$output.find("canvas").css('height', $log.is(":hidden") ? 460 : 320)
+					$log.attr('height',100)
+					LogViewer.resize();
+					for(var tableId in tableMap){
+						tableMap[tableId].resize();
+					}
 				}else{
 					$output.hide();
-					$log.css({
-						maxHeight : '420px'
-					})
+					$log.attr('height',460);
+					LogViewer.resize();
+					for(var tableId in tableMap){
+						tableMap[tableId].resize();
+					}
 				}
 				return false;
 			},
@@ -590,25 +594,36 @@ function bindToolbarClickAction(editor){
 				var $log = $(".test-window-container .log-container");
 				if($log.is(":hidden")){
 					$log.show();
-					$log.css({
-						maxHeight : $output.is(":hidden") ? '420px' : '100px'
-					})
-					$output.css({
-						height : '320px'
-					})
+					$log.attr('height',$output.is(":hidden") ? 460 : 100)
+					$output.find("canvas").attr('height',320);
+					LogViewer.resize();
+					for(var tableId in tableMap){
+						tableMap[tableId].resize();
+					}
 				}else{
 					$log.hide();
-					$output.css({
-						height : '420px'
-					})
+					$output.find("canvas").attr('height',460);
+					LogViewer.resize();
+					for(var tableId in tableMap){
+						tableMap[tableId].resize();
+					}
 				}
-				var logElement = $(".test-window-container .log-container")[0];
-				logElement.scrollTop = logElement.scrollHeight;
 				return false;
 			},
 			success : function(){
-				var tableMap = {};
 				var logElement = $(".test-window-container .log-container")[0];
+				var colors = {
+					'array' : '#2a00ff',
+					'object' : '#2a00ff',
+					'boolean' : '#600100',
+					'number' : '#000E59'
+				}
+				LogViewer = new CanvasViewer({
+					element : logElement,
+					onClick : function(e){
+						onCanvasViewerClick(e,'日志');
+					}
+				})
 				var socket = createWebSocket({
 					onopen : function(){
 						socket.send(JSON.stringify({
@@ -624,55 +639,59 @@ function bindToolbarClickAction(editor){
 							var tableId = 'output-' + message.nodeId;
 							var $table = $('#' + tableId);
 							if($table.length == 0){
-								$table = $('<table/>').appendTo($(".test-window-container .output-container"));
-								$table.attr('id',tableId).attr("class","layui-table").attr("size","mini");
-								var cols = [];
-								for(var i =0,len = message.outputNames.length;i<len;i++){
-									cols.push({
-										field : message.outputNames[i],
-										title : message.outputNames[i]
-									})
-								}
-								tableMap[tableId] = {
-									cols : [cols],
-									data : []
-								};
-							}
-							var row = {};
-							for(var i =0,len = message.outputNames.length;i<len;i++){
-								row[message.outputNames[i]] = message.values[i];
-							}
-							tableMap[tableId].data.unshift(row);
-							if(tableMap[tableId].instance){
-								$('[lay-id="'+tableId+'"] .layui-laypage-btn').trigger('click');
-							}else{
-								tableMap[tableId].instance = layui.table.render({
-									elem : '#' + tableId,
-									cols : tableMap[tableId].cols,
-									data : tableMap[tableId].data,
-									page : true,
-									limit : 5,
-									limits : [5]
+								tableMap[tableId] = {};
+								$table = $('<canvas width="960" height="320"/>').appendTo($(".test-window-container .output-container"));
+								$table.attr('id',tableId);
+								tableMap[tableId] = new CanvasViewer({
+									element : document.getElementById(tableId),
+									grid : true,
+									header : true,
+									style : {
+										font : '12px Arial'
+									},
+									onClick : function(e){
+										onCanvasViewerClick(e,'表格');
+									}
 								})
+								var cols = [];
+								var texts = [];
+								for(var i =0,len = message.outputNames.length;i<len;i++){
+									texts.push(new CanvasText({
+										text : message.outputNames[i],
+										maxWidth : 200,
+										click : true
+									}));
+								}
+								tableMap[tableId].append(texts);
 							}
+							var texts = [];
+							for(var i =0,len = message.outputNames.length;i<len;i++){
+								texts.push(new CanvasText({
+									text : message.values[i],
+									maxWidth : 200,
+									click : true
+								}));
+							}
+							tableMap[tableId].append(texts);
+							tableMap[tableId].scrollTo(-1);
 						}else if(eventType == 'log'){
-							var fragment = document.createDocumentFragment();
-							var div = document.createElement('div');
-							div.className = 'test-log log-' + message.level;
-							var levelElement = document.createElement('span');
-							levelElement.className = 'level';
-							levelElement.innerHTML = message.level;
-							div.appendChild(levelElement);
-							var timestampElement = document.createElement('span');
-							timestampElement.className = 'timestamp';
-							timestampElement.innerHTML = event.timestamp;
-							div.appendChild(timestampElement);
-							var messageElement = document.createElement('span');
-							messageElement.className = 'message';
-							var msg = message.message;
-							if(message.variables){
-								for(var i=0,len=message.variables.length;i<len;i++){
-									var object = message.variables[i];
+							var texts = [];
+							texts.push(new CanvasText({
+								text : message.level
+							}));
+							texts.push(new CanvasText({
+								text : event.timestamp
+							}));
+							var temp = message.message.split("{}");
+							message.variables = message.variables || [];
+							for(var i=0,len=temp.length;i<len;i++){
+								if(temp[i]!=''){
+									texts.push(new CanvasText({
+										text : temp[i]
+									}))
+								}
+								var object = message.variables[i];
+								if(object != undefined){
 									var variableType = '';
 									var displayText = object;
 									if(Array.isArray(object)){
@@ -682,22 +701,18 @@ function bindToolbarClickAction(editor){
 										variableType = typeof object;
 										if(variableType == 'object'){
 											displayText = JSON.stringify(displayText);	
-										}else{
-											var temp = document.createElement('div');
-											(temp.textContent != null) ? (temp.textContent = displayText) : (temp.innerText = displayText);
-											displayText = temp.innerHTML;
-											temp = null;
-											
 										}
 									}
-									msg = msg.replace('{}','</span><span class="variable variable-'+variableType+'">' + displayText + '</span><span>')
+									texts.push(new CanvasText({
+										text : displayText,
+										maxWidth : 230,
+										color : colors[variableType] || '#025900',
+										click : true
+									}))
 								}
 							}
-							messageElement.innerHTML = msg;
-							div.appendChild(messageElement);
-							fragment.appendChild(div);
-							logElement.appendChild(fragment);
-							logElement.scrollTop = logElement.scrollHeight;
+							LogViewer.append(texts);
+							LogViewer.scrollTo(-1);
 						}
 					}
 				});
@@ -708,34 +723,34 @@ function bindToolbarClickAction(editor){
 	}).on('click','.btn-save',function(){
 		Save();
 	})
-	$('body').on('click','.log-container .variable',function(){
-		var msg = $(this).html();
-		var json;
-		try{
-			json = JSON.parse(msg);
-			if(!(Array.isArray(json) || typeof json == 'object')){
-				json = null;
-			}
-		}catch(e){
-			
+}
+function onCanvasViewerClick(e,source){
+	var msg = e.text;
+	var json;
+	try{
+		json = JSON.parse(msg);
+		if(!(Array.isArray(json) || typeof json == 'object')){
+			json = null;
 		}
-		layer.open({
-		  type : 1,
-		  title : '日志内容',
-		  content: '<div class="message-content" style="padding:10px;'+(json ? '':'font-weight:bold;')+'">'+(json ? '' : msg.replace(/\n/g,'<br>'))+'</div>',
-		  shade : 0,
-		  area : json ? ['700px','500px'] : 'auto',
-		  maxmin : true,
-		  maxWidth : json ? undefined : 700,
-		  maxHeight : json ? undefined : 500,
-		  success : function(dom,index){
-			 var $dom = $(dom).find(".message-content");
-			 if(json){
-				 jsonTree.create(json,$dom[0]);
-			 }
-		  }
-		}); 
-	});
+	}catch(e){
+		
+	}
+	layer.open({
+	  type : 1,
+	  title : source +'内容',
+	  content: '<div class="message-content" style="padding:10px;'+(json ? '':'font-weight:bold;')+'">'+(json ? '' : msg.replace(/\n/g,'<br>'))+'</div>',
+	  shade : 0,
+	  area : json ? ['700px','500px'] : 'auto',
+	  maxmin : true,
+	  maxWidth : json ? undefined : 700,
+	  maxHeight : json ? undefined : 500,
+	  success : function(dom,index){
+		 var $dom = $(dom).find(".message-content");
+		 if(json){
+			 jsonTree.create(json,$dom[0]);
+		 }
+	  }
+	}); 
 }
 function createWebSocket(options){
 	options = options || {};

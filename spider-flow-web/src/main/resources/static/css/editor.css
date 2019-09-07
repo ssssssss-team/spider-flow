@@ -91,14 +91,10 @@ html,body{
 }
 
 .test-window-container .output-container{
-	height: 320px;
-    overflow: auto;
+	/* height: 320px; */
 }
 .test-window-container .log-container{
-	max-height: 100px;
-    overflow: auto;
 	border: 1px solid #ccc;
-    padding: 0 10px;
 }
 .test-window-container .log-container textarea{
 	width : 100%;
