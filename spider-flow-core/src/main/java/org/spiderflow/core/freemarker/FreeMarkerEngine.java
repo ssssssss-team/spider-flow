@@ -18,8 +18,8 @@ import org.spiderflow.executor.FunctionExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import freemarker.core.NonStringException;
-import freemarker.core.NonStringOrTemplateOutputException;
+import freemarker.core.TemplateValueFormatException;
+import freemarker.core.UnexpectedTypeException;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
@@ -38,7 +38,6 @@ import freemarker.template.TemplateModelException;
  */
 @Component
 public class FreeMarkerEngine implements ExpressionEngine{
-	
 	
 	private static Logger logger = LoggerFactory.getLogger(FreeMarkerEngine.class);
 	
@@ -64,6 +63,10 @@ public class FreeMarkerEngine implements ExpressionEngine{
 	 */
 	private static ThreadLocal<Object> threadResultLocal = new ThreadLocal<Object>();
 	
+	private static final BigDecimal MAX_LONG_VALUE = new BigDecimal(Long.MAX_VALUE);
+	
+	private static final BigDecimal MIN_LONG_VALUE = new BigDecimal(Long.MIN_VALUE);
+	
 	/**
 	 * 初始化方法
 	 * @throws TemplateModelException 模板模型异常 由loadStaticFunctions()方法抛出
@@ -74,6 +77,8 @@ public class FreeMarkerEngine implements ExpressionEngine{
 		//设置兼容性 经典兼容性
 		configuration.setClassicCompatible(true);
 		configuration.setNumberFormat("0.###############");
+		//屏蔽Freemarker内部异常
+		configuration.setLogTemplateExceptions(false);
 		//如果自定义方法不为空 就将自定义方法列表中的方法循环添加到模板模型
 		if(customMethods != null){
 			for (FreemarkerTemplateMethodModel method : customMethods) {
@@ -108,9 +113,11 @@ public class FreeMarkerEngine implements ExpressionEngine{
 		});
 		BeansWrapper beansWrapper = builder.build();
 		TemplateHashModel model = beansWrapper.getStaticModels();
-		for (FunctionExecutor executor : functionExecutors) {
-			logger.info("注册方法{}:{}",executor.getFunctionPrefix(),executor.getClass().getName());
-			configuration.setSharedVariable(executor.getFunctionPrefix(), model.get(executor.getClass().getName()));
+		if(this.functionExecutors != null){
+			for (FunctionExecutor executor : functionExecutors) {
+				logger.info("注册方法{}:{}",executor.getFunctionPrefix(),executor.getClass().getName());
+				configuration.setSharedVariable(executor.getFunctionPrefix(), model.get(executor.getClass().getName()));
+			}
 		}
 	}
 	
@@ -129,24 +136,25 @@ public class FreeMarkerEngine implements ExpressionEngine{
 				BigDecimal decimal = new BigDecimal(value);
 				if(value.contains(".")){
 					return decimal.doubleValue();
-				}else{
+				}else if(decimal.compareTo(MAX_LONG_VALUE) < 1 && decimal.compareTo(MIN_LONG_VALUE) > -1){
 					return decimal.longValue();
 				}
 			}
 			return value;
-		}catch(NonStringOrTemplateOutputException | NonStringException e){
-			Object value = threadResultLocal.get();
-			if(value != null && value != variables){
-				return value;
+		}catch (Exception e) {
+			Throwable throwable = e.getCause() == null ? e : e.getCause();
+			if(throwable instanceof TemplateValueFormatException || throwable instanceof UnexpectedTypeException){
+				Object value = threadResultLocal.get();
+				if(value != null && value != variables){
+					return value;
+				}
 			}
-		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally{
 			ExpressionHolder.remove();
 			threadLocal.remove();
 			threadResultLocal.remove();
 		}
-		return null;
 	}
 	
 	public static void setFreemarkerObjectValue(FreemarkerObject object){
