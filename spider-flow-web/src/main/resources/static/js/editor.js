@@ -610,6 +610,14 @@ function bindToolbarClickAction(editor){
 				}
 				return false;
 			},
+			end : function(){
+				if(LogViewer){
+					LogViewer.destory();
+				}
+				for(var tableId in tableMap){
+					tableMap[tableId].instance.destory();
+				}
+			},
 			success : function(){
 				var logElement = $(".test-window-container .log-container")[0];
 				var colors = {
