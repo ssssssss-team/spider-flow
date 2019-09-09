@@ -577,14 +577,14 @@ function bindToolbarClickAction(editor){
 					$log.attr('height',100)
 					LogViewer.resize();
 					for(var tableId in tableMap){
-						tableMap[tableId].resize();
+						tableMap[tableId].instance.resize();
 					}
 				}else{
 					$output.hide();
 					$log.attr('height',460);
 					LogViewer.resize();
 					for(var tableId in tableMap){
-						tableMap[tableId].resize();
+						tableMap[tableId].instance.resize();
 					}
 				}
 				return false;
@@ -598,14 +598,14 @@ function bindToolbarClickAction(editor){
 					$output.find("canvas").attr('height',320);
 					LogViewer.resize();
 					for(var tableId in tableMap){
-						tableMap[tableId].resize();
+						tableMap[tableId].instance.resize();
 					}
 				}else{
 					$log.hide();
 					$output.find("canvas").attr('height',460);
 					LogViewer.resize();
 					for(var tableId in tableMap){
-						tableMap[tableId].resize();
+						tableMap[tableId].instance.resize();
 					}
 				}
 				return false;
@@ -623,7 +623,7 @@ function bindToolbarClickAction(editor){
 					onClick : function(e){
 						onCanvasViewerClick(e,'日志');
 					}
-				})
+				});
 				var socket = createWebSocket({
 					onopen : function(){
 						socket.send(JSON.stringify({
@@ -639,10 +639,12 @@ function bindToolbarClickAction(editor){
 							var tableId = 'output-' + message.nodeId;
 							var $table = $('#' + tableId);
 							if($table.length == 0){
-								tableMap[tableId] = {};
+								tableMap[tableId] = {
+									index : 0
+								};
 								$table = $('<canvas width="960" height="320"/>').appendTo($(".test-window-container .output-container"));
 								$table.attr('id',tableId);
-								tableMap[tableId] = new CanvasViewer({
+								tableMap[tableId].instance = new CanvasViewer({
 									element : document.getElementById(tableId),
 									grid : true,
 									header : true,
@@ -654,7 +656,10 @@ function bindToolbarClickAction(editor){
 									}
 								})
 								var cols = [];
-								var texts = [];
+								var texts = [new CanvasText({
+									text : '序号',
+									maxWidth : 100
+								})];
 								for(var i =0,len = message.outputNames.length;i<len;i++){
 									texts.push(new CanvasText({
 										text : message.outputNames[i],
@@ -662,9 +667,13 @@ function bindToolbarClickAction(editor){
 										click : true
 									}));
 								}
-								tableMap[tableId].append(texts);
+								tableMap[tableId].instance.append(texts);
 							}
-							var texts = [];
+							var texts = [new CanvasText({
+								text : ++tableMap[tableId].index,
+								maxWidth : 200,
+								click : true
+							})];
 							for(var i =0,len = message.outputNames.length;i<len;i++){
 								texts.push(new CanvasText({
 									text : message.values[i],
@@ -672,8 +681,8 @@ function bindToolbarClickAction(editor){
 									click : true
 								}));
 							}
-							tableMap[tableId].append(texts);
-							tableMap[tableId].scrollTo(-1);
+							tableMap[tableId].instance.append(texts);
+							tableMap[tableId].instance.scrollTo(-1);
 						}else if(eventType == 'log'){
 							var texts = [];
 							texts.push(new CanvasText({
