@@ -561,6 +561,7 @@ function bindToolbarClickAction(editor){
 	}).on('click','.btn-test',function(){
 		var LogViewer;
 		var tableMap = {};
+		var socket;
 		layui.layer.open({
 			id : 'test-window',
 			content : '<div class="test-window-container"><div class="output-container"></div><canvas class="log-container" width="960" height="100"></canvas></div>',
@@ -611,6 +612,9 @@ function bindToolbarClickAction(editor){
 				return false;
 			},
 			end : function(){
+				if(socket){
+					socket.close();
+				}
 				if(LogViewer){
 					LogViewer.destory();
 				}
@@ -632,7 +636,7 @@ function bindToolbarClickAction(editor){
 						onCanvasViewerClick(e,'日志');
 					}
 				});
-				var socket = createWebSocket({
+				socket = createWebSocket({
 					onopen : function(){
 						socket.send(JSON.stringify({
 							eventType : 'test',
@@ -752,6 +756,12 @@ function onCanvasViewerClick(e,source){
 	}catch(e){
 		
 	}
+	if(!json){
+		var temp = document.createElement("div");
+		(temp.textContent != null) ? (temp.textContent = msg) : (temp.innerText = msg);
+		msg = temp.innerHTML;
+		temp = null;
+	}
 	layer.open({
 	  type : 1,
 	  title : source +'内容',
@@ -759,8 +769,8 @@ function onCanvasViewerClick(e,source){
 	  shade : 0,
 	  area : json ? ['700px','500px'] : 'auto',
 	  maxmin : true,
-	  maxWidth : json ? undefined : 700,
-	  maxHeight : json ? undefined : 500,
+	  maxWidth : (json ? undefined : 700),
+	  maxHeight : (json ? undefined : 500),
 	  success : function(dom,index){
 		 var $dom = $(dom).find(".message-content");
 		 if(json){
