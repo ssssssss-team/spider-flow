@@ -91,7 +91,7 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 		try {
 			url = engine.execute(node.getStringJsonValue(URL), variables).toString();
 		} catch (Exception e) {
-			context.debug("设置请求url出错，异常信息：{}", e);
+			context.error("设置请求url出错，异常信息：{}", e);
 			ExceptionUtils.wrapAndThrow(e);
 		}
 		context.debug("设置请求url:{}", url);
@@ -140,7 +140,7 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 					context.debug("设置代理：{}",proxy);
 				}
 			} catch (Exception e) {
-				context.debug("设置代理出错，异常信息:{}",e);
+				context.error("设置代理出错，异常信息:{}",e);
 			}
 		}
 		try {

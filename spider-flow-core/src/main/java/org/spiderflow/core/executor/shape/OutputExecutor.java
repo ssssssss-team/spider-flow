@@ -40,7 +40,7 @@ public class OutputExecutor implements ShapeExecutor{
 				value = engine.execute(outputValue, variables);
 				context.debug("输出{}={}", outputName,value);
 			} catch (Exception e) {
-				context.debug("输出{}出错，异常信息：{}", outputName,e);
+				context.error("输出{}出错，异常信息：{}", outputName,e);
 			}
 			output.addOutput(outputName, value);
 		}

@@ -717,18 +717,22 @@ function bindToolbarClickAction(editor){
 							tableMap[tableId].instance.scrollTo(-1);
 						}else if(eventType == 'log'){
 							var texts = [];
+							var defaultColor = message.level == 'error' ? 'red' : '';
 							texts.push(new CanvasText({
-								text : message.level
+								text : message.level,
+								color : defaultColor
 							}));
 							texts.push(new CanvasText({
-								text : event.timestamp
+								text : event.timestamp,
+								color : defaultColor
 							}));
 							var temp = message.message.split("{}");
 							message.variables = message.variables || [];
 							for(var i=0,len=temp.length;i<len;i++){
 								if(temp[i]!=''){
 									texts.push(new CanvasText({
-										text : temp[i]
+										text : temp[i],
+										color : defaultColor
 									}))
 								}
 								var object = message.variables[i];
