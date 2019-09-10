@@ -124,7 +124,7 @@ function CanvasViewer(options){
 	animate();
 }
 CanvasViewer.prototype.destory = function(){
-	cancelAnimationFrame(animateIndex);
+	cancelAnimationFrame(this.animateIndex);
 	this.texts = null;
 }
 CanvasViewer.prototype.append = function(texts){

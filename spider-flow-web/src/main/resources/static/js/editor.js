@@ -562,10 +562,11 @@ function bindToolbarClickAction(editor){
 		var LogViewer;
 		var tableMap = {};
 		var socket;
+		var first = true;
 		layui.layer.open({
 			id : 'test-window',
-			content : '<div class="test-window-container"><div class="output-container"></div><canvas class="log-container" width="960" height="100"></canvas></div>',
-			area : ["1000px","600px"],
+			content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="960" height="100"></canvas></div>',
+			area : ["980px","600px"],
 			shade : 0,
 			title : '测试窗口',
 			btn : ['关闭','显示/隐藏输出','显示/隐藏日志'],
@@ -574,7 +575,13 @@ function bindToolbarClickAction(editor){
 				var $log = $(".test-window-container .log-container");
 				if($output.is(":hidden")){
 					$output.show();
-					$output.find("canvas").css('height', $log.is(":hidden") ? 460 : 320)
+					$output.find("canvas").each(function(){
+						if($log.is(":hidden")){
+							this.height = 420;
+						}else{
+							this.height = 300;
+						}
+					})
 					$log.attr('height',100)
 					LogViewer.resize();
 					for(var tableId in tableMap){
@@ -582,7 +589,7 @@ function bindToolbarClickAction(editor){
 					}
 				}else{
 					$output.hide();
-					$log.attr('height',460);
+					$log.attr('height',500);
 					LogViewer.resize();
 					for(var tableId in tableMap){
 						tableMap[tableId].instance.resize();
@@ -595,15 +602,19 @@ function bindToolbarClickAction(editor){
 				var $log = $(".test-window-container .log-container");
 				if($log.is(":hidden")){
 					$log.show();
-					$log.attr('height',$output.is(":hidden") ? 460 : 100)
-					$output.find("canvas").attr('height',320);
+					$log.attr('height',$output.is(":hidden") ? 500 : 100)
+					$output.find("canvas").each(function(){
+						this.height = 300;
+					});
 					LogViewer.resize();
 					for(var tableId in tableMap){
 						tableMap[tableId].instance.resize();
 					}
 				}else{
 					$log.hide();
-					$output.find("canvas").attr('height',460);
+					$output.find("canvas").each(function(){
+						this.height = 420;
+					});
 					LogViewer.resize();
 					for(var tableId in tableMap){
 						tableMap[tableId].instance.resize();
@@ -654,7 +665,16 @@ function bindToolbarClickAction(editor){
 								tableMap[tableId] = {
 									index : 0
 								};
-								$table = $('<canvas width="960" height="320"/>').appendTo($(".test-window-container .output-container"));
+								var $tab = $(".test-window-container .output-container .layui-tab")
+								if(first){
+									$tab.find(".layui-tab-title").append('<li  class="layui-this">输出-'+tableId+'</li>');
+									$tab.find(".layui-tab-content").append('<div class="layui-tab-item layui-show" data-output="'+tableId+'"></div>');
+									first = false;
+								}else{
+									$tab.find(".layui-tab-title").append('<li>输出-'+tableId+'</li>');
+									$tab.find(".layui-tab-content").append('<div class="layui-tab-item" data-output="'+tableId+'"></div>');
+								}
+								$table = $('<canvas width="960" height="300"/>').appendTo($(".test-window-container .output-container .layui-tab-item[data-output="+tableId+"]"));
 								$table.attr('id',tableId);
 								tableMap[tableId].instance = new CanvasViewer({
 									element : document.getElementById(tableId),

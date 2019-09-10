@@ -174,3 +174,7 @@ html,body{
 .jsontree_value_string,.jsontree_node{
 	white-space: nowrap;
 }
+#test-window{
+	padding:10px;
+	padding-top:0px;	
+}
