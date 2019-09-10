@@ -138,7 +138,7 @@ CanvasViewer.prototype.append = function(texts){
 			w = this.context.measureText(content).width;
 		}
 		this.colsOffsetX[i] = Math.max(this.colsOffsetX[i] || 0,w);
-		width += w;
+		width += ((this.grid ? this.colsOffsetX[i] : 0) ||  w);
 	}
 	this.maxWidth = Math.max(this.maxWidth,width);
 	this.lines.push(texts);
