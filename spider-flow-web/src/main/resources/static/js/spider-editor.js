@@ -120,8 +120,8 @@ SpiderEditor.prototype.addShape = function(shape,label,element,defaultAdd){
 	var style = new Object();
 	style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
 	style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-	style[mxConstants.STYLE_IMAGE_WIDTH] = 24;
-	style[mxConstants.STYLE_IMAGE_HEIGHT] = 24;
+	style[mxConstants.STYLE_IMAGE_WIDTH] = 32;
+	style[mxConstants.STYLE_IMAGE_HEIGHT] = 32;
 	style[mxConstants.STYLE_IMAGE] = element.src;
 	style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
 	style[mxConstants.STYLE_FONTCOLOR] = '#000000';
@@ -134,7 +134,7 @@ SpiderEditor.prototype.addShape = function(shape,label,element,defaultAdd){
 		model.beginUpdate();
 		var cell;
 		try{
-			cell = _this.graph.insertVertex(parent, null, label, x, y, 24, 24,shape);
+			cell = _this.graph.insertVertex(parent, null, label, x, y, 32, 32,shape);
 			cell.data = new JsonProperty();
 			cell.data.set('shape',shape);
 		}finally{
@@ -144,8 +144,8 @@ SpiderEditor.prototype.addShape = function(shape,label,element,defaultAdd){
 	}
 	var dragElt = document.createElement('div');
 	dragElt.style.border = 'dashed black 1px';
-	dragElt.style.width = '24px';
-	dragElt.style.height = '24px';
+	dragElt.style.width = '32px';
+	dragElt.style.height = '32px';
 	var ds = mxUtils.makeDraggable(element, this.graph, funct, dragElt, 0, 0, true, true);
 	ds.setGuidesEnabled(true);
 	if(defaultAdd){
@@ -153,7 +153,7 @@ SpiderEditor.prototype.addShape = function(shape,label,element,defaultAdd){
 		var model = this.graph.getModel();
 		model.beginUpdate();
 		try{
-			cell = this.graph.insertVertex(parent, null, label, 80, 80, 24, 24,shape);
+			cell = this.graph.insertVertex(parent, null, label, 80, 80, 32, 32,shape);
 			cell.data = new JsonProperty();
 			cell.data.set('shape',shape);
 		}finally{

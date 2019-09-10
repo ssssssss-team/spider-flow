@@ -13,7 +13,7 @@ html,body{
 }
 .main-container .sidebar-container{
 	position: absolute;
-	width : 38px;
+	width : 46px;
 	left : 0px;
 	top : 30px;
 	bottom:0px;
@@ -27,8 +27,8 @@ html,body{
 	padding: 5px;
 	margin : 2px;
 	border-radius: 3px;
-	width : 24px;
-	height : 24px;
+	width : 32px;
+	height : 32px;
 }
 .main-container .sidebar-container img:hover{
 	background:#ccc;
