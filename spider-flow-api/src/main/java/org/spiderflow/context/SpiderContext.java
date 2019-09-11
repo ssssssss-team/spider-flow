@@ -40,10 +40,21 @@ public class SpiderContext extends HashMap<String, Object>{
 	
 	private SpiderNode rootNode;
 	
+	private boolean running = true; 
+	
 	public List<SpiderOutput> getOutputs() {
 		return outputs;
 	}
 	
+	
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
+	}
+
 	public void addDataSource(String id,DataSource datasource){
 		this.datasources.put(id, datasource);
 	}

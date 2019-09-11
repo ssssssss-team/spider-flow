@@ -569,13 +569,13 @@ function bindToolbarClickAction(editor){
 		var tableMap = {};
 		var socket;
 		var first = true;
-		layui.layer.open({
+		var testWindowIndex = layui.layer.open({
 			id : 'test-window',
 			content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="960" height="100"></canvas></div>',
 			area : ["980px","600px"],
 			shade : 0,
 			title : '测试窗口',
-			btn : ['关闭','显示/隐藏输出','显示/隐藏日志'],
+			btn : ['关闭','显示/隐藏输出','显示/隐藏日志','停止'],
 			btn2 : function(){
 				var $output = $(".test-window-container .output-container");
 				var $log = $(".test-window-container .log-container");
@@ -628,6 +628,21 @@ function bindToolbarClickAction(editor){
 				}
 				return false;
 			},
+			btn4 : function(){
+				var $btn = $("#layui-layer" + testWindowIndex).find('.layui-layer-btn3');
+				if($btn.html() == '停止'){
+					socket.send(JSON.stringify({
+						eventType : 'stop'
+					}));
+				}else{
+					socket.send(JSON.stringify({
+						eventType : 'test',
+						message : editor.getXML()
+					}));
+					$btn.html('停止');
+				}
+				return false;
+			},
 			end : function(){
 				if(socket){
 					socket.close();
@@ -664,7 +679,9 @@ function bindToolbarClickAction(editor){
 						var event = JSON.parse(e.data);
 						var eventType = event.eventType;
 						var message = event.message;
-						if(eventType == 'output'){
+						if(eventType == 'finish'){
+							$("#layui-layer" + testWindowIndex).find('.layui-layer-btn3').html('重新开始');
+						}else if(eventType == 'output'){
 							var tableId = 'output-' + message.nodeId;
 							var $table = $('#' + tableId);
 							if($table.length == 0){

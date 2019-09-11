@@ -123,25 +123,28 @@ public class Spider {
 			for (ShapeExecutor executor : executors) {
 				if(executor.supportShape().equals(shape)){
 					for (int i = 0; i < loopCount; i++) {
-						//存入下标变量
-						Map<String, Object> nVariables = Maps.add(variables, loopVariableName, i);
-						Runnable runnable = ()->{
-							try {
-								executor.execute(node, context,nVariables);
-							} catch (Exception e) {
-								context.error("执行节点[{}:{}]出错,异常信息：{}",node.getNodeName(),node.getNodeId(),e);
-							} finally{
-								context.debug("执行节点[{}:{}]完毕",node.getNodeName(),node.getNodeId());
-								//递归执行下一级
-								executeaNextNodes(pool, node, context, nVariables);
+						if(context.isRunning()){
+							//存入下标变量
+							Map<String, Object> nVariables = Maps.add(variables, loopVariableName, i);
+							Runnable runnable = ()->{
+								if(context.isRunning()){
+									try {
+										executor.execute(node, context,nVariables);
+									} catch (Exception e) {
+										context.error("执行节点[{}:{}]出错,异常信息：{}",node.getNodeName(),node.getNodeId(),e);
+									} finally{
+										context.debug("执行节点[{}:{}]完毕",node.getNodeName(),node.getNodeId());
+										//递归执行下一级
+										executeaNextNodes(pool, node, context, nVariables);
+									}
+								}
+							};
+							if(executor.isThread()){
+								pool.submit(runnable);
+							}else{
+								runnable.run();
 							}
-						};
-						if(executor.isThread()){
-							pool.submit(runnable);
-						}else{
-							runnable.run();
 						}
-						
 					}
 				}
 			}
