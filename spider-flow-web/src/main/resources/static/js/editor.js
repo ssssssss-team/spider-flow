@@ -139,6 +139,9 @@ function serializeForm(){
 			cell.data.set(name,value);
 		}
 	});
+	$(".properties-container form [lay-skin=switch]").each(function(){
+		cell.data.set(this.value,$(this).is(":checked") ? '1': '0');
+	});
 	cell.data.set('shape',shape);
 }
 $(function(){
@@ -253,7 +256,10 @@ $(function(){
 		bindToolbarClickAction(editor);
 		//加载图形
 		loadShapes(editor,$('.sidebar-container')[0]);
-
+		
+		layui.form.on('switch',function(e){
+			serializeForm();
+		});
 		//节点名称输入框事件
 		$("body").on("mousewheel",".layui-tab .layui-tab-title",function(e,delta){
 			var $dom = $(this);

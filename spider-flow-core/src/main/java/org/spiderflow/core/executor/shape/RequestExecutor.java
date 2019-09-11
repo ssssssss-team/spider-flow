@@ -65,6 +65,8 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 	
 	public static final String RESPONSE_CHARSET = "response-charset";
 	
+	public static final String FOLLOW_REDIRECT = "follow-redirect";
+	
 	@Autowired
 	private FreeMarkerEngine engine;
 
@@ -105,6 +107,12 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 		//设置请求方法
 		request.method(method);
 		context.debug("设置请求方法:{}", method);
+		
+		//是否跟随重定向
+		boolean followRedirects = !"0".equals(node.getStringJsonValue(FOLLOW_REDIRECT));
+		request.followRedirect(followRedirects);
+		context.debug("设置跟随重定向：{}", followRedirects);
+		
 		SpiderNode root = context.getRootNode();
 		//设置请求header
 		setRequestHeader(request, root.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);

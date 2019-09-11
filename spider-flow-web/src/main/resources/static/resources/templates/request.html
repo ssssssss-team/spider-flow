@@ -65,6 +65,12 @@
    					</select>
     			</div>
     		</div>
+    		<div class="layui-form-item">
+	   			<label class="layui-form-label">跟随重定向</label>
+	   			<div class="layui-input-block">
+	   				<input type="checkbox" value="follow-redirect" lay-skin="switch" {{d.data.object['follow-redirect'] == '0' ? '' : 'checked'}}/>
+    			</div>
+	   		</div>
     	</form>
     </div>
     <div class="layui-tab-item">

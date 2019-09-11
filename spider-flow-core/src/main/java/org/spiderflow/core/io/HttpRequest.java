@@ -85,6 +85,11 @@ public class HttpRequest {
 		return this;
 	}
 	
+	public HttpRequest followRedirect(boolean followRedirects){
+		this.connection.followRedirects(followRedirects);
+		return this;
+	}
+	
 	public HttpRequest timeout(int timeout){
 		this.connection.timeout(timeout);
 		return this;
