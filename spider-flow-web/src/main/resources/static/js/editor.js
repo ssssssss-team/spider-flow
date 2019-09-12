@@ -569,6 +569,7 @@ function bindToolbarClickAction(editor){
 		var tableMap = {};
 		var socket;
 		var first = true;
+		var filterText = '';
 		var testWindowIndex = layui.layer.open({
 			id : 'test-window',
 			content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="960" height="100"></canvas></div>',
@@ -654,7 +655,7 @@ function bindToolbarClickAction(editor){
 					tableMap[tableId].instance.destory();
 				}
 			},
-			success : function(){
+			success : function(layero,index){
 				var logElement = $(".test-window-container .log-container")[0];
 				var colors = {
 					'array' : '#2a00ff',
@@ -668,6 +669,11 @@ function bindToolbarClickAction(editor){
 						onCanvasViewerClick(e,'日志');
 					}
 				});
+				$(layero).find(".layui-layer-btn")
+					.append('<div class="layui-inline"><input type="text" class="layui-input" placeholder="输入关键字过滤日志"/></div>')
+					.on("keyup","input",function(){
+						LogViewer.filter(this.value);
+					});
 				socket = createWebSocket({
 					onopen : function(){
 						socket.send(JSON.stringify({

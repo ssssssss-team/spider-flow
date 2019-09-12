@@ -22,6 +22,7 @@ function CanvasViewer(options){
 	this.context.font = this.style.font || 'bold 14px Consolas';
 	this.context.textBaseline = this.style.textBaseLine || 'middle';
 	this.lines = [];
+	this.sourceLines = [];
 	this.lineHeight = 24;
 	this.maxRows = Math.ceil(this.canvas.height  / this.lineHeight);
 	this.scrollHeight = this.canvas.height;
@@ -35,6 +36,7 @@ function CanvasViewer(options){
 	this.mouseX = 0;
 	this.mouseY = 0;
 	this.colsOffsetX = [0];
+	this.filterText = '';
 	this.maxWidth = this.canvas.width - 8;
 	this.onClick = options.onClick || function(){};
 	this.grid = options.grid;
@@ -128,6 +130,13 @@ CanvasViewer.prototype.destory = function(){
 	this.texts = null;
 }
 CanvasViewer.prototype.append = function(texts){
+	this.sourceLines.push(texts);
+	if(this.filterLine(texts)){
+		this.calcMaxWidth(texts);
+		this.lines.push(texts);
+	}
+}
+CanvasViewer.prototype.calcMaxWidth = function(texts){
 	var width = texts.length * 10 - 10;
 	for(var i =0,len = texts.length;i<len;i++){
 		var text = texts[i];
@@ -141,7 +150,29 @@ CanvasViewer.prototype.append = function(texts){
 		width += ((this.grid ? this.colsOffsetX[i] : 0) ||  w);
 	}
 	this.maxWidth = Math.max(this.maxWidth,width);
-	this.lines.push(texts);
+}
+CanvasViewer.prototype.filter = function(content){
+	this.filterText = content;
+	var nLines = [];
+	for(var i=0,len = this.sourceLines.length;i<len;i++){
+		var sourceLine = this.sourceLines[i];
+		if(this.filterLine(this.sourceLines[i],content)){
+			this.calcMaxWidth(sourceLine);
+			nLines.push(sourceLine);
+		}
+	}
+	this.lines = nLines;
+	this.scrollTo(-1);
+}
+CanvasViewer.prototype.filterLine = function(line){
+	if(!this.filterText){
+		return true;
+	}
+	var text = [];
+	for(var j=0,l = line.length;j<l;j++){
+		text.push(line[j].text);
+	}
+	return text.join('').indexOf(this.filterText) > -1;
 }
 CanvasViewer.prototype.resize = function(){
 	var prevMaxRows = this.maxRows;

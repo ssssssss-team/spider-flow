@@ -175,6 +175,5 @@ html,body{
 	white-space: nowrap;
 }
 #test-window{
-	padding:10px;
-	padding-top:0px;	
+	padding:0px 10px;
 }
