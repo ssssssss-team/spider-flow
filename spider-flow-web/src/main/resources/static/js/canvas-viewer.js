@@ -74,7 +74,7 @@ function CanvasViewer(options){
 			var delta = e.offsetX - _this.mouseDownX;
 			_this.mouseDownX = e.offsetX;
 			var canvasWidth = _this.canvas.width - 8;
-			_this.startX = Math.max(Math.min(_this.startX - (canvasWidth / _this.slideWidth) * delta,0),canvasWidth - _this.maxWidth)
+			_this.startX = Math.max(Math.min(_this.startX - (canvasWidth / _this.slideWidth) * delta,_this.grid ? 5 : 0),canvasWidth - _this.maxWidth)
 		}
 		
 	}
