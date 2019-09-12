@@ -779,7 +779,7 @@ function bindToolbarClickAction(editor){
 									}
 									texts.push(new CanvasText({
 										text : displayText,
-										maxWidth : 230,
+										maxWidth : 330,
 										color : colors[variableType] || '#025900',
 										click : true
 									}))

@@ -72,7 +72,9 @@ function CanvasViewer(options){
 		//鼠标按下且有横向滚动条
 		if(_this.mouseEvent == 2 && _this.hasXScroll){
 			var delta = e.offsetX - _this.mouseDownX;
-			_this.startX = Math.min(-(_this.maxWidth-_this.canvas.width) * (x / (_this.canvas.width - 8)),0) + 5;
+			_this.mouseDownX = e.offsetX;
+			var canvasWidth = _this.canvas.width - 8;
+			_this.startX = Math.max(Math.min(_this.startX - (canvasWidth / _this.slideWidth) * delta,0),canvasWidth - _this.maxWidth)
 		}
 		
 	}
