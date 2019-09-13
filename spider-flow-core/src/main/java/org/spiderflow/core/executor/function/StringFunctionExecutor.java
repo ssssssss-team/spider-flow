@@ -49,6 +49,18 @@ public class StringFunctionExecutor implements FunctionExecutor,Grammer{
 		return content != null ? content.indexOf(str, fromIndex) : -1;
 	}
 	
+	public static int toInt(String value){
+		return Integer.parseInt(value);
+	}
+	
+	public static Integer toInt(String value,Integer defaultValue){
+		try {
+			return Integer.parseInt(value);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
 	public static String replace(String content,String source,String target){
 		return content != null ? content.replace(source, target): null;
 	}

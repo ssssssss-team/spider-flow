@@ -3,8 +3,8 @@ package org.spiderflow.core.executor.shape;
 import java.util.List;
 import java.util.Map;
 
+import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.SpiderContext;
-import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
@@ -24,7 +24,7 @@ public class OutputExecutor implements ShapeExecutor{
 	public static final String OUTPUT_VALUE = "output-value";
 	
 	@Autowired
-	private FreeMarkerEngine engine;
+	private ExpressionEngine engine;
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
