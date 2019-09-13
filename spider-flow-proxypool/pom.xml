@@ -9,7 +9,7 @@
 		<version>0.0.1</version>
 	</parent>
 	<artifactId>spider-flow-proxypool</artifactId>
-	<name>spider-flow-web</name>
+	<name>spider-flow-proxypool</name>
 	<url>https://gitee.com/jmxd/spider-flow/tree/master/spider-flow-proxypool</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,11 +24,13 @@
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-data-jpa</artifactId>
+		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.11.3</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

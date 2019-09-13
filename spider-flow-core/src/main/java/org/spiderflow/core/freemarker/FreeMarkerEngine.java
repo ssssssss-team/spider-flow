@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.ExpressionEngine;
@@ -129,7 +130,7 @@ public class FreeMarkerEngine implements ExpressionEngine{
 			template.process(variables, out);
 			FreemarkerObject object = threadLocal.get();
 			String value = out.toString();
-			if(object != null && object.getValue() != variables){
+			if(StringUtils.isBlank(value) &&object != null && object.getValue() != variables){
 				return object.getValue();
 			}
 			if(ExtractUtils.isNumber(value)){
