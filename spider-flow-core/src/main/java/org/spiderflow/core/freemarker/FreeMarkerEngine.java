@@ -130,8 +130,10 @@ public class FreeMarkerEngine implements ExpressionEngine{
 			template.process(variables, out);
 			FreemarkerObject object = threadLocal.get();
 			String value = out.toString();
-			if(StringUtils.isBlank(value) &&object != null && object.getValue() != variables){
-				return object.getValue();
+			if(object != null && object.getValue() != variables){
+				if(StringUtils.isBlank(value) || object.getValue().toString().equals(value)){
+					return object.getValue();
+				}
 			}
 			if(ExtractUtils.isNumber(value)){
 				BigDecimal decimal = new BigDecimal(value);
