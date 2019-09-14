@@ -714,7 +714,7 @@ public abstract class Ast {
 		@Override
 		public Object evaluate (ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
 			Object value = context.get(getSpan().getText());
-			if (value == null) ExpressionError.error("找不到变量'" + getSpan().getText() + "'或变量值为null", getSpan());
+			//if (value == null) ExpressionError.error("找不到变量'" + getSpan().getText() + "'或变量值为null", getSpan());
 			return value;
 		}
 	}
@@ -1047,7 +1047,7 @@ public abstract class Ast {
 		public Object evaluate (ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
 			try {
 				Object object = getObject().evaluate(template, context);
-				if (object == null) ExpressionError.error("Couldn't find object in context.", getSpan());
+				if (object == null) ExpressionError.error("对象为空", getSpan());
 
 				Object[] argumentValues = getCachedArguments();
 				List<Expression> arguments = getArguments();
@@ -1076,7 +1076,32 @@ public abstract class Ast {
 						ExpressionError.error(t.getMessage(), getSpan(), t);
 						return null; // never reached
 					}
-				} else {
+				} 
+				method = Reflection.getInstance().getExtensionMethod(object, getMethod().getName().getText(), argumentValues);
+				if(method != null){
+					try {
+						int argumentLength = argumentValues == null ? 0 : argumentValues.length;
+						Object[] parameters = new Object[argumentLength + 1];
+						if(argumentLength > 0){
+							for (int i = 0; i < argumentLength; i++) {
+								parameters[i + 1] = argumentValues[i];
+							}
+						}
+						parameters[0] = object;
+						if(object.getClass().isArray()){
+							Object[] objs = new Object[Array.getLength(object)];
+							for (int i = 0,len = objs.length; i < len; i++) {
+								Array.set(objs, i, Array.get(object, i));
+							}
+							parameters[0] = objs;
+						}
+						return Reflection.getInstance().callMethod(object, method, parameters);
+					} catch (Throwable t) {
+						ExpressionError.error(t.getMessage(), getSpan(), t);
+						// fall through
+						return null;
+					}
+				}else {
 					// didn't find the method on the object, try to find a field pointing to a lambda
 					Object field = Reflection.getInstance().getField(object, getMethod().getName().getText());
 					if (field == null)

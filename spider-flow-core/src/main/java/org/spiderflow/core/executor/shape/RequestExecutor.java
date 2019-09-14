@@ -81,8 +81,10 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 		if(StringUtils.isNotBlank(sleepCondition)){
 			try {
 				Object value = engine.execute(sleepCondition, variables);
-				long sleepTime = ((Long)value).longValue();
-				Thread.sleep(sleepTime);
+				if(value != null){
+					long sleepTime = NumberUtils.toLong(value.toString(), 0L);
+					Thread.sleep(sleepTime);
+				}
 			} catch (InterruptedException e) {
 				
 			}

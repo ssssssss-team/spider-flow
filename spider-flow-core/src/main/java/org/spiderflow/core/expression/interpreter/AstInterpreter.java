@@ -33,7 +33,7 @@ public class AstInterpreter {
 			if (t instanceof TemplateException)
 				throw (TemplateException)t;
 			else {
-				ExpressionError.error("Couldn't interpret node list due to I/O error, " + t.getMessage(), template.getNodes().get(0).getSpan());
+				ExpressionError.error("执行表达式出错 " + t.getMessage(), template.getNodes().get(0).getSpan(),t);
 				return null; // never reached
 			}
 		} 

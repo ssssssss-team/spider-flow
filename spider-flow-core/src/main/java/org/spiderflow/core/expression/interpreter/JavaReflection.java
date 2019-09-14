@@ -3,13 +3,18 @@ package org.spiderflow.core.expression.interpreter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JavaReflection extends Reflection {
-	@SuppressWarnings("rawtypes") private final Map<Class, Map<String, Field>> fieldCache = new ConcurrentHashMap<Class, Map<String, Field>>();
-	@SuppressWarnings("rawtypes") private final Map<Class, Map<JavaReflection.MethodSignature, Method>> methodCache = new ConcurrentHashMap<Class, Map<JavaReflection.MethodSignature, Method>>();
+	private final Map<Class<?>, Map<String, Field>> fieldCache = new ConcurrentHashMap<Class<?>, Map<String, Field>>();
+	private final Map<Class<?>, Map<JavaReflection.MethodSignature, Method>> methodCache = new ConcurrentHashMap<Class<?>, Map<JavaReflection.MethodSignature, Method>>();
+	private final Map<Class<?>, Map<String,List<Method>>> extensionmethodCache = new ConcurrentHashMap<>();
 
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -57,6 +62,68 @@ public class JavaReflection extends Reflection {
 		} catch (Throwable e) {
 			throw new RuntimeException("Couldn't get value of field '" + javaField.getName() + "' from object of type '" + obj.getClass().getSimpleName() + "'");
 		}
+	}
+	
+	@Override
+	public void registerExtensionClass(Class<?> target,Class<?> clazz){
+		Method[] methods = clazz.getDeclaredMethods();
+		if(methods != null){
+			Map<String, List<Method>> cachedMethodMap = extensionmethodCache.get(target);
+			if(cachedMethodMap == null){
+				cachedMethodMap = new HashMap<>();
+				extensionmethodCache.put(target,cachedMethodMap);
+			}
+			for (Method method : methods) {
+				if(Modifier.isStatic(method.getModifiers()) && method.getParameterCount() > 0){
+					List<Method> cachedList = cachedMethodMap.get(method.getName());
+					if(cachedList == null){
+						cachedList = new ArrayList<>();
+						cachedMethodMap.put(method.getName(), cachedList);
+					}
+					cachedList.add(method);
+				}
+			}
+		}
+	}
+	
+	@Override
+	public Object getExtensionMethod(Object obj, String name, Object... arguments) {
+		Class<?> cls = obj instanceof Class ? (Class<?>)obj : obj.getClass();
+		if(cls.isArray()){
+			cls = Object[].class;
+		}
+		return getExtensionMethod(cls,name,arguments);
+	}
+	
+	private Object getExtensionMethod(Class<?> cls, String name, Object... arguments) {
+		if(cls == null){
+			cls = Object.class;
+		}
+		Map<String, List<Method>> methodMap = extensionmethodCache.get(cls);
+		if(methodMap != null){
+			List<Method> methodList = methodMap.get(name);
+			if(methodList != null){
+				Class<?>[] parameterTypes = new Class[arguments.length + 1];
+				parameterTypes[0] = cls;
+				for (int i = 0; i < arguments.length; i++) {
+					parameterTypes[i + 1] = arguments[i] == null ? Object.class : arguments[i].getClass();
+				}
+				return findMethod(methodList, parameterTypes);
+			}
+		}
+		if(cls != Object.class){
+			Class<?>[] interfaces = cls.getInterfaces();
+			if(interfaces != null){
+				for (Class<?> clazz : interfaces) {
+					Object method = getExtensionMethod(clazz,name,arguments);
+					if(method != null){
+						return method;
+					}
+				}
+			}
+			return getExtensionMethod(cls.getSuperclass(),name,arguments);
+		}
+		return null;
 	}
 
 	@Override
@@ -122,20 +189,15 @@ public class JavaReflection extends Reflection {
 		return null;
 	}
 
-	/** Returns the method best matching the given signature, including type coercion, or null. **/
-	private static Method findMethod (Class<?> cls, String name, Class<?>[] parameterTypes) {
-		Method[] methods = cls.getDeclaredMethods();
+	private static Method findMethod (List<Method> methods, Class<?>[] parameterTypes) {
 		Method foundMethod = null;
 		int foundScore = 0;
-		for (int i = 0, n = methods.length; i < n; i++) {
-			Method method = methods[i];
-
-			// if neither name or parameter list size match, bail on this method
-			if (!method.getName().equals(name)) continue;
-			if (method.getParameterTypes().length != parameterTypes.length) continue;
-
+		for (Method method : methods) {
 			// Check if the types match.
 			Class<?>[] otherTypes = method.getParameterTypes();
+			if(parameterTypes.length != otherTypes.length){
+				continue;
+			}
 			boolean match = true;
 			int score = 0;
 			for (int ii = 0, nn = parameterTypes.length; ii < nn; ii++) {
@@ -168,6 +230,21 @@ public class JavaReflection extends Reflection {
 			}
 		}
 		return foundMethod;
+	}
+	
+	/** Returns the method best matching the given signature, including type coercion, or null. **/
+	private static Method findMethod (Class<?> cls, String name, Class<?>[] parameterTypes) {
+		Method[] methods = cls.getDeclaredMethods();
+		List<Method> methodList = new ArrayList<>();
+		for (int i = 0, n = methods.length; i < n; i++) {
+			Method method = methods[i];
+
+			// if neither name or parameter list size match, bail on this method
+			if (!method.getName().equals(name)) continue;
+			if (method.getParameterTypes().length != parameterTypes.length) continue;
+			methodList.add(method);
+		}
+		return findMethod(methodList,parameterTypes);
 	}
 
 	/** Returns whether the from type can be assigned to the to type, assuming either type is a (boxed) primitive type. We can
@@ -218,7 +295,11 @@ public class JavaReflection extends Reflection {
 		if (from == Long.class || from == long.class) {
 			return to == float.class || to == Float.class || to == double.class || to == Double.class;
 		}
-
+		
+		if(from == int[].class || from == Integer[].class){
+			return to == Object[].class || to == float[].class || to == Float[].class || to == double[].class || to == Double[].class || to == long[].class || to == Long[].class;
+		}
+		
 		return false;
 	}
 
