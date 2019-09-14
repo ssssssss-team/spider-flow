@@ -272,6 +272,14 @@ $(function(){
 				$dom.scrollLeft($dom.scrollLeft()+60);
 			}
 			return false;
+		}).on("dblclick",".layui-input-block[codemirror]",function(){
+			layui.layer.open({
+				type : 1,
+				title : '请输入'+$(this).prev().html()+'表达式',
+				content : $(this),
+				skin : 'codemirror',
+				area : '800px'
+			})
 		}).on("keyup","input,textarea",function(){
 			var $input = $(this);
 			if($input.attr('name') == 'value'){

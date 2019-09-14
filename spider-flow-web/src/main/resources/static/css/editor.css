@@ -177,3 +177,6 @@ html,body{
 #test-window{
 	padding:0px 10px;
 }
+.layui-layer.codemirror .layui-input-block{
+	margin-left:0px;
+}
