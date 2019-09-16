@@ -9,9 +9,11 @@ import org.jsoup.Jsoup;
 import org.spiderflow.core.executor.function.DateFunctionExecutor;
 import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.FunctionExtension;
+import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 
+@Component
 public class StringFunctionExtension implements FunctionExtension{
 
 	@Override
