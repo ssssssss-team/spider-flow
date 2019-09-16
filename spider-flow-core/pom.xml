@@ -44,11 +44,13 @@
 		    <groupId>cn.wanghaomiao</groupId>
 		    <artifactId>JsoupXpath</artifactId>
 		    <version>2.3.2</version>
+		    <exclusions>
+		    	<exclusion>
+		    		<groupId>org.jsoup</groupId>
+		    		<artifactId>jsoup</artifactId>
+		    	</exclusion>
+		    </exclusions>
 		</dependency>  
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>

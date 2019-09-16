@@ -12,9 +12,9 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.spiderflow.ExpressionEngine;
 import org.spiderflow.Grammer;
 import org.spiderflow.context.SpiderContext;
-import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.io.HttpRequest;
 import org.spiderflow.core.io.HttpResponse;
 import org.spiderflow.executor.ShapeExecutor;
@@ -68,7 +68,7 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 	public static final String FOLLOW_REDIRECT = "follow-redirect";
 	
 	@Autowired
-	private FreeMarkerEngine engine;
+	private ExpressionEngine engine;
 
 	@Override
 	public String supportShape() {
@@ -81,8 +81,10 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 		if(StringUtils.isNotBlank(sleepCondition)){
 			try {
 				Object value = engine.execute(sleepCondition, variables);
-				long sleepTime = ((Long)value).longValue();
-				Thread.sleep(sleepTime);
+				if(value != null){
+					long sleepTime = NumberUtils.toLong(value.toString(), 0L);
+					Thread.sleep(sleepTime);
+				}
 			} catch (InterruptedException e) {
 				
 			}

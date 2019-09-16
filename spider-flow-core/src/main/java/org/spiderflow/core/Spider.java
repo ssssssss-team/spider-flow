@@ -7,8 +7,9 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.spiderflow.ExpressionEngine;
+import org.spiderflow.ExpressionHolder;
 import org.spiderflow.context.SpiderContext;
-import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.utils.SpiderFlowUtils;
 import org.spiderflow.executor.ShapeExecutor;
@@ -37,7 +38,7 @@ public class Spider {
 	 * 选择器
 	 */
 	@Autowired
-	private FreeMarkerEngine engine;
+	private ExpressionEngine engine;
 	
 	
 	@Autowired(required = false)
@@ -80,6 +81,7 @@ public class Spider {
 			if(listeners != null){
 				listeners.forEach(listener->listener.afterEnd(context));
 			}
+			ExpressionHolder.remove();
 		}
 	}
 	
@@ -115,7 +117,11 @@ public class Spider {
 			Object result = engine.execute(loopCountStr, variables);
 			if(result != null){
 				context.debug("获取循环次数{}={}",loopCountStr,result);
-				loopCount = ((Long)result).intValue();
+				try {
+					loopCount = Integer.valueOf(result.toString());
+				} catch (NumberFormatException e) {
+					loopCount = 0;
+				}
 			}
 		}
 		if(loopCount > 0){
@@ -129,6 +135,7 @@ public class Spider {
 							Runnable runnable = ()->{
 								if(context.isRunning()){
 									try {
+										ExpressionHolder.setVariables(nVariables);
 										executor.execute(node, context,nVariables);
 									} catch (Exception e) {
 										context.error("执行节点[{}:{}]出错,异常信息：{}",node.getNodeName(),node.getNodeId(),e);

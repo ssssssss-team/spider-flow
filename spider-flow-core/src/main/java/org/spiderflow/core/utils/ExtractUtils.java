@@ -148,6 +148,33 @@ public class ExtractUtils {
 		return null;
 	}
 	
+	public static String getElementByXPath(Element element,String xpath){
+		JXDocument jXdocument = JXDocument.create(new Elements(element));
+		JXNode node = jXdocument.selNOne(xpath);
+		if(node != null){
+			return node.asString();
+		}
+		return null;
+	}
+	
+	public static Object getObjectValueByXPath(Element element,String xpath){
+		return getObjectValueByXPath(new Elements(element),xpath);
+	}
+	
+	public static List<Object> getObjectValuesByXPath(Element element,String xpath){
+		return getObjectValuesByXPath(new Elements(element),xpath);
+	}
+	
+	public static Object getObjectValueByXPath(Elements elements,String xpath){
+		JXDocument jXdocument = JXDocument.create(elements);
+		return jXdocument.selOne(xpath);
+	}
+	
+	public static List<Object> getObjectValuesByXPath(Elements elements,String xpath){
+		JXDocument jXdocument = JXDocument.create(elements);
+		return jXdocument.sel(xpath);
+	}
+	
 	public static boolean isNumber(String str) {  
         return compile("^(\\-|\\+)?\\d+(\\.\\d+)?$").matcher(str).matches();  
 	}

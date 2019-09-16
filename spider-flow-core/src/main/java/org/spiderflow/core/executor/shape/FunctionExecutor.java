@@ -3,8 +3,8 @@ package org.spiderflow.core.executor.shape;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.SpiderContext;
-import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class FunctionExecutor implements ShapeExecutor{
 	public static final String FUNCTION = "function";
 	
 	@Autowired
-	private FreeMarkerEngine engine;
+	private ExpressionEngine engine;
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
@@ -30,7 +30,7 @@ public class FunctionExecutor implements ShapeExecutor{
 			try {
 				engine.execute(function, variables);
 			} catch (Exception e) {
-				context.error("执行函数%s失败,异常信息:{}",e);
+				context.error("执行函数{}失败,异常信息:{}",function,e);
 			}
 		}
 	}

@@ -3,6 +3,8 @@ package org.spiderflow.core.io;
 import java.util.Map;
 
 import org.jsoup.Connection.Response;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.spiderflow.io.SpiderResponse;
 
 import com.alibaba.fastjson.JSON;
@@ -39,6 +41,10 @@ public class HttpResponse implements SpiderResponse{
 	@Override
 	public Object getJson(){
 		return JSON.parse(getHtml());
+	}
+	
+	public Document getDocument(){
+		return Jsoup.parse(getHtml());
 	}
 	
 	@Override

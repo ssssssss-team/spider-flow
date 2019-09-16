@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.spiderflow.ExpressionEngine;
 import org.spiderflow.Grammer;
 import org.spiderflow.context.SpiderContext;
-import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
@@ -40,7 +40,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammer{
 	public static final String STATEMENT_DELETE = "delete";
 	
 	@Autowired
-	private FreeMarkerEngine engine;
+	private ExpressionEngine engine;
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {

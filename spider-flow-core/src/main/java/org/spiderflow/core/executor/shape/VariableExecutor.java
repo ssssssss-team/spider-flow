@@ -3,8 +3,8 @@ package org.spiderflow.core.executor.shape;
 import java.util.List;
 import java.util.Map;
 
+import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.SpiderContext;
-import org.spiderflow.core.freemarker.FreeMarkerEngine;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class VariableExecutor implements ShapeExecutor{
 	private static final String VARIABLE_VALUE = "variable-value";
 	
 	@Autowired
-	private FreeMarkerEngine engine;
+	private ExpressionEngine engine;
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
