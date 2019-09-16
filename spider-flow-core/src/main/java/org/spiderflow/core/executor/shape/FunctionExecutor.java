@@ -30,7 +30,7 @@ public class FunctionExecutor implements ShapeExecutor{
 			try {
 				engine.execute(function, variables);
 			} catch (Exception e) {
-				context.error("执行函数%s失败,异常信息:{}",e);
+				context.error("执行函数{}失败,异常信息:{}",function,e);
 			}
 		}
 	}
