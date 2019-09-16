@@ -8,6 +8,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.spiderflow.ExpressionEngine;
+import org.spiderflow.ExpressionHolder;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.utils.SpiderFlowUtils;
@@ -80,6 +81,7 @@ public class Spider {
 			if(listeners != null){
 				listeners.forEach(listener->listener.afterEnd(context));
 			}
+			ExpressionHolder.remove();
 		}
 	}
 	
@@ -133,6 +135,7 @@ public class Spider {
 							Runnable runnable = ()->{
 								if(context.isRunning()){
 									try {
+										ExpressionHolder.setVariables(nVariables);
 										executor.execute(node, context,nVariables);
 									} catch (Exception e) {
 										context.error("执行节点[{}:{}]出错,异常信息：{}",node.getNodeName(),node.getNodeId(),e);
