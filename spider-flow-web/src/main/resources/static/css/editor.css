@@ -37,7 +37,7 @@ html,body{
 	cursor: w-resize;
 	position: absolute;
 	right : 400px;
-	width : 3px;
+	width : 10px;
 	height : 100%;
 	background: transparent;
 }
@@ -104,9 +104,11 @@ html,body{
 	display: none;
 }
 .xml-container textarea{
-	width : 99%;
-	height : 99%;
+    width: 100%;
+    height: 99.6%;
 	border:none;
+    padding: 10px 20px;
+    box-sizing: border-box;
 }
 .xml-container textarea::-webkit-scrollbar {
  	width: 5px;
