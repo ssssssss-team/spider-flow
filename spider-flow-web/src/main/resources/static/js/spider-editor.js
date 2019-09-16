@@ -30,7 +30,7 @@ function SpiderEditor(options){
 		this.registerJsonCodec();
 		//配置样式
 		this.configureStylesheet();
-		this.keyHandler = new mxKeyHandler(this.graph,options.element);
+		this.keyHandler = new mxKeyHandler(this.graph);
 		this.keyHandler.getFunction = function(evt) {
 			if (evt != null)
 			{

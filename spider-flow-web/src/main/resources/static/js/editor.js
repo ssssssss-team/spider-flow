@@ -273,6 +273,9 @@ $(function(){
 			}
 			return false;
 		}).on("dblclick",".layui-input-block[codemirror]",function(){
+			if($(this).parent().hasClass("layui-layer-content")){
+				return;
+			}
 			layui.layer.open({
 				type : 1,
 				title : '请输入'+$(this).prev().html()+'表达式',
