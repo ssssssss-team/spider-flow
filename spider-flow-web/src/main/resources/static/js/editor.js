@@ -194,6 +194,7 @@ $(function(){
 	      resize.style.left = moveLen + 'px';
 	      $(".editor-container").css('right',($('body').width() - moveLen) + 'px')
 	      $(".properties-container").width(box.clientWidth - moveLen - 5);
+	      $(".xml-container").width($(".main-container").width() - $(".properties-container").width() - $(".sidebar-container").width() + 8);
 	    }
 	    document.onmouseup = function(evt){
 	    	document.onmousemove = null;
