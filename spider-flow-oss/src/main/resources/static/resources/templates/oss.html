@@ -1,0 +1,46 @@
+<style>
+	.oss-form .layui-input-block{
+		margin-left: 135px;
+	}
+</style>
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">基本配置</li>
+  </ul>
+  <div class="layui-tab-content editor-form-node">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form oss-form">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">endpoint</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="endpoint" placeholder="请输入endpoint" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.endpoint}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">accessKeyId</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="accessKeyId" placeholder="请输入accessKeyId" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.accessKeyId}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">accessKeySecret</label>
+    			<div class="layui-input-block">
+    				<input type="password" name="accessKeySecret" placeholder="请输入accessKeySecret" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.accessKeySecret}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">bucketName</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="bucketName" placeholder="请输入bucketName" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.bucketName}}">
+    			</div>
+    		</div>
+    	</form>
+    </div>
+  </div>
+</div>

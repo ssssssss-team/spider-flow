@@ -36,5 +36,6 @@
     	<module>spider-flow-selenium</module>
     	<module>spider-flow-proxypool</module>
     	<module>spider-flow-redis</module>
+    	<module>spider-flow-oss</module>
   </modules>
 </project>
