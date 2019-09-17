@@ -2,8 +2,11 @@ package org.spiderflow.core.executor.function.extension;
 
 import java.util.Objects;
 
+import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.FunctionExtension;
 import org.springframework.stereotype.Component;
+
+import com.alibaba.fastjson.JSON;
 
 @Component
 public class ObjectFunctionExtension implements FunctionExtension{
@@ -18,6 +21,13 @@ public class ObjectFunctionExtension implements FunctionExtension{
 			return (String) obj;
 		}
 		return Objects.toString(obj);
+	}
+	
+	public static Object jsonpath(Object obj,String path){
+		if(obj instanceof String){
+			return ExtractUtils.getValueByJsonPath(JSON.parse((String)obj), path);
+		}
+		return ExtractUtils.getValueByJsonPath(obj, path);
 	}
 
 }

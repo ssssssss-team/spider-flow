@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.spiderflow.core.executor.function.DateFunctionExecutor;
 import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.FunctionExtension;
@@ -35,6 +37,18 @@ public class StringFunctionExtension implements FunctionExtension{
 	
 	public static List<Object> xpaths(String source,String xpath){
 		return ExtractUtils.getObjectValuesByXPath(Jsoup.parse(source), xpath);
+	}
+	
+	public static Element element(String source){
+		return Jsoup.parse(source);
+	}
+	
+	public static Element selector(String source,String cssQuery){
+		return element(source).selectFirst(cssQuery);
+	}
+	
+	public static Elements selectors(String source,String cssQuery){
+		return element(source).select(cssQuery);
 	}
 	
 	public static Object json(String source){

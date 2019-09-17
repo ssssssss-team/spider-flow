@@ -3,6 +3,7 @@ package org.spiderflow.core.executor.function.extension;
 import java.util.List;
 
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.FunctionExtension;
 import org.springframework.stereotype.Component;
@@ -30,5 +31,14 @@ public class ElementFunctionExtension implements FunctionExtension{
 	public static List<String> regxs(Element element,String regx){
 		return ExtractUtils.getMatchers(element.html(), regx, true);
 	}
+	
+	public static Element selector(Element element,String cssQuery){
+		return element.selectFirst(cssQuery);
+	}
+	
+	public static Elements selectors(Element element,String cssQuery){
+		return element.select(cssQuery);
+	}
+
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.FunctionExtension;
 import org.spiderflow.io.SpiderResponse;
@@ -35,6 +36,14 @@ public class ResponseFunctionExtension implements FunctionExtension{
 	
 	public static List<String> regxs(SpiderResponse response,String pattern){
 		return ExtractUtils.getMatchers(response.getHtml(), pattern, true);
+	}
+	
+	public static Element selector(SpiderResponse response,String selector){
+		return ElementFunctionExtension.selector(element(response), selector);
+	}
+	
+	public static Elements selectors(SpiderResponse response,String selector){
+		return ElementFunctionExtension.selectors(element(response), selector);
 	}
 	
 	public static Object jsonpath(SpiderResponse response,String path){
