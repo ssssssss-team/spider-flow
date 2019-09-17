@@ -100,10 +100,12 @@ public class HttpRequest {
 		return this;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public HttpResponse execute() throws IOException{
 		this.connection.ignoreContentType(true);
 		this.connection.ignoreHttpErrors(true);
 		this.connection.maxBodySize(0);
+		this.connection.validateTLSCertificates(false);
 		Response response = connection.execute();
 		return new HttpResponse(response);
 	}
