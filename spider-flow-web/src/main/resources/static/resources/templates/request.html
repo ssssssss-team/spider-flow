@@ -71,6 +71,12 @@
 	   				<input type="checkbox" value="follow-redirect" lay-skin="switch" {{d.data.object['follow-redirect'] == '0' ? '' : 'checked'}}/>
     			</div>
 	   		</div>
+	   		<div class="layui-form-item">
+	   			<label class="layui-form-label">TLS证书验证</label>
+	   			<div class="layui-input-block">
+	   				<input type="checkbox" value="tls-validate" lay-skin="switch" {{d.data.object['tls-validate'] == '0' ? '' : 'checked'}}/>
+    			</div>
+	   		</div>
     	</form>
     </div>
     <div class="layui-tab-item">

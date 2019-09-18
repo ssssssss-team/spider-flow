@@ -67,6 +67,8 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 	
 	public static final String FOLLOW_REDIRECT = "follow-redirect";
 	
+	public static final String TLS_VALIDATE = "tls-validate";
+	
 	@Autowired
 	private ExpressionEngine engine;
 
@@ -114,6 +116,12 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 		boolean followRedirects = !"0".equals(node.getStringJsonValue(FOLLOW_REDIRECT));
 		request.followRedirect(followRedirects);
 		context.debug("设置跟随重定向：{}", followRedirects);
+		
+		//是否验证TLS证书,默认是验证
+		if("0".equals(node.getStringJsonValue(TLS_VALIDATE))){
+			request.followRedirect(false);
+			context.debug("设置TLS证书验证：{}", false);
+		}
 		
 		SpiderNode root = context.getRootNode();
 		//设置请求header
