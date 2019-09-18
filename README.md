@@ -51,7 +51,7 @@ spider-flow
 - [ ] Mongodb插件
 - [ ] Hbase插件
 - [x] IP代理池插件
-- [ ] OCR识别插件
+- [x] OCR识别插件
 
 ### 项目部分截图
 ![GVP项目爬虫测试](https://images.gitee.com/uploads/images/2019/0730/171455_bfe1a97b_1253940.gif "spider-test.gif")
