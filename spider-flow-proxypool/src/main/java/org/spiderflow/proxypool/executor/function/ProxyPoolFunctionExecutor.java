@@ -39,6 +39,9 @@ public class ProxyPoolFunctionExecutor implements FunctionExecutor,Grammer{
 	}
 	
 	private static String convertToString(Proxy proxy){
+		if(proxy == null){
+			return null;
+		}
 		return String.format("%s:%s", proxy.getIp(),proxy.getPort());
 	}
 	

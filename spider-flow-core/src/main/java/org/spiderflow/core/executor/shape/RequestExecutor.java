@@ -143,11 +143,13 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 		String proxy = node.getStringJsonValue(PROXY);
 		if(proxy != null){
 			try {
-				proxy = engine.execute(proxy, variables).toString();
-				String[] proxyArr = proxy.split(":");
-				if(proxyArr != null && proxyArr.length == 2){
-					request.proxy(proxyArr[0], Integer.parseInt(proxyArr[1]));
-					context.debug("设置代理：{}",proxy);
+				Object value = engine.execute(proxy, variables);
+				if(value != null){
+					String[] proxyArr = value.toString().split(":");
+					if(proxyArr != null && proxyArr.length == 2){
+						request.proxy(proxyArr[0], Integer.parseInt(proxyArr[1]));
+						context.debug("设置代理：{}",proxy);
+					}
 				}
 			} catch (Exception e) {
 				context.error("设置代理出错，异常信息:{}",e);
