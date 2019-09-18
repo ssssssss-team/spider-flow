@@ -1,0 +1,42 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">基本配置</li>
+  </ul>
+  <div class="layui-tab-content editor-form-node">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">变量名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="variableName" placeholder="请输入变量名称" value="{{=d.data.object.variableName}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">选择OCR</label>
+    			<div class="layui-input-block">
+    				<select name="ocrId">
+    					{{# for(var ocrIndex in d.model.cells){ }}
+    						{{# var cell = d.model.cells[ocrIndex] }}
+    						{{# if(cell.data&&cell.data.get('shape') == 'ocr'){ }}
+    							<option value="{{=ocrIndex}}" {{ocrIndex == d.data.object.ocrId ? 'selected': ''}}>{{cell.value}}</option>
+    						{{# } }}
+    					{{# } }}
+    				</select>
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">bytes / url</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="bytesOrUrl" placeholder="比如：${resp.bytes}或者http://...*.jpg" value="{{=d.data.object.bytesOrUrl}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    	</form>
+    </div>
+  </div>
+</div>

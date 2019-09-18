@@ -1,0 +1,43 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">基本配置</li>
+  </ul>
+  <div class="layui-tab-content editor-form-node">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">OCR提供商</label>
+    			<div class="layui-input-block">
+    				<select name="ocrProvider">
+						<option value="baidu" selected>百度</option>
+    				</select>
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">APP_ID</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="appId" placeholder="请输入appId" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.appId}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">API_KEY</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="apiKey" placeholder="请输入apiKey" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.apiKey}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">SECRET_KEY</label>
+    			<div class="layui-input-block">
+    				<input type="password" name="secretKey" placeholder="请输入secretKey" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.secretKey}}">
+    			</div>
+    		</div>
+    	</form>
+    </div>
+  </div>
+</div>
