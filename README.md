@@ -27,6 +27,7 @@ spider-flow
 ├── spider-flow-proxypool -- ip代理池插件
 ├── spider-flow-redis -- redis插件
 ├── spider-flow-oss -- oss插件
+├── spider-flow-ocr -- ocr插件
 ```
 
 #### 特性
