@@ -24,6 +24,9 @@ spider-flow
 ├── spider-flow-core -- 核心包
 ├── spider-flow-web -- web界面
 ├── spider-flow-selenium -- selenium插件
+├── spider-flow-proxypool -- ip代理池插件
+├── spider-flow-redis -- redis插件
+├── spider-flow-oss -- oss插件
 ```
 
 #### 特性
