@@ -4,6 +4,6 @@ out/
 .idea
 .classpath
 .project
-.settings/
+.settings
 bin/
 .myeclipse
