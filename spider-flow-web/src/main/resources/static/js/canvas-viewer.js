@@ -9,7 +9,7 @@ function CanvasText(options){
 	options = options || {};
 	this.maxWidth = options.maxWidth || 2147483648;
 	this.color = options.color;
-	this.text = options.text.toString();
+	this.text = options.text === undefined || options.text === null ? '': options.text.toString();
 	this.click = options.click;
 	this.startX = 0;
 	this.endX = 0;
