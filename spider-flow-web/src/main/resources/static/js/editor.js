@@ -257,7 +257,9 @@ $(function(){
 		bindToolbarClickAction(editor);
 		//加载图形
 		loadShapes(editor,$('.sidebar-container')[0]);
-		
+		if($('.sidebar-container')[0].scrollWidth>$('.sidebar-container')[0].clientWidth){
+			$('.sidebar-container').width($('.sidebar-container').width() + 3);
+		}
 		layui.form.on('switch',function(e){
 			serializeForm();
 		});

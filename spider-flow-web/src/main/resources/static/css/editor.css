@@ -23,6 +23,21 @@ html,body{
 	z-index: 1;
 	border-radius: 2px;
 }
+.main-container .sidebar-container::-webkit-scrollbar {
+ 	width: 3px;
+}
+.main-container .sidebar-container::-webkit-scrollbar-track {
+	background-color:#ccc;
+	-webkit-border-radius: 2em;
+	-moz-border-radius: 2em;
+	border-radius:2em;
+}
+.main-container .sidebar-container::-webkit-scrollbar-thumb {
+	background-color:#999;
+	-webkit-border-radius: 2em;
+	-moz-border-radius: 2em;
+	border-radius:2em;
+}
 .main-container .sidebar-container img{
 	padding: 5px;
 	margin : 2px;
