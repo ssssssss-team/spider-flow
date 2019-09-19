@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.core.model.DataSource;
 import org.spiderflow.core.service.DataSourceService;
+import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.model.JsonBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,9 @@ public class DataSourceController {
 	
 	@RequestMapping("/save")
 	public String save(DataSource dataSource){
+		if(StringUtils.isNotBlank(dataSource.getId())){
+			DataSourceUtils.remove(dataSource.getId());
+		}
 		return dataSourceService.save(dataSource).getId();
 	}
 	
@@ -46,6 +50,7 @@ public class DataSourceController {
 	
 	@RequestMapping("/remove")
 	public void remove(String id){
+		DataSourceUtils.remove(id);
 		dataSourceService.remove(id);
 	}
 	

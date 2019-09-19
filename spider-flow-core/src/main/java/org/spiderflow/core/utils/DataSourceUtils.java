@@ -35,6 +35,15 @@ public class DataSourceUtils {
 		return datasource;
 	}
 	
+	public static void remove(String dataSourceId){
+		DataSource dataSource = datasources.get(dataSourceId);
+		if(dataSource != null){
+			DruidDataSource ds = (DruidDataSource) dataSource;
+			ds.close();
+			datasources.remove(dataSourceId);
+		}
+	}
+	
 	public synchronized static DataSource getDataSource(String dataSourceId){
 		DataSource dataSource = datasources.get(dataSourceId);
 		if(dataSource == null){
