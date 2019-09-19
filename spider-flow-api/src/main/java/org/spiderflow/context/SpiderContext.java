@@ -31,10 +31,6 @@ public class SpiderContext extends HashMap<String, Object>{
 	 * 爬虫输出参数列表
 	 */
 	private List<SpiderOutput> outputs = new ArrayList<>();
-	/**
-	 * 数据源集合
-	 */
-	private Map<String,DataSource> datasources = new HashMap<>();
 	
 	private ThreadPool threadPool;
 	
@@ -53,14 +49,6 @@ public class SpiderContext extends HashMap<String, Object>{
 
 	public void setRunning(boolean running) {
 		this.running = running;
-	}
-
-	public void addDataSource(String id,DataSource datasource){
-		this.datasources.put(id, datasource);
-	}
-	
-	public DataSource getDataSource(String id){
-		return this.datasources.get(id);
 	}
 
 	public void setOutputs(List<SpiderOutput> outputs) {

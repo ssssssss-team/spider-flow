@@ -40,3 +40,16 @@
     </div>
   </div>
 </div>
+<script>
+	$.ajax({
+		url : 'datasource/all',
+		success : function(datasources){
+			for(var i =0;i<datasources.length;i++){
+				var ds = datasources[i];
+				var selected = (ds.id == '{{d.data.object.datasourceId}}' ? 'selected' : '');
+				$('select[name=datasourceId]').append('<option value="'+ds.id+'" '+selected+' >'+ds.name+'</option>');
+			}
+			layui.form.render();
+		}
+	})
+</script>

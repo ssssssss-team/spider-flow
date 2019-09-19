@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.Grammer;
 import org.spiderflow.context.SpiderContext;
+import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
@@ -44,14 +45,15 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammer{
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
-		if(!StringUtils.isNotBlank(node.getStringJsonValue(DATASOURCE_ID))){
+		String dsId = node.getStringJsonValue(DATASOURCE_ID);
+		String sql = node.getStringJsonValue(SQL);
+		if(!StringUtils.isNotBlank(dsId)){
 			context.debug("数据源ID为空！");
-		}else if(!StringUtils.isNotBlank(node.getStringJsonValue(SQL))){
+		}else if(!StringUtils.isNotBlank(sql)){
 			context.debug("sql为空！");
 		}else{
-			JdbcTemplate template = new JdbcTemplate(context.getDataSource(node.getStringJsonValue(DATASOURCE_ID)));
+			JdbcTemplate template = new JdbcTemplate(DataSourceUtils.getDataSource(dsId));
 			//把变量替换成占位符
-			String sql = node.getStringJsonValue(SQL);
 			List<String> parameters = ExtractUtils.getMatchers(sql, "#(.*?)#", true);
 			sql = sql.replaceAll("#(.*?)#", "?");
 			int size = parameters.size();

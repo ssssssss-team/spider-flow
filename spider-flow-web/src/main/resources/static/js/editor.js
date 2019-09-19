@@ -207,16 +207,6 @@ $(function(){
 	var templateCache = {};
 	function loadTemplate(cell,model,callback){
 		var cells = model.cells;
-		var datasources = [];
-		for(var index in cells){
-			var data = cells[index].data;
-			if(data && data.get('shape') == 'datasource'){
-				datasources.push({
-					id : index,
-					name : cells[index].value
-				});
-			}
-		}
 		var template = cell.data.get('shape') || 'root';
 		if(cell.isEdge()){
 			template = 'edge';
@@ -225,7 +215,6 @@ $(function(){
 			layui.laytpl(templateCache[template]).render({
 				data : cell.data,
 				value : cell.value,
-				datasources : datasources,
 				flows : flows || [],
 				model : model
 			},function(html){
@@ -319,36 +308,6 @@ $(function(){
 		}).on("click",".editor-form-node .output-add",function(){
 			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close output-remove"></i><label class="layui-form-label">输出项</label><div class="layui-input-block"><input type="text" name="output-name" placeholder="请输入输出项" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">输出值</label><div class="layui-input-block array" codemirror="output-value" placeholder="请输入输出值"></div></div><hr>');
 			renderCodeMirror();
-		}).on('click','.btn-datasource-test',function(){
-			var type = $("select[name=datasourceType]").val();
-			var url = $("input[name=datasourceUrl]").val();
-			var username = $("input[name=datasourceUsername]").val();
-			var password = $("input[name=datasourcePassword]").val();
-			var socket = createWebSocket({
-				onopen : function(){
-					socket.send(JSON.stringify({
-						eventType : 'testDatasource',
-						message : {
-							type : type,
-							url : url,
-							username : username,
-							password : password
-						}
-					}))
-				},
-				onmessage : function(e){
-					var event = JSON.parse(e.data);
-					var eventType = event.eventType;
-					var message = event.message;
-					if(eventType == 'error'){
-						layui.layer.alert(message,{
-							icon : 2
-						})
-					}else if(eventType == 'success'){
-						layui.layer.msg(message)
-					}
-				}
-			});
 		}).on("click",".parameter-form-add",function(){
 			var html = '';
 			html+='<div class="layui-form-item layui-form-relative">';
@@ -492,10 +451,6 @@ $(function(){
 			name : 'output',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAByUlEQVRYR+WXwVHDMBBF/4YD3AgHwEd3QKiA0IE7IOnAqoCkAqWDmAqACggVJJTAzRku4UYOmWVWloMZgi17bGcGdNGMrZWeVtrdL4JtXc3dI8I9gH76rWIfxSENXW0pHehpHoAwdTXMHccYx4pGLnNlAUYg3BojxtjFODPGB+Hmmw1jGCuKiubZCRCHtP1eNIH89zT3QXgy7IwXIlzYjRRC1A7wwTg5BGauELUDiPfkQrtCNAIg7neFaAzAFaJRAIE41dzrJHfieNfFrB2gMGoYz7GibbL7GwAmjQO9vN0zMDGh2YQHCt2eJKsZCFf/F+A3L9VyCV2OQMLxgKA3DPWmaJHatAbgaTbVloHFmnG9UrQSiDYBfFlcEpL0y5AuWwWQxc40B51EdUkzyqmUB6xs0wB8l3PfNYaBHgFdqx1UKYCs8KgKkLVjYFUKwJbYKN1BFQjjga/CNC4FUGXBrI0NxbmtinexokFrAJ5mnwlz8Z7oxjXQl1BsEyDJA4z3NeC3ngeM+4HJBgj3kgn3XgvONRs9IOe/VBTuoxa46wEQnN51pcKSMTAZNEcR1fc4zSFjxuNSUfDjCKyuezCyqanGeN0AQTYKPgFOSUMAph/CYQAAAABJRU5ErkJggg==',
 			title : '输出'
-		},{
-			name : 'datasource',
-			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACDklEQVRYR+2XwW3bQBBF39CX3MxLAN3iDqIOQlcQd6AOErOCOBUw6cDuQK4gdAdKB8pNQC70TRdyglnvJmuKK0uKHMlABBAihN35f2fn/xkJB/7IgfF5OQReVzo+OeFUlbFAPpQ5hUaEWdty/7OU2SbZTWbAAWa8V+VCYLxJsIE1NULddtymCK0QGFVaIHwCih1BU9vqVin7RB4R8ODf9gz8O5xdUaecxyT6BK786Z+LAyifF6VcBYD/BI4rAya9DGoRTp+jCFS5N0kvSpkP1oD9OKr0DLBinOyVhHJjcWNwi//oCiwDQSJ5pfkruDA/UBiL8HYbQqp8FzA3rJcwbUppbH+MsUJgVKmd/M1SKcOGGNS5o7dhR+rPe+PBaKEZcj13IKFC+fGkDJ2nw5SM68UHudvm5P213twmirP0fFcfqIE5wjw0nMFmFBqVYnVkz6qdH7UR/QsZdlAke0Ekw2uEd39z9/29qtwKXK6VoXlAWGDvVjj+HottzclMxyRojxV0HDdpRE6GGbrs+NqXofeFMJikZgUDZAmzwf0ZH+mQJ2VoFa8w7ZSbTUer1HW5uhIm8pDNs61l6D1hZqOVAwnfKUSlUCU3z4/NKppKjngeOAoZer//sm8Zoty1cLl2KB1oPA8y3NUTFOsjdQvTjcfyddXsO2Hw+ZWloWBTHXEo9sv5a7ZPW45jHTwDvwD6pR4w+W6OXgAAAABJRU5ErkJggg==',
-			title : '定义数据源'
 		},{
 			name : 'executeSql',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAD1ElEQVRYR7WXUXIaRxCGv4YqR2+WH2zxZukEUU5gdAKjExhfILAnMD7BohMYn8D4BEYnsHQCobfd5CHkDVIFnerZmc0sLAJjMlVUSbszPX93//13r7DnOk319JcGb0TpAOfRzyxMw0+F8WLF7SyR2T6mZdemVqrnCB+A7sZe5dE9E17X2BmhfMwSMXBb11YAzmPhg0DfnVYeFcYKkz8SGddZfJVqR6At0ClBCYP5ipttEakF4C//JnCpyt/AIE9kuCta8fuzVA34QITnCncL5aoOxAaAl6leNgS7/FSVrwvo7pvPdYDOERiJ8FZhtlKu/kzkLt5XAeA9f/CX3+SJFOH/yXWW6lCEnoFYKBexQyWAtbAf7fKAPQJRSUcJoNygfM0TsVI7+jpLdWzp8NUxKAoI8KX2YIRbwPmhOd+F2HNiasREubASDQBGCO9USdbZ3kq1TRPNfpfb9Qsc8CavWfIY17sRudnk+XzJ/bozrVQHTleUz1kiXTFUJ8JfVudZIqZwbjkjwhevePZoulSuA4tLQ36/wjDvS+IjOkF4g3KVJTKpAT41nZgrL8TEoyF8UaVCvFaqbpOVooEQ4Ver57wvv7moCN8sZVKIU8eH9X2WyKiV6i4ALuIr5VpaqZb/BIWLOHGfJ3LpvXKAsr7YGRdGM2Bn1p3YBSDstzSYMYfWDIdQBQ9RbrNE2h6A9YLzLJFBlEcX4vX9uwA4e0NVs28ASs/iXLkN1uWKPFYayrEAWErFI6kQ0IAEXbC/rQmJchMIdRQA3nEHIJCrhq0mFt2ysxXt9TgpKAFsSUElHakaiE+m5XlfXhwlAua4cl9LwjpFi8l6LACBhBtl6EUo9Wo1isUlLkMj6BJmTaHnUuWrZlcVVMqwTog8gO+BG14tv7syjHTApNuGFhMVF7X/OLK/EJVSDNOsLxdR+7wz9aukw+u3CZUrIWsq0QqTzwmMnRRXX8aaUpb+1mbkgMHQZNa3zfEc+qG5mPiY/juJLuR6YvPjEjoN6LrIrIGzAWejGfn82uT7UDex1BHy0GfxxFVpxx6E03cTnbwv14de8tS5iJxOT3xkiyN+WJj4kP5/I5lyv4B2SOXmUApuYon7+89GIxr3Niau+rHcCFWAGC+U94eOaD7nn+xDxWaHFbSfHMuDp5V0wAxhkPfk5kciYWxXoedH/ErYYztPfpqd2GdZ8V1oa2oRQZjkPbGy21he1N4CNkMU453ycQ7DH/o0iy276QisQgq1q64wJ5SzZPla+WznDv44Xb/J0vIM2o1CmEwJT4NSuq5mqYLpCsb/wGRf3vwLgODoY+vqQ1gAAAAASUVORK5CYII=',

@@ -1,6 +1,13 @@
 package org.spiderflow.core.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.sql.DataSource;
+
+import org.spiderflow.core.repository.DataSourceRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.pool.DruidDataSource;
 
@@ -9,21 +16,12 @@ import com.alibaba.druid.pool.DruidDataSource;
  * @author jmxd
  *
  */
+@Component
 public class DataSourceUtils {
 	
-	/**
-	 * 
-	 * @param databaseType 数据库类型
-	 * @return String 数据库驱动 com.mysql.jdbc.Driver/oracle.jdbc.driver.OracleDriver
-	 */
-	public static String getDriverClassByDataBaseType(String databaseType){
-		if("mysql".equalsIgnoreCase(databaseType)){
-			return "com.mysql.jdbc.Driver";
-		}else if("oracle".equalsIgnoreCase(databaseType)){
-			return "oracle.jdbc.driver.OracleDriver";
-		}
-		return null;
-	}
+	private static final Map<String,DataSource> datasources = new HashMap<>();
+	
+	private static DataSourceRepository dataSourceRepository;
 	
 	public static DataSource createDataSource(String className,String url,String username,String password){
 		DruidDataSource datasource = new DruidDataSource();
@@ -34,8 +32,24 @@ public class DataSourceUtils {
 		datasource.setDefaultAutoCommit(true);
 		datasource.setMinIdle(1);
 		datasource.setInitialSize(2);
-		
 		return datasource;
+	}
+	
+	public synchronized static DataSource getDataSource(String dataSourceId){
+		DataSource dataSource = datasources.get(dataSourceId);
+		if(dataSource == null){
+			org.spiderflow.core.model.DataSource ds = dataSourceRepository.getOne(dataSourceId);
+			if(ds != null){
+				dataSource = createDataSource(ds.getDriverClassName(), ds.getJdbcUrl(), ds.getUsername(), ds.getPassword());
+				datasources.put(dataSourceId, dataSource);
+			}
+		}
+		return dataSource;
+	}
+
+	@Autowired
+	public void setDataSourceRepository(DataSourceRepository dataSourceRepository) {
+		DataSourceUtils.dataSourceRepository = dataSourceRepository;
 	}
 
 }

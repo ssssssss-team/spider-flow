@@ -1,7 +1,5 @@
 package org.spiderflow.websocket;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,9 +8,7 @@ import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.core.Spider;
-import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.core.utils.SpiderFlowUtils;
 import org.spiderflow.model.SpiderWebSocketContext;
 import org.spiderflow.model.WebSocketEvent;
@@ -57,30 +53,6 @@ public class WebSocketEditorServer {
 			}).start();
 		}else if("stop".equals(eventType)){
 			context.setRunning(false);
-		}else if("testDatasource".equals(eventType)){
-			JSONObject dsConfig = event.getJSONObject("message");
-			String className = DataSourceUtils.getDriverClassByDataBaseType(dsConfig.getString("type"));
-			if(StringUtils.isEmpty(className)){
-				context.write(new WebSocketEvent<>("error", "不支持的数据库类型！"));
-			}else{
-				String url = dsConfig.getString("url");
-				String username = dsConfig.getString("username");
-				String password = dsConfig.getString("password");
-				Connection connection = null;
-				try{
-					Class.forName(className);
-					connection = DriverManager.getConnection(url,username,password);
-					context.write(new WebSocketEvent<>("success", "测试连接成功！"));
-				}catch(Exception e){
-					context.write(new WebSocketEvent<>("error", "连接失败," + e.getMessage()));
-				} finally{
-					try {
-						connection.close();
-					} catch (Exception e) {
-					}
-				}
-				
-			}
 		}
 	}
 	

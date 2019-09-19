@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>DataSource</title>
+	<link rel="stylesheet" href="js/layui/css/layui.css" />
+	<link rel="stylesheet" href="css/layui-blue.css" />
+	<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+	<script type="text/javascript" src="js/common.js" ></script>
+	<style type="text/css">
+		html,body{
+			width:100%;
+		}
+		.layui-form{
+			width : 700px;
+			margin-top:10px;
+		}
+		.layui-form-label{
+			width : 140px;
+		}
+		.layui-input-block{
+			margin-left : 170px;
+		}
+		.btns-submit{
+			text-align : center;
+		}
+	</style>
+</head>
+<body>
+	<form class="layui-form" autocomplete="off" lay-filter="form">
+		<div class="layui-form-item">
+   			<label class="layui-form-label">数据源名称</label>
+   			<div class="layui-input-block">
+   				<input type="text" name="name" placeholder="请输入数据源名称" autocomplete="off" class="layui-input" lay-verify="required"/>
+   			</div>
+   		</div>
+		<div class="layui-form-item">
+   			<label class="layui-form-label">DriverClassName</label>
+   			<div class="layui-input-block">
+   				<input type="text" name="driverClassName" placeholder="请输入DriverClassName" autocomplete="off" class="layui-input" lay-verify="required"/>
+   			</div>
+   		</div>
+		<div class="layui-form-item">
+   			<label class="layui-form-label">数据库连接</label>
+   			<div class="layui-input-block">
+   				<input type="text" name="jdbcUrl" placeholder="请输入数据库连接" autocomplete="off" class="layui-input"  lay-verify="required"/>
+   			</div>
+   		</div>
+   		<div class="layui-form-item">
+   			<label class="layui-form-label">用户名</label>
+   			<div class="layui-input-block">
+   				<input type="text" name="username" placeholder="请输入用户名" autocomplete="off" class="layui-input" />
+   			</div>
+   		</div>
+   		<div class="layui-form-item">
+   			<label class="layui-form-label">密码</label>
+   			<div class="layui-input-block">
+   				<input type="password" name="password" placeholder="请输入密码" autocomplete="off" class="layui-input" />
+   			</div>
+   		</div>
+   		<div class="btns-submit">
+			<button class="layui-btn layui-btn-normal" lay-submit lay-filter="save">保存</button>
+			<button class="layui-btn layui-btn-normal" lay-submit lay-filter="test" type="button">测试连接</button>
+			<button class="layui-btn layui-btn-primary btn-return" type="button" onclick="history.go(-1);">返回</button>
+		</div>
+	</form>
+	<script type="text/javascript">
+		var $ = layui.$;
+		var dsId = getQueryString('id');
+		if(dsId){
+			$.ajax({
+				url : 'datasource/get',
+				data : {
+					id : dsId
+				},
+				success : function(data){
+					layui.form.val('form',data)
+				}
+			})
+		}
+		layui.form.on('submit(save)',function(){
+			$.ajax({
+				url : 'datasource/save',
+				type : 'post',
+				data : {
+					id : dsId,
+					name : $("input[name=name]").val(),
+					driverClassName : $("input[name=driverClassName]").val(),
+					jdbcUrl : $("input[name=jdbcUrl]").val(),
+					username : $("input[name=username]").val(),
+					password : $("input[name=password]").val()
+				},
+				success : function(json){
+					layui.layer.msg('保存成功',{
+						time : 800
+					},function(){
+						location.href = 'datasources.html';
+					})
+				},
+				error : function(){
+					layui.layer.msg('请求失败');
+				}
+			})
+			return false;
+		})
+		layui.form.on('submit(test)',function(){
+			$.ajax({
+				url : 'datasource/test',
+				type : 'post',
+				data : {
+					driverClassName : $("input[name=driverClassName]").val(),
+					jdbcUrl : $("input[name=jdbcUrl]").val(),
+					username : $("input[name=username]").val(),
+					password : $("input[name=password]").val()
+				},
+				success : function(json){
+					layui.layer.msg(json.msg);
+				},
+				error : function(){
+					layui.layer.msg('请求失败');
+				}
+			})
+			return false;
+		})
+	</script>
+</body>
+</html>
