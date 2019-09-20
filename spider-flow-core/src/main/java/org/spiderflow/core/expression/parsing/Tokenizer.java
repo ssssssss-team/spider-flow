@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.spiderflow.core.expression.ExpressionError;
+import org.spiderflow.core.expression.ExpressionError.StringLiteralException;
+import org.spiderflow.core.expression.ExpressionError.TemplateException;
 
 
 public class Tokenizer {
@@ -18,16 +20,33 @@ public class Tokenizer {
 		CharacterStream stream = new CharacterStream(source);
 		stream.startSpan();
 
+		RuntimeException re = null;
 		// TODO: this will fall on its face if we have something like {{ "}}" }}.
 		while (stream.hasMore()) {
 			if (stream.match("${", false)) {
 				if (!stream.isSpanEmpty()) tokens.add(new Token(TokenType.TextBlock, stream.endSpan()));
 				stream.startSpan();
-				while (!stream.match("}", true)) {
-					if (!stream.hasMore()) ExpressionError.error("Did not find closing }.", stream.endSpan());
-					stream.consume();
+				boolean isContinue = false;
+				do{
+					while (!stream.match("}", true)) {
+						if (!stream.hasMore()) ExpressionError.error("Did not find closing }.", stream.endSpan());
+						stream.consume();
+					}
+					try{
+						tokens.addAll(tokenizeCodeSpan(stream.endSpan()));
+						isContinue = false;
+						re = null;
+					}catch(TemplateException e){
+						re = e;
+						if(e.getCause() != null && e.getCause() instanceof StringLiteralException){
+							isContinue = true;
+						}
+					}
+					
+				}while(isContinue);
+				if(re != null){
+					throw re;
 				}
-				tokens.addAll(tokenizeCodeSpan(stream.endSpan()));
 				stream.startSpan();
 			} else {
 				stream.consume();
@@ -108,7 +127,7 @@ public class Tokenizer {
 					}
 					stream.consume();
 				}
-				if (!matchedEndQuote) ExpressionError.error("字符串没有结束符\'", stream.endSpan());
+				if (!matchedEndQuote) ExpressionError.error("字符串没有结束符\'", stream.endSpan(),new StringLiteralException());
 				Span stringSpan = stream.endSpan();
 				stringSpan = new Span(stringSpan.getSource(), stringSpan.getStart() - 1, stringSpan.getEnd());
 				tokens.add(new Token(TokenType.StringLiteral, stringSpan));
@@ -130,7 +149,7 @@ public class Tokenizer {
 					}
 					stream.consume();
 				}
-				if (!matchedEndQuote) ExpressionError.error("字符串没有结束符\"", stream.endSpan());
+				if (!matchedEndQuote) ExpressionError.error("字符串没有结束符\"", stream.endSpan(),new StringLiteralException());
 				Span stringSpan = stream.endSpan();
 				stringSpan = new Span(stringSpan.getSource(), stringSpan.getStart() - 1, stringSpan.getEnd());
 				tokens.add(new Token(TokenType.StringLiteral, stringSpan));

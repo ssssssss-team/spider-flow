@@ -109,4 +109,10 @@ public class ExpressionError {
 			return builder.toString();
 		}
 	}
+	
+	public static class StringLiteralException extends RuntimeException {
+
+		private static final long serialVersionUID = 1L;
+		
+	}
 }

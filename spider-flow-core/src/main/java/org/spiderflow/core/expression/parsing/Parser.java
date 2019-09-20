@@ -119,12 +119,20 @@ public class Parser {
 
 	private static Expression parseAccessOrCallOrLiteral (TokenStream stream) {
 		if (stream.match(TokenType.Identifier, false)) {
-			return parseAccessOrCall(stream);
+			return parseAccessOrCall(stream,TokenType.Identifier);
 		} else if (stream.match(TokenType.LeftCurly, false)) {
 			return parseMapLiteral(stream);
 		} else if (stream.match(TokenType.LeftBracket, false)) {
 			return parseListLiteral(stream);
 		} else if (stream.match(TokenType.StringLiteral, false)) {
+			if(stream.hasNext()){
+				if(stream.next().getType() == TokenType.Period){
+					stream.prev();
+					return parseAccessOrCall(stream,TokenType.StringLiteral);
+				}
+				stream.prev();
+			}
+			
 			return new StringLiteral(stream.expect(TokenType.StringLiteral).getSpan());
 		} else if (stream.match(TokenType.BooleanLiteral, false)) {
 			return new BooleanLiteral(stream.expect(TokenType.BooleanLiteral).getSpan());
@@ -179,9 +187,11 @@ public class Parser {
 		return new ListLiteral(new Span(openBracket, closeBracket), values);
 	}
 
-	private static Expression parseAccessOrCall (TokenStream stream) {
-		Span identifier = stream.expect(TokenType.Identifier).getSpan();
-		Expression result = new VariableAccess(identifier);
+	private static Expression parseAccessOrCall (TokenStream stream,TokenType tokenType) {
+		//Span identifier = stream.expect(TokenType.Identifier);
+		//Expression result = new VariableAccess(identifier);
+		Span identifier = stream.expect(tokenType).getSpan();
+		Expression result = tokenType == TokenType.StringLiteral ? new StringLiteral(identifier) :new VariableAccess(identifier);
 
 		while (stream.hasMore() && stream.match(false, TokenType.LeftParantheses, TokenType.LeftBracket, TokenType.Period)) {
 

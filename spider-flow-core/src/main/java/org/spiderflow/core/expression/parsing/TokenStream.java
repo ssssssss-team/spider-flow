@@ -25,11 +25,31 @@ public class TokenStream {
 	public boolean hasMore () {
 		return index < end;
 	}
+	
+	public boolean hasNext(){
+		return index + 1 < end;
+	}
+	
+	public boolean hasPrev(){
+		return index > 0;
+	}
 
 	/** Consumes the next token and returns it. **/
 	public Token consume () {
 		if (!hasMore()) throw new RuntimeException("Reached the end of the source.");
 		return tokens.get(index++);
+	}
+	
+	public Token next(){
+		if (!hasMore()) throw new RuntimeException("Reached the end of the source.");
+		return tokens.get(++index);
+	}
+	
+	public Token prev(){
+		if(index == 0){
+			throw new RuntimeException("Reached the end of the source.");
+		}
+		return tokens.get(--index);
 	}
 
 	/** Checks if the next token has the give type and optionally consumes, or throws an error if the next token did not match the
