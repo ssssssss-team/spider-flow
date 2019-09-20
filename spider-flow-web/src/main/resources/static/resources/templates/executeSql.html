@@ -4,7 +4,7 @@
   </ul>
   <div class="layui-tab-content">
     <div class="layui-tab-item layui-show">
-    	<form class="layui-form editor-form-node">
+    	<form class="layui-form editor-form-node" lay-filter="executesql-form">
     		<div class="layui-form-item">
     			<label class="layui-form-label">节点名称</label>
     			<div class="layui-input-block">
@@ -46,10 +46,13 @@
 		success : function(datasources){
 			for(var i =0;i<datasources.length;i++){
 				var ds = datasources[i];
-				var selected = (ds.id == '{{d.data.object.datasourceId}}' ? 'selected' : '');
-				$('select[name=datasourceId]').append('<option value="'+ds.id+'" '+selected+' >'+ds.name+'</option>');
+				$('select[name=datasourceId]').append('<option value="'+ds.id+'">'+ds.name+'</option>');
 			}
 			layui.form.render();
+			var selectDataSourceId = '{{=d.data.object.datasourceId}}';
+			if(selectDataSourceId != ''){
+				$('.layui-form-select dd[lay-value='+selectDataSourceId+']').trigger('click');
+			}
 		}
 	})
 </script>
