@@ -1,13 +1,9 @@
 package org.spiderflow.core.executor.function;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.RandomUtils;
-import org.spiderflow.Grammer;
+import org.spiderflow.annotation.Comment;
+import org.spiderflow.annotation.Example;
 import org.spiderflow.executor.FunctionExecutor;
-import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,21 +12,27 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class RandomFunctionExecutor implements FunctionExecutor,Grammer{
+public class RandomFunctionExecutor implements FunctionExecutor{
 	
 	@Override
 	public String getFunctionPrefix() {
 		return "random";
 	}
 	
+	@Comment("随机获取int")
+	@Example("${random.randomInt(1,10)}")
 	public static int randomInt(int min,int max){
 		return RandomUtils.nextInt(min, max);
 	}
 	
+	@Comment("随机获取double")
+	@Example("${random.randomDouble(1,10)}")
 	public static double randomDouble(double min,double max){
 		return RandomUtils.nextDouble(min, max);
 	}
 	
+	@Comment("随机获取long")
+	@Example("${random.randomLong(1,10)}")
 	public static long randomLong(long min,long max){
 		return RandomUtils.nextLong(min, max);
 	}
@@ -41,6 +43,8 @@ public class RandomFunctionExecutor implements FunctionExecutor,Grammer{
 	 * @param length 字符范围
 	 * @return String 随机字符串
 	 */
+	@Comment("随机获取字符串")
+	@Example("${random.string('abcde',10)}")
 	public static String string(String chars,int length){
 		if (chars != null) {
 			char[] newChars = new char[length];
@@ -51,11 +55,6 @@ public class RandomFunctionExecutor implements FunctionExecutor,Grammer{
 			return new String(newChars);
 		}
 		return null;
-	}
-	
-	@Override
-	public Map<String, List<String>> getFunctionMap() {
-		return Maps.newMap("random", Arrays.asList("randomInt","randomDouble","randomLong","string"));
 	}
 	
 }

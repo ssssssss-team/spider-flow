@@ -25,10 +25,7 @@ public class DefaultExpressionEngine implements ExpressionEngine{
 	@PostConstruct
 	private void init(){
 		for (FunctionExtension extension : functionExtensions) {
-			List<Class<?>> clazzs = extension.supports();
-			for (Class<?> clazz : clazzs) {
-				Reflection.getInstance().registerExtensionClass(clazz, extension.getClass());
-			}
+			Reflection.getInstance().registerExtensionClass(extension.support(), extension.getClass());
 		}
 	}
 	

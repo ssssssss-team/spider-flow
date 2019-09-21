@@ -1,12 +1,22 @@
 package org.spiderflow.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
-import org.spiderflow.Grammer;
+import org.spiderflow.Grammerable;
+import org.spiderflow.annotation.Comment;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.service.SpiderFlowService;
+import org.spiderflow.executor.FunctionExecutor;
+import org.spiderflow.executor.FunctionExtension;
 import org.spiderflow.executor.ShapeExecutor;
+import org.spiderflow.model.Grammer;
+import org.spiderflow.model.JsonBean;
 import org.spiderflow.model.Shape;
-import org.spiderflow.utils.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,12 +26,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 爬虫Controller
@@ -36,29 +40,39 @@ public class SpiderFlowController {
 	private List<ShapeExecutor> executors;
 	
 	@Autowired
-	private List<Grammer> grammers;
+	private List<FunctionExecutor> functionExecutors;
 	
-	private Map<String,Map<String,List<String>>> keywords = new HashMap<>();
+	@Autowired
+	private List<FunctionExtension> functionExtensions;
+	
+	@Autowired
+	private List<Grammerable> grammerables;
 	
 	@Autowired
 	private SpiderFlowService spiderFlowService;
 	
+	private final List<Grammer> grammers = new ArrayList<Grammer>();
+	
 	@PostConstruct
 	private void init(){
-		for (Grammer grammer : grammers) {
-			Map<String, List<String>> functions = grammer.getFunctionMap();
-			if(functions != null){
-				functions.entrySet().stream().forEach(e->{
-					keywords.put(e.getKey(), Maps.newMap("functions", e.getValue()));
-				});
+		for (FunctionExecutor executor : functionExecutors) {
+			String function = executor.getFunctionPrefix();
+			grammers.addAll(Grammer.findGrammers(executor.getClass(),function,function,true));
+			Comment comment = executor.getClass().getAnnotation(Comment.class);
+			Grammer grammer = new Grammer();
+			if(comment!= null){
+				grammer.setComment(comment.value());
 			}
-			Map<String, List<String>> attributes = grammer.getAttributeMap();
-			if(attributes != null){
-				attributes.entrySet().stream().forEach(e->{
-					keywords.put(e.getKey(), Maps.newMap("attributes", e.getValue()));
-				});
-			}
-			
+			grammer.setFunction(function);
+			grammers.add(grammer);
+		}
+		
+		for (FunctionExtension extension : functionExtensions) {
+			String owner = extension.support().getSimpleName();
+			grammers.addAll(Grammer.findGrammers(extension.getClass(),null,owner,true));
+		}
+		for (Grammerable grammerable : grammerables) {
+			grammers.addAll(grammerable.grammers());
 		}
 	}
 	
@@ -127,8 +141,8 @@ public class SpiderFlowController {
 		return executors.stream().filter(e-> e.shape() !=null).map(executor -> executor.shape()).collect(Collectors.toList());
 	}
 	@RequestMapping("/grammers")
-	public Map<String,Map<String,List<String>>> grammers(){
-		return this.keywords;
+	public JsonBean<List<Grammer>> grammers(){
+		return new JsonBean<>(this.grammers);
 	}
 
 	@GetMapping("/recent5TriggerTime")

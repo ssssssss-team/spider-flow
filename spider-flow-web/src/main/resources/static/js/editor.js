@@ -2,22 +2,6 @@ var $ = layui.$;
 var editor;
 var flows;
 var cms = [];
-var grammers = {};
-var grammerVariables = [];
-function initGrammers(){
-	$.ajax({
-		url : 'spider/grammers',
-		dataType : 'json',
-		success : function(gms){
-			grammers = gms;
-			for(var key in grammers){
-				grammerVariables.push(key);
-				grammers[key].functions = (grammers[key].functions || []).sort();
-				grammers[key].attributes = (grammers[key].attributes || []).sort();
-			}
-		}
-	})
-}
 function renderCodeMirror(){
 	cms = [];
 	$('[codemirror]').each(function(){
@@ -32,80 +16,11 @@ function renderCodeMirror(){
 			placeholder : $dom.attr("placeholder"),
 			value : $dom.attr('data-value') || '',
 			scrollbarStyle : 'null',	//隐藏滚动条
-			hintOptions : {
-				completeSingle : false,
-				hint : function(codeeditor){
-					var cur = codeeditor.getCursor();
-					var curLine = codeeditor.getLine(cur.line);
-					var token = cm.getTokenAt(cur);
-					var end = cur.ch;
-					var start = end;
-					var list = [];
-					var str1 = curLine.charAt(start - 2);
-					var str2 = curLine.charAt(start - 1);
-					if(token.type=='string'){
-						return {
-							list: [], 
-							from: CodeMirror.Pos(cur.line, start), 
-							to: CodeMirror.Pos(cur.line, end)
-						}
-					}
-					if(str1 == '$' && str2 == '{'){
-						return {
-							list: grammerVariables || [], 
-							from: CodeMirror.Pos(cur.line, start), 
-							to: CodeMirror.Pos(cur.line, end)
-						}
-					}else{
-						var prefix = curLine.substring(0,end);
-						var regx = /[^\w]([\w]+?)[\.]/g;
-						var keyword = null;
-						var tmp = null;
-						while((tmp = regx.exec(prefix)) !== null){
-							keyword = tmp[1];
-						}
-						if(str2 == '.'){
-							return {
-								list: grammers[keyword]&&grammers[keyword].functions.concat(grammers[keyword].attributes).sort()||[], 
-								from: CodeMirror.Pos(cur.line, start), 
-								to: CodeMirror.Pos(cur.line, end)
-							}
-						}else{
-							var arr = prefix.split(/[^\w]/);
-							if(arr.length > 0){
-								var str = arr[arr.length - 1];
-								if(str){
-									regx = new RegExp('[^\\w]+([\\w]+?)[\\.]['+str+']','g');
-									var keyword = null;
-									var tmp = null;
-									while((tmp = regx.exec(prefix)) != null){
-										keyword = tmp[1];
-									}
-									var array = grammerVariables;
-									if(keyword != null&&grammers[keyword]){
-										array = grammers[keyword].functions.concat(grammers[keyword].attributes);
-									}
-									for(var i =0,len = array.length;i<len;i++){
-										var s = array[i];
-										if(s!=str&&s.indexOf(str) === 0){
-											list.push(array[i]);
-										}
-									}
-								}
-							}
-						}
-						return {
-							list: list, 
-							from: CodeMirror.Pos(cur.line, token.start), 
-							to: CodeMirror.Pos(cur.line, token.end)
-						}
-					}
-				}
-			}
 		});
+		initHint(cm);
 		cm.on('change',function(){
-			cm.closeHint();
-			cm.showHint();
+			//cm.closeHint();
+			//cm.showHint();
 			$dom.attr('data-value',cm.getValue());
 			serializeForm();
 		});
@@ -145,7 +60,6 @@ function serializeForm(){
 	cell.data.set('shape',shape);
 }
 $(function(){
-	initGrammers();
 	$.ajax({
 		url : 'spider/other',
 		type : 'post',

@@ -1,13 +1,11 @@
 package org.spiderflow.core.executor.function;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import org.spiderflow.Grammer;
+import org.spiderflow.annotation.Comment;
+import org.spiderflow.annotation.Example;
 import org.spiderflow.executor.FunctionExecutor;
-import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,13 +14,15 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class ListFunctionExecutor implements FunctionExecutor,Grammer{
+public class ListFunctionExecutor implements FunctionExecutor{
 	
 	@Override
 	public String getFunctionPrefix() {
 		return "list";
 	}
 
+	@Comment("获取list的长度")
+	@Example("${list.length(listVar)}")
 	public static int length(List<?> list){
 		return list != null ? list.size() : 0;
 	}
@@ -33,6 +33,8 @@ public class ListFunctionExecutor implements FunctionExecutor,Grammer{
 	 * @param len 按多长进行分割
 	 * @return List<List<?>> 分割后的数组
 	 */
+	@Comment("分割List")
+	@Example("${list.split(listVar,10)}")
 	public static List<List<?>> split(List<?> list,int len){
 		List<List<?>> result = new ArrayList<>();
 		if (list == null || list.size() == 0 || len < 1) {
@@ -47,12 +49,10 @@ public class ListFunctionExecutor implements FunctionExecutor,Grammer{
 		return result;
 	}
 	
+	@Comment("截取List")
+	@Example("${list.sublist(listVar,fromIndex,toIndex)}")
 	public static List<?> sublist(List<?> list,int fromIndex,int toIndex){
 		return list!= null ? list.subList(fromIndex, toIndex) : new ArrayList<>();
 	}
-	@Override
-	public Map<String, List<String>> getFunctionMap() {
-		return Maps.newMap("list", Arrays.asList("length","split","subList"));
-	}
-	
+		
 }

@@ -1,5 +1,5 @@
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
-// Distributed under an MIT license: https://codemirror.net/LICENSE
+// Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
   if (typeof exports == "object" && typeof module == "object") // CommonJS
@@ -45,15 +45,32 @@
     CodeMirror.signal(this, "startCompletion", this);
     completion.update(true);
   });
+  CodeMirror.defineExtension("showHint1", function(options,datas) {
+    options = parseOptions(this, this.getCursor("start"), options);
+    var selections = this.listSelections()
+    if (selections.length > 1) return;
+    // By default, don't allow completion when something is selected.
+    // A hint function can have a `supportsSelection` property to
+    // indicate that it can handle selections.
+    if (this.somethingSelected()) {
+      if (!options.hint.supportsSelection) return;
+      // Don't try with cross-line selections
+      for (var i = 0; i < selections.length; i++)
+        if (selections[i].head.line != selections[i].anchor.line) return;
+    }
+    if (this.state.completionActive) this.state.completionActive.close();
+    var completion = this.state.completionActive = new Completion(this, options);
+    if (!completion.options.hint) return;
 
-  CodeMirror.defineExtension("closeHint", function() {
-    if (this.state.completionActive) this.state.completionActive.close()
-  })
-
+    CodeMirror.signal(this, "startCompletion", this);
+    completion.update1(true,datas);
+  });
   function Completion(cm, options) {
     this.cm = cm;
     this.options = options;
     this.widget = null;
+	this.comments = this.options.comments;
+    //this.widget1 = null;
     this.debounce = 0;
     this.tick = 0;
     this.startPos = this.cm.getCursor("start");
@@ -76,7 +93,9 @@
       this.cm.off("cursorActivity", this.activityFunc);
 
       if (this.widget && this.data) CodeMirror.signal(this.data, "close");
-      if (this.widget) this.widget.close();
+      if (this.widget) {
+        this.widget.close();
+       }
       CodeMirror.signal(this.cm, "endCompletion", this.cm);
     },
 
@@ -102,30 +121,89 @@
       var pos = this.cm.getCursor(), line = this.cm.getLine(pos.line);
       if (pos.line != this.startPos.line || line.length - pos.ch != this.startLen - this.startPos.ch ||
           pos.ch < this.startPos.ch || this.cm.somethingSelected() ||
-          (!pos.ch || this.options.closeCharacters.test(line.charAt(pos.ch - 1)))) {
+          (pos.ch && this.options.closeCharacters.test(line.charAt(pos.ch - 1)))) {
         this.close();
       } else {
         var self = this;
         this.debounce = requestAnimationFrame(function() {self.update();});
-        if (this.widget) this.widget.disable();
+        if (this.widget)
+        {
+          this.widget.disable();
+         }
+       
       }
     },
 
     update: function(first) {
-      if (this.tick == null) return
-      var self = this, myTick = ++this.tick
-      fetchHints(this.options.hint, this.cm, this.options, function(data) {
-        if (self.tick == myTick) self.finishUpdate(data, first)
-      })
+      if (this.tick == null) return;
+      if (!this.options.hint.async) {
+        this.finishUpdate(this.options.hint(this.cm, this.options), first);
+      } else {
+        var myTick = ++this.tick, self = this;
+        this.options.hint(this.cm, function(data) {
+          if (self.tick == myTick) self.finishUpdate(data, first);
+        }, this.options);
+      }
     },
-
-    finishUpdate: function(data, first) {
-      if (this.data) CodeMirror.signal(this.data, "update");
+    update1: function(first,datas) {
+      if (this.tick == null) return;
+      if (!this.options.hint.async) {
+        //
+        //datas = JSON.parse(datas);
+        this.finishUpdate1(datas, first);
+      } else {
+        var myTick = ++this.tick, self = this;
+        this.options.hint(this.cm, function(data) {
+          if (self.tick == myTick) self.finishUpdate(data, first);
+        }, this.options);
+      }
+    },
+    finishUpdate1: function(data, first) {
+      if (this.data)
+      {
+        CodeMirror.signal(this.data, "update");
+      }
 
       var picked = (this.widget && this.widget.picked) || (first && this.options.completeSingle);
-      if (this.widget) this.widget.close();
-
+      if (this.widget)
+      {
+        this.widget.close();
+      }
+      if (data && this.data && isNewCompletion(this.data, data))
+      {
+        return;
+      }
       this.data = data;
+
+
+      if (data && data.list.length) {
+        if (picked && data.list.length == 1) {
+			
+          this.pick(data, 0);
+        } else {
+          this.widget = new Widget1(this, data,this.comments);
+          CodeMirror.signal(data, "shown");
+        }
+      }
+    },
+    finishUpdate: function(data, first) {
+      if (this.data)
+      {
+        CodeMirror.signal(this.data, "update");
+      }
+
+      var picked = (this.widget && this.widget.picked) || (first && this.options.completeSingle);
+      if (this.widget)
+      {
+        this.widget.close();
+      }
+
+      if (data && this.data && isNewCompletion(this.data, data))
+      {
+        return;
+      }
+      this.data = data;
+
 
       if (data && data.list.length) {
         if (picked && data.list.length == 1) {
@@ -137,6 +215,11 @@
       }
     }
   };
+
+  function isNewCompletion(old, nw) {
+    var moved = CodeMirror.cmpPos(nw.from, old.from)
+    return moved > 0 && old.to.ch - old.from.ch != nw.to.ch - nw.from.ch
+  }
 
   function parseOptions(cm, pos, options) {
     var editor = cm.options.hintOptions;
@@ -167,14 +250,6 @@
       Tab: handle.pick,
       Esc: handle.close
     };
-
-    var mac = /Mac/.test(navigator.platform);
-
-    if (mac) {
-      baseMap["Ctrl-P"] = function() {handle.moveFocus(-1);};
-      baseMap["Ctrl-N"] = function() {handle.moveFocus(1);};
-    }
-
     var custom = completion.options.customKeys;
     var ourMap = custom ? {} : baseMap;
     function addBinding(key, val) {
@@ -204,81 +279,108 @@
       el = el.parentNode;
     }
   }
-
-  function Widget(completion, data) {
+  function Widget1(completion, data,comments) {
     this.completion = completion;
     this.data = data;
+	this.comments = comments;
     this.picked = false;
     var widget = this, cm = completion.cm;
-    var ownerDocument = cm.getInputField().ownerDocument;
-    var parentWindow = ownerDocument.defaultView || ownerDocument.parentWindow;
-
-    var hints = this.hints = ownerDocument.createElement("ul");
-    var theme = completion.cm.options.theme;
-    hints.className = "CodeMirror-hints " + theme;
+    var winW = window.innerWidth || Math.max(document.body.offsetWidth, document.documentElement.offsetWidth);
+    var hints = this.hints = document.createElement("ul");
+      var hints2 = this.hints2 = document.createElement("ul");
+    //文档说明提示框
+    var completions = data.list;
+    hints.className = "CodeMirror-hints";
     this.selectedHint = data.selectedHint || 0;
 
     var completions = data.list;
     for (var i = 0; i < completions.length; ++i) {
-      var elt = hints.appendChild(ownerDocument.createElement("li")), cur = completions[i];
+      var cur = completions[i];
+      if(!cur){
+    	  continue;
+      }
+      var elt = hints.appendChild(document.createElement("li"));
       var className = HINT_ELEMENT_CLASS + (i != this.selectedHint ? "" : " " + ACTIVE_HINT_ELEMENT_CLASS);
       if (cur.className != null) className = cur.className + " " + className;
       elt.className = className;
       if (cur.render) cur.render(elt, data, cur);
-      else elt.appendChild(ownerDocument.createTextNode(cur.displayText || getText(cur)));
+      else elt.appendChild(document.createTextNode(cur.displayText || getText(cur)));
       elt.hintId = i;
     }
 
-    var container = completion.options.container || ownerDocument.body;
     var pos = cm.cursorCoords(completion.options.alignWithWord ? data.from : null);
     var left = pos.left, top = pos.bottom, below = true;
-    var offsetLeft = 0, offsetTop = 0;
-    if (container !== ownerDocument.body) {
-      // We offset the cursor position because left and top are relative to the offsetParent's top left corner.
-      var isContainerPositioned = ['absolute', 'relative', 'fixed'].indexOf(parentWindow.getComputedStyle(container).position) !== -1;
-      var offsetParent = isContainerPositioned ? container : container.offsetParent;
-      var offsetParentPosition = offsetParent.getBoundingClientRect();
-      var bodyPosition = ownerDocument.body.getBoundingClientRect();
-      offsetLeft = (offsetParentPosition.left - bodyPosition.left - offsetParent.scrollLeft);
-      offsetTop = (offsetParentPosition.top - bodyPosition.top - offsetParent.scrollTop);
-    }
-    hints.style.left = (left - offsetLeft) + "px";
-    hints.style.top = (top - offsetTop) + "px";
+    hints.style.left = left + "px";
+    hints.style.top = top + "px";
+
 
     // If we're at the edge of the screen, then we want the menu to appear on the left of the cursor.
-    var winW = parentWindow.innerWidth || Math.max(ownerDocument.body.offsetWidth, ownerDocument.documentElement.offsetWidth);
-    var winH = parentWindow.innerHeight || Math.max(ownerDocument.body.offsetHeight, ownerDocument.documentElement.offsetHeight);
-    container.appendChild(hints);
-    var box = hints.getBoundingClientRect(), overlapY = box.bottom - winH;
-    var scrolls = hints.scrollHeight > hints.clientHeight + 1
-    var startScroll = cm.getScrollInfo();
-
+   // var winW = window.innerWidth || Math.max(document.body.offsetWidth, document.documentElement.offsetWidth);
+    var winH = window.innerHeight || Math.max(document.body.offsetHeight, document.documentElement.offsetHeight);
+    (completion.options.container || document.body).appendChild(hints);
+    var hintsWidth = 0;
+    var box = hints.getBoundingClientRect();
+    var overlapY = box.bottom - winH;
     if (overlapY > 0) {
       var height = box.bottom - box.top, curTop = pos.top - (pos.bottom - box.top);
       if (curTop - height > 0) { // Fits above cursor
-        hints.style.top = (top = pos.top - height - offsetTop) + "px";
-        below = false;
+        hints.style.top = (top = pos.top - height) + "px";
+        hints2.style.top = (top = pos.top - height) + "px";
+          below = false;
       } else if (height > winH) {
         hints.style.height = (winH - 5) + "px";
-        hints.style.top = (top = pos.bottom - box.top - offsetTop) + "px";
+        hints.style.top = (top = pos.bottom - box.top) + "px";
+        hints2.style.top = (top = pos.bottom - box.top) + "px";
         var cursor = cm.getCursor();
         if (data.from.ch != cursor.ch) {
           pos = cm.cursorCoords(cursor);
-          hints.style.left = (left = pos.left - offsetLeft) + "px";
+          hints.style.left = (left = pos.left) + "px";
           box = hints.getBoundingClientRect();
         }
       }
     }
+    hintsWidth = box.width;
     var overlapX = box.right - winW;
     if (overlapX > 0) {
       if (box.right - box.left > winW) {
         hints.style.width = (winW - 5) + "px";
         overlapX -= (box.right - box.left) - winW;
+        hintsWidth = minW - 5;
       }
-      hints.style.left = (left = pos.left - overlapX - offsetLeft) + "px";
+      hints.style.left = (left = pos.left - overlapX) + "px";
     }
-    if (scrolls) for (var node = hints.firstChild; node; node = node.nextSibling)
-      node.style.paddingRight = cm.display.nativeBarWidth + "px"
+    
+    try{
+        hints2.className = "CodeMirror-hints";
+
+	    var elt = hints2.appendChild(document.createElement("li")), cur = completions[0];
+	    var key = data.key;
+	    var index = 0;
+	    if(typeof(key) != "undefined"){
+	    	var showList = data.showList;
+	        index = showList[0];
+	        if (cur.render) cur.render(elt, data, cur);
+		    else elt.innerHTML = comments[key][index] || '';
+		    elt.hintId = i;
+	        var left = hints.style.left;
+	        left = Number(left.substring(0,left.length-2));
+	        var top = hints.style.top;
+	        top = Number(top.substring(0,top.length-2));
+	        if(document.documentElement.clientWidth - left < 210){
+	        	left = left - 207;
+	        }else{
+	        	left = left + hintsWidth;
+	        }
+	        hints2.style.left =   left + "px";
+	        hints2.style.height =  200 + "px";
+	        hints2.style.width =  200 + "px";
+	        hints2.style.top = top + "px";
+	        (completion.options.container || document.body).appendChild(hints2);
+	    }
+    }catch(e)
+    {
+    }
+
 
     cm.addKeyMap(this.keyMap = buildKeyMap(completion, {
       moveFocus: function(n, avoidWrap) { widget.changeActive(widget.selectedHint + n, avoidWrap); },
@@ -296,10 +398,113 @@
       cm.on("focus", this.onFocus = function() { clearTimeout(closingOnBlur); });
     }
 
+    var startScroll = cm.getScrollInfo();
     cm.on("scroll", this.onScroll = function() {
       var curScroll = cm.getScrollInfo(), editor = cm.getWrapperElement().getBoundingClientRect();
       var newTop = top + startScroll.top - curScroll.top;
-      var point = newTop - (parentWindow.pageYOffset || (ownerDocument.documentElement || ownerDocument.body).scrollTop);
+      var point = newTop - (window.pageYOffset || (document.documentElement || document.body).scrollTop);
+      if (!below) point += hints.offsetHeight;
+      if (point <= editor.top || point >= editor.bottom) return completion.close();
+      hints.style.top = newTop + "px";
+      hints.style.left = (left + startScroll.left - curScroll.left) + "px";
+    });
+    CodeMirror.on(hints, "dblclick", function(e) {
+      var t = getHintElement(hints, e.target || e.srcElement);
+      if (t && t.hintId != null) {widget.changeActive(t.hintId); widget.pick();}
+    });
+
+    CodeMirror.on(hints, "click", function(e) {
+      var t = getHintElement(hints, e.target || e.srcElement);
+      if (t && t.hintId != null) {
+        widget.changeActive(t.hintId);
+        if (completion.options.completeOnSingleClick) widget.pick();
+      }
+    });
+
+    CodeMirror.on(hints, "mousedown", function() {
+      setTimeout(function(){cm.focus();}, 20);
+    });
+
+    CodeMirror.signal(data, "select", completions[0], hints.firstChild);
+    return true;
+  }
+  function Widget(completion, data) {
+    this.completion = completion;
+    this.data = data;
+    this.picked = false;
+    var widget = this, cm = completion.cm;
+
+    var hints = this.hints = document.createElement("ul");
+    hints.className = "CodeMirror-hints";
+    this.selectedHint = data.selectedHint || 0;
+
+    var completions = data.list;
+    for (var i = 0; i < completions.length; ++i) {
+      var elt = hints.appendChild(document.createElement("li")), cur = completions[i];
+      var className = HINT_ELEMENT_CLASS + (i != this.selectedHint ? "" : " " + ACTIVE_HINT_ELEMENT_CLASS);
+      if (cur.className != null) className = cur.className + " " + className;
+      elt.className = className;
+      if (cur.render) cur.render(elt, data, cur);
+      else elt.appendChild(document.createTextNode(cur.displayText || getText(cur)));
+      elt.hintId = i;
+    }
+
+    var pos = cm.cursorCoords(completion.options.alignWithWord ? data.from : null);
+    var left = pos.left, top = pos.bottom, below = true;
+    hints.style.left = left + "px";
+    hints.style.top = top + "px";
+
+    // If we're at the edge of the screen, then we want the menu to appear on the left of the cursor.
+    var winW = window.innerWidth || Math.max(document.body.offsetWidth, document.documentElement.offsetWidth);
+    var winH = window.innerHeight || Math.max(document.body.offsetHeight, document.documentElement.offsetHeight);
+    (completion.options.container || document.body).appendChild(hints);
+    var box = hints.getBoundingClientRect(), overlapY = box.bottom - winH;
+    if (overlapY > 0) {
+      var height = box.bottom - box.top, curTop = pos.top - (pos.bottom - box.top);
+      if (curTop - height > 0) { // Fits above cursor
+        hints.style.top = (top = pos.top - height) + "px";
+        below = false;
+      } else if (height > winH) {
+        hints.style.height = (winH - 5) + "px";
+        hints.style.top = (top = pos.bottom - box.top) + "px";
+        var cursor = cm.getCursor();
+        if (data.from.ch != cursor.ch) {
+          pos = cm.cursorCoords(cursor);
+          hints.style.left = (left = pos.left) + "px";
+          box = hints.getBoundingClientRect();
+        }
+      }
+    }
+    var overlapX = box.right - winW;
+    if (overlapX > 0) {
+      if (box.right - box.left > winW) {
+        hints.style.width = (winW - 5) + "px";
+        overlapX -= (box.right - box.left) - winW;
+      }
+      hints.style.left = (left = pos.left - overlapX) + "px";
+    }
+
+    cm.addKeyMap(this.keyMap = buildKeyMap(completion, {
+      moveFocus: function(n, avoidWrap) { widget.changeActive(widget.selectedHint + n, avoidWrap); },
+      setFocus: function(n) { widget.changeActive(n); },
+      menuSize: function() { return widget.screenAmount(); },
+      length: completions.length,
+      close: function() { completion.close(); },
+      pick: function() { widget.pick(); },
+      data: data
+    }));
+
+    if (completion.options.closeOnUnfocus) {
+      var closingOnBlur;
+      cm.on("blur", this.onBlur = function() { closingOnBlur = setTimeout(function() { completion.close(); }, 100); });
+      cm.on("focus", this.onFocus = function() { clearTimeout(closingOnBlur); });
+    }
+
+    var startScroll = cm.getScrollInfo();
+    cm.on("scroll", this.onScroll = function() {
+      var curScroll = cm.getScrollInfo(), editor = cm.getWrapperElement().getBoundingClientRect();
+      var newTop = top + startScroll.top - curScroll.top;
+      var point = newTop - (window.pageYOffset || (document.documentElement || document.body).scrollTop);
       if (!below) point += hints.offsetHeight;
       if (point <= editor.top || point >= editor.bottom) return completion.close();
       hints.style.top = newTop + "px";
@@ -323,15 +528,19 @@
       setTimeout(function(){cm.focus();}, 20);
     });
 
-    CodeMirror.signal(data, "select", completions[this.selectedHint], hints.childNodes[this.selectedHint]);
+    CodeMirror.signal(data, "select", completions[0], hints.firstChild);
     return true;
   }
-
   Widget.prototype = {
     close: function() {
       if (this.completion.widget != this) return;
       this.completion.widget = null;
       this.hints.parentNode.removeChild(this.hints);
+      try{
+        this.hints2.parentNode.removeChild(this.hints2);//此处消失
+      }catch(e){
+
+      }
       this.completion.cm.removeKeyMap(this.keyMap);
 
       var cm = this.completion.cm;
@@ -360,8 +569,75 @@
         i = avoidWrap ? 0  : this.data.list.length - 1;
       if (this.selectedHint == i) return;
       var node = this.hints.childNodes[this.selectedHint];
-      if (node) node.className = node.className.replace(" " + ACTIVE_HINT_ELEMENT_CLASS, "");
+      node.className = node.className.replace(" " + ACTIVE_HINT_ELEMENT_CLASS, "");
       node = this.hints.childNodes[this.selectedHint = i];
+      node.className += " " + ACTIVE_HINT_ELEMENT_CLASS;
+      if (node.offsetTop < this.hints.scrollTop)
+        this.hints.scrollTop = node.offsetTop - 3;
+      else if (node.offsetTop + node.offsetHeight > this.hints.scrollTop + this.hints.clientHeight)
+        this.hints.scrollTop = node.offsetTop + node.offsetHeight - this.hints.clientHeight + 3;
+      CodeMirror.signal(this.data, "select", this.data.list[this.selectedHint], node);
+    },
+
+    screenAmount: function() {
+      return Math.floor(this.hints.clientHeight / this.hints.firstChild.offsetHeight) || 1;
+    }
+  };
+  Widget1.prototype = {
+    close: function() {
+      if (this.completion.widget != this) return;
+      this.completion.widget = null;
+      this.hints.parentNode.removeChild(this.hints);
+      try{
+        this.hints2.parentNode.removeChild(this.hints2);//此处消失
+      }catch(e){
+
+      }
+      this.completion.cm.removeKeyMap(this.keyMap);
+      var cm = this.completion.cm;
+      if (this.completion.options.closeOnUnfocus) {
+        cm.off("blur", this.onBlur);
+        cm.off("focus", this.onFocus);
+      }
+      cm.off("scroll", this.onScroll);
+    },
+
+    disable: function() {
+      this.completion.cm.removeKeyMap(this.keyMap);
+      var widget = this;
+      this.keyMap = {Enter: function() { widget.picked = true; }};
+      this.completion.cm.addKeyMap(this.keyMap);
+    },
+
+    pick: function() {
+      this.completion.pick(this.data, this.selectedHint);
+    },
+
+    changeActive: function(i, avoidWrap) {
+		if (i >= this.hints.childNodes.length)
+	        i = avoidWrap ? this.hints.childNodes.length - 1 : 0;
+	      else if (i < 0)
+	        i = avoidWrap ? 0  : this.hints.childNodes.length - 1;
+      try{
+
+        this.hints2.innerHTML = "";
+        var key = this.data.key;
+        var index = i;
+        if(typeof(key) != "undefined"){
+          var showList = this.data.showList;
+          index = showList[i];
+          var elt = this.hints2.appendChild(document.createElement("li"));
+          elt.innerHTML = this.comments[key][index] || '';
+        }
+      }catch(e){
+
+      }
+      if (this.selectedHint == i) return;
+      var node = this.hints.childNodes[this.selectedHint];
+      //if(!node) return;
+      node.className = node.className.replace(" " + ACTIVE_HINT_ELEMENT_CLASS, "");
+      node = this.hints.childNodes[this.selectedHint = i];
+      //if(!node) return;
       node.className += " " + ACTIVE_HINT_ELEMENT_CLASS;
       if (node.offsetTop < this.hints.scrollTop)
         this.hints.scrollTop = node.offsetTop - 3;
@@ -383,31 +659,40 @@
     return result
   }
 
-  function fetchHints(hint, cm, options, callback) {
-    if (hint.async) {
-      hint(cm, callback, options)
-    } else {
-      var result = hint(cm, options)
-      if (result && result.then) result.then(callback)
-      else callback(result)
-    }
-  }
-
   function resolveAutoHints(cm, pos) {
     var helpers = cm.getHelpers(pos, "hint"), words
     if (helpers.length) {
-      var resolved = function(cm, callback, options) {
-        var app = applicableHelpers(cm, helpers);
-        function run(i) {
-          if (i == app.length) return callback(null)
-          fetchHints(app[i], cm, options, function(result) {
-            if (result && result.list.length > 0) callback(result)
-            else run(i + 1)
-          })
+      var async = false, resolved
+      for (var i = 0; i < helpers.length; i++) if (helpers[i].async) async = true
+      if (async) {
+        resolved = function(cm, callback, options) {
+          var app = applicableHelpers(cm, helpers)
+          function run(i, result) {
+            if (i == app.length) return callback(null)
+            var helper = app[i]
+            if (helper.async) {
+              helper(cm, function(result) {
+                if (result) callback(result)
+                else run(i + 1)
+              }, options)
+            } else {
+              var result = helper(cm, options)
+              if (result) callback(result)
+              else run(i + 1)
+            }
+          }
+          run(0)
         }
-        run(0)
+        resolved.async = true
+      } else {
+        resolved = function(cm, options) {
+          var app = applicableHelpers(cm, helpers)
+          for (var i = 0; i < app.length; i++) {
+            var cur = app[i](cm, options)
+            if (cur && cur.list.length) return cur
+          }
+        }
       }
-      resolved.async = true
       resolved.supportsSelection = true
       return resolved
     } else if (words = cm.getHelper(cm.getCursor(), "hintWords")) {
@@ -424,13 +709,12 @@
   });
 
   CodeMirror.registerHelper("hint", "fromList", function(cm, options) {
-    var cur = cm.getCursor(), token = cm.getTokenAt(cur)
-    var term, from = CodeMirror.Pos(cur.line, token.start), to = cur
-    if (token.start < cur.ch && /\w/.test(token.string.charAt(cur.ch - token.start - 1))) {
-      term = token.string.substr(0, cur.ch - token.start)
+    var cur = cm.getCursor(), token = cm.getTokenAt(cur);
+    var to = CodeMirror.Pos(cur.line, token.end);
+    if (token.string && /\w/.test(token.string[token.string.length - 1])) {
+      var term = token.string, from = CodeMirror.Pos(cur.line, token.start);
     } else {
-      term = ""
-      from = cur
+      var term = "", from = to;
     }
     var found = [];
     for (var i = 0; i < options.words.length; i++) {

@@ -1,23 +1,19 @@
 package org.spiderflow.executor.function;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.spiderflow.ExpressionHolder;
-import org.spiderflow.Grammer;
 import org.spiderflow.executor.FunctionExecutor;
 import org.spiderflow.executor.shape.SeleniumExecutor;
-import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SeleniumFunctionExecutor implements FunctionExecutor,Grammer{
+public class SeleniumFunctionExecutor implements FunctionExecutor{
 
 	@Override
 	public String getFunctionPrefix() {
@@ -125,10 +121,5 @@ public class SeleniumFunctionExecutor implements FunctionExecutor,Grammer{
 	
 	private static WebDriver getDriver(){
 		return (WebDriver) ExpressionHolder.get(SeleniumExecutor.DRIVER_VAR_NAME);
-	}
-	
-	@Override
-	public Map<String, List<String>> getFunctionMap() {
-		return Maps.newMap("selenium", Arrays.asList("attribute","element","elements","html","text","screenshot"));
 	}
 }

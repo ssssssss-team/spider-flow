@@ -4,12 +4,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import org.spiderflow.Grammer;
+import org.spiderflow.annotation.Comment;
+import org.spiderflow.annotation.Example;
 import org.spiderflow.executor.FunctionExecutor;
-import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,41 +17,52 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class StringFunctionExecutor implements FunctionExecutor,Grammer{
+@Comment("string常用方法")
+public class StringFunctionExecutor implements FunctionExecutor{
 	
 	@Override
 	public String getFunctionPrefix() {
 		return "string";
 	}
 
+	@Comment("截取字符串方法")
+	@Example("${string.substring(str,5)}")
 	public static String substring(String content, int beginIndex) {
 		return content != null ? content.substring(beginIndex) : null;
 	}
 
+	@Comment("截取字符串方法")
+	@Example("${string.substring(str,0,str.length() - 1)}")
 	public static String substring(String content, int beginIndex, int endIndex) {
 		return content != null ? content.substring(beginIndex, endIndex) : null;
 	}
 
+	@Comment("将字符串转为小写")
 	public static String lower(String content) {
 		return content != null ? content.toLowerCase() : null;
 	}
 
+	@Comment("将字符串转为大写")
 	public static String upper(String content) {
 		return content != null ? content.toUpperCase() : null;
 	}
 
+	@Comment("查找指定字符在字符串在中的位置")
 	public static int indexOf(String content, String str) {
 		return content != null ? content.indexOf(str) : -1;
 	}
 
+	@Comment("查找指定字符在字符串在中的位置")
 	public static int indexOf(String content, String str, int fromIndex) {
 		return content != null ? content.indexOf(str, fromIndex) : -1;
 	}
 	
+	@Comment("将字符串转为int")
 	public static int toInt(String value){
 		return Integer.parseInt(value);
 	}
 	
+	@Comment("将字符串转为Integer")
 	public static Integer toInt(String value,Integer defaultValue){
 		try {
 			return Integer.parseInt(value);
@@ -129,8 +139,4 @@ public class StringFunctionExecutor implements FunctionExecutor,Grammer{
 		return ids;
 	}
 	
-	@Override
-	public Map<String, List<String>> getFunctionMap() {
-		return Maps.newMap("string", Arrays.asList("bytes","equals","indexOf","length","lower","upper","newString","replace","replaceAll","replaceFirst","split","substring","trim","uuid","uuids"));
-	}
 }

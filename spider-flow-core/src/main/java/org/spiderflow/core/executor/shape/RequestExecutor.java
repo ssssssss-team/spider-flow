@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,13 +12,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.spiderflow.ExpressionEngine;
-import org.spiderflow.Grammer;
+import org.spiderflow.Grammerable;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.io.HttpRequest;
 import org.spiderflow.core.io.HttpResponse;
 import org.spiderflow.executor.ShapeExecutor;
+import org.spiderflow.io.SpiderResponse;
+import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
-import org.spiderflow.utils.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class RequestExecutor implements ShapeExecutor,Grammer{
+public class RequestExecutor implements ShapeExecutor,Grammerable{
 	
 	public static final String SLEEP = "sleep";
 	
@@ -267,8 +267,15 @@ public class RequestExecutor implements ShapeExecutor,Grammer{
 			}
 		}
 	}
+
 	@Override
-	public Map<String, List<String>> getAttributeMap() {
-		return Maps.newMap("resp", Arrays.asList("json","html","statusCode","cookies","headers","bytes","contentType"));
+	public List<Grammer> grammers() {
+		List<Grammer> grammers = Grammer.findGrammers(SpiderResponse.class,"resp" , "SpiderResponse", false);
+		Grammer grammer = new Grammer();
+		grammer.setFunction("resp");
+		grammer.setComment("抓取结果");
+		grammer.setOwner("SpiderResponse");
+		grammers.add(grammer);
+		return grammers;
 	}
 }

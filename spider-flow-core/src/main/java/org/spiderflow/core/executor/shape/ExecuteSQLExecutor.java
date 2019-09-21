@@ -1,19 +1,19 @@
 package org.spiderflow.core.executor.shape;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.ExpressionEngine;
-import org.spiderflow.Grammer;
+import org.spiderflow.Grammerable;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.ShapeExecutor;
+import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
-import org.spiderflow.utils.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class ExecuteSQLExecutor implements ShapeExecutor,Grammer{
+public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
 	
 	public static final String DATASOURCE_ID = "datasourceId";
 	
@@ -90,7 +90,13 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammer{
 	}
 
 	@Override
-	public Map<String, List<String>> getFunctionMap() {
-		return Maps.newMap("rs", Collections.emptyList());
+	public List<Grammer> grammers() {
+		Grammer grammer = new Grammer();
+		grammer.setComment("执行SQL结果");
+		grammer.setFunction("rs");
+		grammer.setReturns(Arrays.asList("List<Map<String,Object>>","int"));
+		return Arrays.asList(grammer);
 	}
+
+	
 }

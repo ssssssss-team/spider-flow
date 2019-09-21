@@ -197,3 +197,23 @@ html,body{
 .layui-layer.codemirror .layui-input-block{
 	margin-left:0px;
 }
+
+.hint-grammer{
+	width : 100%;
+	color : #333;
+}
+.hint-grammer:not(:first-child){
+	border-top:1px solid #ccc;
+	margin-top:5px;
+	padding-top:5px;
+}
+.hint-grammer .hint-owner span{
+	color : #600100
+}
+.hint-grammer .hint-return span{
+	color : #0000C0
+}
+.hint-grammer .hint-example{
+	padding:2px 5px;
+	color : #000;
+}

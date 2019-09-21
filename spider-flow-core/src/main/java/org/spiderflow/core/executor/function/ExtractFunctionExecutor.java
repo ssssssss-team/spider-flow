@@ -1,86 +1,73 @@
 package org.spiderflow.core.executor.function;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
-import org.spiderflow.Grammer;
+import org.spiderflow.annotation.Comment;
+import org.spiderflow.annotation.Example;
 import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.FunctionExecutor;
-import org.spiderflow.utils.Maps;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExtractFunctionExecutor implements FunctionExecutor,Grammer{
+public class ExtractFunctionExecutor implements FunctionExecutor{
 
 	@Override
 	public String getFunctionPrefix() {
 		return "extract";
 	}
 	
+	@Comment("根据jsonpath提取内容")
+	@Example("${extract.jsonpath(resp.json,'$.code')}")
 	public static Object jsonpath(Object root,String jsonpath){
 		return ExtractUtils.getValueByJsonPath(root, jsonpath);
 	}
 	
+	@Comment("根据正则表达式提取内容")
+	@Example("${extract.regx(resp.html,'<title>(.*?)</title>')}")
 	public static String regx(String content,String pattern){
 		return ExtractUtils.getFirstMatcher(content, pattern, true);
 	}
 	
+	@Comment("根据正则表达式提取内容")
+	@Example("${extract.regxs(resp.html,'<h2>(.*?)</h2>')}")
 	public static List<String> regxs(String content,String pattern){
 		return ExtractUtils.getMatchers(content, pattern, true);
 	}
 	
+	@Comment("根据xpath提取内容")
+	@Example("${extract.xpath(resp.element(),'//title/text()')}")
 	public static String xpath(Element element,String xpath){
 		return ExtractUtils.getValueByXPath(element, xpath);
 	}
 	
+	@Comment("根据xpath提取内容")
+	@Example("${extract.xpath(resp.html,'//title/text()')}")
 	public static String xpath(String content,String xpath){
 		return xpath(Jsoup.parse(content),xpath);
 	}
 	
+	@Comment("根据xpaths提取内容")
+	@Example("${extract.xpaths(resp.element(),'//h2/text()')}")
 	public static List<String> xpaths(Element element,String xpath){
 		return ExtractUtils.getValuesByXPath(element, xpath);
 	}
 	
+	@Comment("根据xpaths提取内容")
+	@Example("${extract.xpaths(resp.html,'//h2/text()')}")
 	public static List<String> xpaths(String content,String xpath){
 		return xpaths(Jsoup.parse(content),xpath);
 	}
 	
-	public static Object selector(Object ... args){
-		if(args != null && args.length > 1 &&args[0] != null && args[1] != null){
-			Element element = null;
-			if(args[0] instanceof Element){
-				element = (Element) args[0];
-			}else{
-				element = Jsoup.parse(args[0].toString());
-			}
-			String selector = (String) args[1];
-			if(args.length == 2){
-				return ExtractUtils.getFirstHTMLBySelector(element, selector);
-			}
-			String type = (String) args[2];
-			if("text".equals(type)){
-				return ExtractUtils.getFirstTextBySelector(element, selector);
-			}
-			if("attr".equals(type) && args.length == 4){
-				return ExtractUtils.getFirstAttrBySelector(element, selector,(String) args[3]);
-			}
-			if("outerhtml".equals(type)){
-				return ExtractUtils.getFirstOuterHTMLBySelector(element, selector);
-			}
-			if("element".equals(type)){
-				return ExtractUtils.getFirstElement(element, selector);
-			}
-		}
-		return null;
-	}
-	
-	public static Object selectors(Object object,String selector){
+	@Comment("根据css选择器提取内容")
+	@Example("${extract.selectors(resp.html,'div > a')}")
+	public static List<String> selectors(Object object,String selector){
 		return ExtractUtils.getHTMLBySelector(getElement(object), selector);
 	}
 	
+	@Comment("根据css选择器提取内容")
+	@Example("${extract.selector(resp.html,'div > a','text')}")
 	public static Object selector(Object object,String selector,String type){
 		if("element".equals(type)){
 			return ExtractUtils.getFirstElement(getElement(object), selector);
@@ -92,17 +79,23 @@ public class ExtractFunctionExecutor implements FunctionExecutor,Grammer{
 		return null;
 	}
 	
-	public static Object selector(Object object,String selector,String type,String attrValue){
+	@Comment("根据css选择器提取内容")
+	@Example("${extract.selector(resp.html,'div > a','attr','href')}")
+	public static String selector(Object object,String selector,String type,String attrValue){
 		if("attr".equals(type)){
 			return ExtractUtils.getFirstAttrBySelector(getElement(object), selector,attrValue);
 		}
 		return null;
 	}
 	
-	public static Object selector(Object object,String selector){
+	@Comment("根据css选择器提取内容")
+	@Example("${extract.selector(resp.html,'div > a')}")
+	public static String selector(Object object,String selector){
 		return ExtractUtils.getFirstHTMLBySelector(getElement(object), selector);
 	}
 	
+	@Comment("根据css选择器提取内容")
+	@Example("${extract.selectors(resp.html,'div > a','element')}")
 	public static Object selectors(Object object,String selector,String type){
 		if("element".equals(type)){
 			return ExtractUtils.getElements(getElement(object), selector);
@@ -114,6 +107,8 @@ public class ExtractFunctionExecutor implements FunctionExecutor,Grammer{
 		return null;
 	}
 	
+	@Comment("根据css选择器提取内容")
+	@Example("${extract.selectors(resp.html,'div > a','attr','href')}")
 	public static Object selectors(Object object,String selector,String type,String attrValue){
 		if("attr".equals(type)){
 			return ExtractUtils.getAttrBySelector(getElement(object), selector,attrValue);
@@ -126,10 +121,5 @@ public class ExtractFunctionExecutor implements FunctionExecutor,Grammer{
 			return object instanceof Element ? (Element)object:Jsoup.parse((String) object);
 		}
 		return null;
-	}
-	
-	@Override
-	public Map<String, List<String>> getFunctionMap() {
-		return Maps.newMap("extract", Arrays.asList("jsonpath","regx","regxs","selector","selectors","xpath","xpaths"));
 	}
 }
