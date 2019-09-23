@@ -1,0 +1,68 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">配置</li>
+  </ul>
+  <div class="layui-tab-content">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form editor-form-node">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">数据源</label>
+    			<div class="layui-input-block">
+    				<select name="datasourceId">
+    					{{# for(var datasourceIndex in d.model.cells){ }}
+    						{{# var cell = d.model.cells[datasourceIndex] }}
+    						{{# if(cell.data&&cell.data.get('shape') == 'mongodb'){ }}
+    							<option value="{{=datasourceIndex}}" {{datasourceIndex == d.data.object.datasourceId ? 'selected': ''}}>{{cell.value}}</option>
+    						{{# } }}
+    					{{# } }}
+    				</select>
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">语句类型</label>
+    			<div class="layui-input-block">
+    				<select name="operationType" lay-filter="otf">
+    					<option value="select" {{d.data.object.operationType == 'select' ? 'selected':''}}>select</option>
+    					<option value="insert" {{d.data.object.operationType == 'insert' ? 'selected':''}}>insert</option>
+    					<option value="delete" {{d.data.object.operationType == 'delete' ? 'selected':''}}>delete</option>
+    					<option value="update" {{d.data.object.operationType == 'update' ? 'selected':''}}>update</option>
+    				</select>
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">SQL语句</label>
+    			<textarea class="layui-input" style="height:200px" name="sql">{{=d.data.object.sql}}</textarea>
+    		</div>
+    		<!-- <div class="update" style="display:none;">
+	    		<div class="layui-form-item" >
+	    			<label class="layui-form-label">SQL语句</label>
+	    			<textarea class="layui-input" style="height:80px" name="selectsql">{{=d.data.object.selectsql}}</textarea>
+	    		</div>
+	    		<div class="layui-form-item" >
+	    			<label class="layui-form-label">SQL语句</label>
+	    			<textarea class="layui-input" style="height:80px" name="updatesql">{{=d.data.object.updatesql}}</textarea>
+	    		</div>
+    		</div> -->
+    	</form>
+    </div>
+  </div>
+</div>
+<script>
+/* $(function(){
+	var operationType = ".editor-form-node [name=operationType]";
+	layui.form.on('select(otf)',function(data){
+		$(".noup").show();
+		$(".update").hide();
+		if(data.value === "update"){
+			$(".noup").hide();
+			$("."+data.value).show();
+		}
+	})
+}) */
+</script>

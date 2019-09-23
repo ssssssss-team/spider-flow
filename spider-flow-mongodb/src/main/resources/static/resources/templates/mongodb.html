@@ -1,0 +1,94 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">配置</li>
+  </ul>
+  <div class="layui-tab-content">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form editor-form-node">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">IP地址</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="host" placeholder="请输入IP地址" autocomplete="off" class="layui-input" value="{{=d.data.object.host}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">端口</label>
+    			<div class="layui-input-block">
+    				<input type="number" name="port" placeholder="请输入端口" autocomplete="off" class="layui-input" value="{{=d.data.object.port}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">数据库名</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="database" placeholder="请输入数据库名称" autocomplete="off" class="layui-input" value="{{=d.data.object.database}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">表</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="table" placeholder="请输入表名称" autocomplete="off" class="layui-input" value="{{=d.data.object.table}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">用户名</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="adminName" placeholder="请输入数据库用户名" autocomplete="off" class="layui-input" value="{{=d.data.object.adminName}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">密码</label>
+    			<div class="layui-input-block">
+    				<input type="password" name="password" placeholder="请输入数据库密码" autocomplete="off" class="layui-input" value="{{=d.data.object.password}}">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<div class="layui-input-block">
+    				<button class="layui-btn btn-mongodb-datasource-test" type="button">测试连接</button>
+    			</div>
+    		</div>
+    	</form>
+    </div>
+  </div>
+</div>
+<script>
+	$('.layui-form').on('click','.btn-mongodb-datasource-test',function(){
+		var $form = $('.layui-form');
+		var host = $form.find('input[name=host]').val();
+		var port = $form.find('input[name=port]').val();
+		var database = $form.find('input[name=database]').val();
+		var table = $form.find('input[name=table]').val();
+		var adminName = $form.find('input[name=adminName]').val();
+		var password = $form.find('input[name=password]').val();
+		$.ajax({
+			url : 'mongo/connTest',
+			data : {
+				host : host || 'localhost',
+				port : port || 27017,
+				database : database,
+				table : table,
+				adminName : adminName,
+				password : password
+			},
+			type : 'post',
+			dataType : 'json',
+			success : function(json){
+				if(json.code == 1){
+					layui.layer.msg('测试成功');
+				}else{
+					layui.layer.alert('测试失败,' + json.message || '',{
+						icon : 2
+					})
+				}
+			},
+			error : function(){
+				layui.layer.msg('测试失败');
+			}
+		})
+	});
+</script>

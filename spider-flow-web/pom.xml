@@ -47,6 +47,11 @@
 			<artifactId>spider-flow-ocr</artifactId>
 			<version>0.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.spiderflow</groupId>
+			<artifactId>spider-flow-mongodb</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

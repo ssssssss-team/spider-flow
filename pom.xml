@@ -38,5 +38,6 @@
     	<module>spider-flow-redis</module>
     	<module>spider-flow-oss</module>
     	<module>spider-flow-ocr</module>
+		<module>spider-flow-mongodb</module>
   </modules>
 </project>
