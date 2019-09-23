@@ -1,6 +1,9 @@
 <style>
 	.oss-form .layui-input-block{
-		margin-left: 135px;
+		margin-left: 185px;
+	}
+	.oss-form .layui-form-label{
+		width: 155px;
 	}
 </style>
 <div class="layui-tab layui-tab-fixed layui-tab-brief">
@@ -17,27 +20,27 @@
     			</div>
     		</div>
     		<div class="layui-form-item">
-    			<label class="layui-form-label">endpoint</label>
+    			<label class="layui-form-label">EndPoint（地域节点）</label>
     			<div class="layui-input-block">
-    				<input type="text" name="endpoint" placeholder="请输入endpoint" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.endpoint}}">
+    				<input type="text" name="endpoint" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.endpoint}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
-    			<label class="layui-form-label">accessKeyId</label>
+    			<label class="layui-form-label">ACCESS_KEY_ID</label>
     			<div class="layui-input-block">
-    				<input type="text" name="accessKeyId" placeholder="请输入accessKeyId" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.accessKeyId}}">
+    				<input type="text" name="accessKeyId" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.accessKeyId}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
-    			<label class="layui-form-label">accessKeySecret</label>
+    			<label class="layui-form-label">ACCESS_KEY_SECRET</label>
     			<div class="layui-input-block">
-    				<input type="password" name="accessKeySecret" placeholder="请输入accessKeySecret" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.accessKeySecret}}">
+    				<input type="password" name="accessKeySecret" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.accessKeySecret}}">
     			</div>
     		</div>
     		<div class="layui-form-item">
-    			<label class="layui-form-label">bucketName</label>
+    			<label class="layui-form-label">Bucket 名称</label>
     			<div class="layui-input-block">
-    				<input type="text" name="bucketName" placeholder="请输入bucketName" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.bucketName}}">
+    				<input type="text" name="bucketName" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.bucketName}}">
     			</div>
     		</div>
     	</form>
