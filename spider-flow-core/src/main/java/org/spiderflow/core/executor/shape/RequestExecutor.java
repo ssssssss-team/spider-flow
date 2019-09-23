@@ -119,7 +119,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		
 		//是否验证TLS证书,默认是验证
 		if("0".equals(node.getStringJsonValue(TLS_VALIDATE))){
-			request.followRedirect(false);
+			request.validateTLSCertificates(false);
 			context.debug("设置TLS证书验证：{}", false);
 		}
 		
