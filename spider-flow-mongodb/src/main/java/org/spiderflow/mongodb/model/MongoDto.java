@@ -1,14 +1,46 @@
 package org.spiderflow.mongodb.model;
 
 public class MongoDto {
-	private static String userName;//用户名
-	private static String pwd;//密码
-	private static String[] host;//主机地址
-	private static int[] port;//端口地址
-	private static String dbName;//数据库名
-	private static int connectionsPerHost = 20;//每台主机最大连接数
-	private static int threadsAllowedToBlockForConnectionMultiplier = 10;//线程队列数
-	private static boolean authentication = false;//是否需要身份验证
+	
+	/**
+	 * 用户名
+	 */
+	private static String userName;
+	
+	/**
+	 * 密码
+	 */
+	private static String pwd;
+	
+	/**
+	 * 主机地址
+	 */
+	private static String[] host;
+	
+	/**
+	 * 端口地址
+	 */
+	private static int[] port;
+	
+	/**
+	 * 数据库名
+	 */
+	private static String dbName;
+	
+	/**
+	 * 每台主机最大连接数
+	 */
+	private static int connectionsPerHost = 20;
+	
+	/**
+	 * 线程队列数
+	 */
+	private static int threadsAllowedToBlockForConnectionMultiplier = 10;
+	
+	/**
+	 * 是否需要身份验证
+	 */
+	private static boolean authentication = false;
 	
 	public static String getUserName() {
 		return userName;

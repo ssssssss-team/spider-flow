@@ -20,7 +20,6 @@ public class MongoDBUtils {
     	ServerAddress serverAddress = new ServerAddress(host,port);                
     	List<ServerAddress> addrs = new ArrayList<ServerAddress>();                
     	addrs.add(serverAddress);                                
-    	//MongoCredential.createScramSha1Credential()
     	MongoCredential credential = MongoCredential.createScramSha1Credential(adminName, database, password.toCharArray());                
     	credentials.add(credential);                                
     	//通过连接认证获取MongoDB连接
@@ -28,11 +27,6 @@ public class MongoDBUtils {
     	DB db = mongoClient.getDB(table);
     	DBCollection con = db.getCollection(table);
     	return con;
-    	/*//连接到数据库
-    	@SuppressWarnings("deprecation")
-		DBObject user_json = (DBObject)JSON.parse("{'$or' : [{\"name\":\"AA12\"},{\"name\":\"BB123\"}]}");//,\"age\":\"20\"
-    	//con.insert(user_json);
-    	DBCursor query =  con.find(user_json);*/
 	}
 	
 	public static void analysisJSON(Map<String, Object> variables,DBCursor db){
@@ -40,7 +34,6 @@ public class MongoDBUtils {
 		while(db.hasNext()){
 			JSONObject jsonObject1=JSON.parseObject(db.next().toString());//将json字符串转换为json对象
 			for (Map.Entry<String, Object> entry : jsonObject1.entrySet()) {
-			System.out.println(entry.getKey()+"------"+entry.getValue());
 				if(variables.containsKey(entry.getKey())){
 					List<String> rsStr = (List<String>) variables.get(entry.getKey());
 					rsStr.add(entry.getValue().toString());

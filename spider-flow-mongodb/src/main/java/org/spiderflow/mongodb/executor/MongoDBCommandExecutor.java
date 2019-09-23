@@ -3,8 +3,6 @@ package org.spiderflow.mongodb.executor;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.Shape;
@@ -12,22 +10,14 @@ import org.spiderflow.model.SpiderNode;
 import org.spiderflow.mongodb.utils.MongoDBUtils;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSONObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
-/**
- * 命令
- * @author xuan
- *
- */
 @Component
 public class MongoDBCommandExecutor implements ShapeExecutor {
 
-private static Logger logger = LoggerFactory.getLogger(MongoDBCommandExecutor.class);
-	
 	public static final String DATASOURCE_ID = "datasourceId";
 	
 	public static final String MONGODB_SQL = "sql";
@@ -37,15 +27,17 @@ private static Logger logger = LoggerFactory.getLogger(MongoDBCommandExecutor.cl
 	public static final String MONGODB_COMMAND_VAR = "___mongoDB";
 	
 	public static final String OPERATION_INSERT = "insert";
+	
 	public static final String OPERATION_DELETE = "delete";
+	
 	public static final String OPERATION_UPDATE = "update";
+	
 	public static final String OPERATION_SELECT = "select";
 	
 	DBCollection dbCollection = null;
 	
 	@Override
 	public String supportShape() {
-		// TODO Auto-generated method stub
 		return "mongodbcommand";
 	}
 	

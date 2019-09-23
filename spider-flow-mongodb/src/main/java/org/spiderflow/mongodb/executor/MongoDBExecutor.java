@@ -15,10 +15,15 @@ import com.mongodb.DBCollection;
 public class MongoDBExecutor implements ShapeExecutor{
 
 	public static final String MONGODB_HOST = "host";
+	
 	public static final String MONGODB_POST = "port";
+	
 	public static final String MONGODB_DATABASE = "database";
+	
 	public static final String MONGODB_TABLE = "table";
+	
 	public static final String MONGODB_ADMIN_NAME = "adminName";
+	
 	public static final String MONGODB_PASSOWRD = "password";
 	
 	public static final String MONGODB_CONTEXT_KEY = "$mongodb_";
@@ -47,7 +52,6 @@ public class MongoDBExecutor implements ShapeExecutor{
 	};
 	@Override
 	public String supportShape() {
-		// TODO Auto-generated method stub
 		return "mongodb";
 	}
 }

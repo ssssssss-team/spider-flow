@@ -27,7 +27,6 @@ public class MongoDBController {
 	 * @param adminName 用户名
 	 * @param database 数据库名
 	 * @param password 密码
-	 * @return
 	 */
 	@RequestMapping("/connTest")
 	public JsonBean<String> test(String host,Integer port,String adminName,String table,String database,String password){
