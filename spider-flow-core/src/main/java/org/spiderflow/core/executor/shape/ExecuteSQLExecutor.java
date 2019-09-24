@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.Grammerable;
 import org.spiderflow.context.SpiderContext;
@@ -68,18 +69,19 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
 				try{
 					rs = template.queryForList(sql, params);
 					rs = rs == null ? new ArrayList<>() : rs;
+					variables.put("rs", rs);
 				}catch(Exception e){
 					context.error("执行sql出错,异常信息:{}",e);
+					ExceptionUtils.wrapAndThrow(e);
 				}
-				variables.put("rs", rs);
 			}else if(STATEMENT_UPDATE.equals(statementType) || STATEMENT_INSERT.equals(statementType) || STATEMENT_DELETE.equals(statementType)){
-				int rs = -1;
 				try{
-					rs = template.update(sql, params);	
+					variables.put("rs", template.update(sql, params));
 				}catch(Exception e){
 					context.error("执行sql出错,异常信息:{}",e);
+					variables.put("rs", -1);
+					ExceptionUtils.wrapAndThrow(e);
 				}
-				variables.put("rs", rs);
 			}
 		}
 	}

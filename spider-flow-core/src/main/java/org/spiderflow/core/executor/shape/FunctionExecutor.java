@@ -3,6 +3,7 @@ package org.spiderflow.core.executor.shape;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.executor.ShapeExecutor;
@@ -31,6 +32,7 @@ public class FunctionExecutor implements ShapeExecutor{
 				engine.execute(function, variables);
 			} catch (Exception e) {
 				context.error("执行函数{}失败,异常信息:{}",function,e);
+				ExceptionUtils.wrapAndThrow(e);
 			}
 		}
 	}

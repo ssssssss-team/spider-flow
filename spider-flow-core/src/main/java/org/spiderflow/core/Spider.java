@@ -145,7 +145,9 @@ public class Spider {
 							try {
 								ExpressionHolder.setVariables(nVariables);
 								executor.execute(node, context, nVariables);
+								nVariables.put("ex", null);
 							} catch (Exception e) {
+								nVariables.put("ex", e);
 								context.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), e);
 							} finally {
 								context.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());

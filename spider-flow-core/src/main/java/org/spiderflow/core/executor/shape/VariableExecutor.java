@@ -3,6 +3,7 @@ package org.spiderflow.core.executor.shape;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.executor.ShapeExecutor;
@@ -37,6 +38,7 @@ public class VariableExecutor implements ShapeExecutor{
 				context.debug("设置变量{}={}",variableName,value);
 			} catch (Exception e) {
 				context.error("设置变量{}出错，异常信息：{}",variableName,e);
+				ExceptionUtils.wrapAndThrow(e);
 			}
 			variables.put(variableName, value);
 		}
