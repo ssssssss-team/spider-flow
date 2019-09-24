@@ -106,7 +106,7 @@ public class JavaReflection extends Reflection {
 				Class<?>[] parameterTypes = new Class[arguments.length + 1];
 				parameterTypes[0] = cls;
 				for (int i = 0; i < arguments.length; i++) {
-					parameterTypes[i + 1] = arguments[i] == null ? Object.class : arguments[i].getClass();
+					parameterTypes[i + 1] = arguments[i] == null ? null : arguments[i].getClass();
 				}
 				return findMethod(methodList, parameterTypes);
 			}
@@ -137,7 +137,7 @@ public class JavaReflection extends Reflection {
 
 		Class<?>[] parameterTypes = new Class[arguments.length];
 		for (int i = 0; i < arguments.length; i++) {
-			parameterTypes[i] = arguments[i] == null ? Object.class : arguments[i].getClass();
+			parameterTypes[i] = arguments[i] == null ? null : arguments[i].getClass();
 		}
 
 		JavaReflection.MethodSignature signature = new MethodSignature(name, parameterTypes);
@@ -215,6 +215,9 @@ public class JavaReflection extends Reflection {
 							score++;
 						}
 					}
+				}else if(type == null && otherType.isPrimitive()){
+					match = false;
+					break;
 				}
 			}
 			if (match) {
