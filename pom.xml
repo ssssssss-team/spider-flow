@@ -33,11 +33,5 @@
 		<module>spider-flow-api</module>
 		<module>spider-flow-core</module>
 		<module>spider-flow-web</module>
-    	<module>spider-flow-selenium</module>
-    	<module>spider-flow-proxypool</module>
-    	<module>spider-flow-redis</module>
-    	<module>spider-flow-oss</module>
-    	<module>spider-flow-ocr</module>
-		<module>spider-flow-mongodb</module>
   </modules>
 </project>
