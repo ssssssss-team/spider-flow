@@ -23,11 +23,6 @@ spider-flow
 ├── spider-flow-api -- 插件开发的依赖
 ├── spider-flow-core -- 核心包
 ├── spider-flow-web -- web界面
-├── spider-flow-selenium -- selenium插件
-├── spider-flow-proxypool -- ip代理池插件
-├── spider-flow-redis -- redis插件
-├── spider-flow-oss -- oss插件
-├── spider-flow-ocr -- ocr插件
 ```
 
 #### 特性
@@ -46,13 +41,13 @@ spider-flow
 - [x] 支持HTTP接口
 
 #### 插件列表
-- [x] Selenium插件
-- [x] Redis插件
-- [x] OSS插件
-- [ ] Mongodb插件
+- [x] [Selenium插件](https://gitee.com/jmxd/spider-flow-selenium)
+- [x] [Redis插件](https://gitee.com/jmxd/spider-flow-redis)
+- [x] [OSS插件](https://gitee.com/jmxd/spider-flow-oss)
+- [x] [Mongodb插件](https://gitee.com/jmxd/spider-flow-mongodb)
 - [ ] Hbase插件
-- [x] IP代理池插件
-- [x] OCR识别插件
+- [x] [IP代理池插件](https://gitee.com/jmxd/spider-flow-proxypool)
+- [x] [OCR识别插件](https://gitee.com/jmxd/spider-flow-ocr)
 
 ### 项目部分截图
 ![GVP项目爬虫测试](https://images.gitee.com/uploads/images/2019/0730/171455_bfe1a97b_1253940.gif "spider-test.gif")
