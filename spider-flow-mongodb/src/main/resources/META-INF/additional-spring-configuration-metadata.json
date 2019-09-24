@@ -1,0 +1,32 @@
+{"properties": [
+  {
+    "name": "mongo.options.socketTimeout",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.options.socketTimeout'"
+  },
+  {
+    "name": "mongo.options.connectTimeout",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.options.connectTimeout'"
+  },
+  {
+    "name": "mongo.options.maxWaitTime",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.options.maxWaitTime'"
+  },
+  {
+    "name": "mongo.options.threadsAllowedToBlockForConnectionMultiplier",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.options.threadsAllowedToBlockForConnectionMultiplier'"
+  },
+  {
+    "name": "mongo.options.connectionsPerHost",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.options.connectionsPerHost'"
+  },
+  {
+    "name": "mongo.options.autoConnectRetry",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.options.autoConnectRetry'"
+  }
+]}
