@@ -163,14 +163,13 @@ public class Parser {
 
 		List<Span> keys = new ArrayList<>();
 		List<Expression> values = new ArrayList<>();
-		while (stream.hasMore() && !stream.match(TokenType.RightCurly, false)) {
+		while (stream.hasMore() && !stream.match("}", false)) {
 			keys.add(stream.expect(TokenType.Identifier).getSpan());
 			stream.expect(":");
 			values.add(parseExpression(stream));
-			if (!stream.match(TokenType.RightCurly, false)) stream.expect(TokenType.Comma);
+			if (!stream.match("}", false)) stream.expect(TokenType.Comma);
 		}
-
-		Span closeCurly = stream.expect(TokenType.RightCurly).getSpan();
+		Span closeCurly = stream.expect("}").getSpan();
 		return new MapLiteral(new Span(openCurly, closeCurly), keys, values);
 	}
 
