@@ -114,7 +114,7 @@
 					password : $("input[name=password]").val()
 				},
 				success : function(json){
-					layui.layer.msg(json.msg);
+					layui.layer.msg(json.message);
 				},
 				error : function(){
 					layui.layer.msg('请求失败');
