@@ -1,6 +1,7 @@
 package org.spiderflow.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,9 +14,11 @@ import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.service.SpiderFlowService;
 import org.spiderflow.executor.FunctionExecutor;
 import org.spiderflow.executor.FunctionExtension;
+import org.spiderflow.executor.PluginConfig;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.Grammer;
 import org.spiderflow.model.JsonBean;
+import org.spiderflow.model.Plugin;
 import org.spiderflow.model.Shape;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +53,9 @@ public class SpiderFlowController {
 	
 	@Autowired
 	private SpiderFlowService spiderFlowService;
+	
+	@Autowired(required = false)
+	private List<PluginConfig> pluginConfigs;
 	
 	private final List<Grammer> grammers = new ArrayList<Grammer>();
 	
@@ -139,6 +145,11 @@ public class SpiderFlowController {
 	@RequestMapping("/shapes")
 	public List<Shape> shapes(){
 		return executors.stream().filter(e-> e.shape() !=null).map(executor -> executor.shape()).collect(Collectors.toList());
+	}
+	
+	@RequestMapping("/pluginConfigs")
+	public List<Plugin> pluginConfigs(){
+		return null == pluginConfigs ? Collections.emptyList() : pluginConfigs.stream().filter(e-> e.plugin() != null).map(plugin -> plugin.plugin()).collect(Collectors.toList());
 	}
 	
 	@RequestMapping("/grammers")

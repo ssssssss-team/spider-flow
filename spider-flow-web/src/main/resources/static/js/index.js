@@ -28,4 +28,12 @@ $(function(){
 			return false;
 		}
 	})
+	$.ajax({
+		url:'spider/pluginConfigs',
+		success:function(data){
+			for(var i =0;i<data.length;i++){
+				$(".menu-list .layui-nav-tree").append('<li class="layui-nav-item layui-nav-itemed"><a data-link="'+data[i].url+'" title="'+data[i].name+'">'+data[i].name+'</a></li>');
+			}
+		}
+	})
 });
