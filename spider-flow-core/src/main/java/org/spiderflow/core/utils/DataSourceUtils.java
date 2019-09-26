@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.spiderflow.core.repository.DataSourceRepository;
+import org.spiderflow.core.service.DataSourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ public class DataSourceUtils {
 	
 	private static final Map<String,DataSource> datasources = new HashMap<>();
 	
-	private static DataSourceRepository dataSourceRepository;
+	private static DataSourceService dataSourceService;
 	
 	public static DataSource createDataSource(String className,String url,String username,String password){
 		DruidDataSource datasource = new DruidDataSource();
@@ -47,7 +47,7 @@ public class DataSourceUtils {
 	public synchronized static DataSource getDataSource(String dataSourceId){
 		DataSource dataSource = datasources.get(dataSourceId);
 		if(dataSource == null){
-			org.spiderflow.core.model.DataSource ds = dataSourceRepository.getOne(dataSourceId);
+			org.spiderflow.core.model.DataSource ds = dataSourceService.getById(dataSourceId);
 			if(ds != null){
 				dataSource = createDataSource(ds.getDriverClassName(), ds.getJdbcUrl(), ds.getUsername(), ds.getPassword());
 				datasources.put(dataSourceId, dataSource);
@@ -57,8 +57,8 @@ public class DataSourceUtils {
 	}
 
 	@Autowired
-	public void setDataSourceRepository(DataSourceRepository dataSourceRepository) {
-		DataSourceUtils.dataSourceRepository = dataSourceRepository;
+	public void setDataSourceService(DataSourceService dataSourceService) {
+		DataSourceUtils.dataSourceService = dataSourceService;
 	}
 
 }

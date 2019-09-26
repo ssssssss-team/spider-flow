@@ -30,7 +30,7 @@ public class SpiderRestController {
 	
 	@RequestMapping("/run/{id}")
 	public JsonBean<List<SpiderOutput>> run(@PathVariable("id")String id,@RequestBody(required = false)Map<String,Object> params){
-		SpiderFlow flow = spiderFlowService.get(id);
+		SpiderFlow flow = spiderFlowService.getById(id);
 		if(flow == null){
 			return new JsonBean<>(0, "找不到此爬虫信息");
 		}

@@ -21,8 +21,8 @@
 		parseData : function(resp){
 			return {
 				code : 0,
-				data : resp.content,
-				count : resp.totalElements
+				data : resp.records,
+				count : resp.total
 			}
 		},
 		cols : [[{

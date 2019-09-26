@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronScheduleBuilder;
@@ -16,13 +15,13 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerUtils;
 import org.quartz.spi.OperableTrigger;
 import org.spiderflow.core.job.SpiderJobManager;
+import org.spiderflow.core.mapper.SpiderFlowMapper;
 import org.spiderflow.core.model.SpiderFlow;
-import org.spiderflow.core.repository.SpiderFlowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 /**
  * 爬虫流程执行服务
@@ -30,19 +29,17 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class SpiderFlowService {
+public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow> {
 	
 	@Autowired
-	private SpiderFlowRepository repository;
+	private SpiderFlowMapper sfMapper;
 	
 	@Autowired
 	private SpiderJobManager spiderJobManager;
 	
 	@PostConstruct
 	private void initJobs(){
-		SpiderFlow spiderFlow = new SpiderFlow();
-		spiderFlow.setEnabled("1");
-		List<SpiderFlow> spiderFlows = repository.findAll(Example.of(spiderFlow));
+		List<SpiderFlow> spiderFlows = sfMapper.selectList(new QueryWrapper<SpiderFlow>().eq("enabled", "1"));
 		if(spiderFlows != null){
 			for (SpiderFlow sf : spiderFlows) {
 				if(StringUtils.isNotEmpty(sf.getCron())){
@@ -52,16 +49,11 @@ public class SpiderFlowService {
 		}
 	}
 	
-	public Page<SpiderFlow> findAll(Pageable pageable){
-		return repository.findAll(pageable);
-	}
-	
-	@Transactional
 	public int executeCountIncrement(String id, Date lastExecuteTime, Date nextExecuteTime){
 		if(nextExecuteTime == null){
-			return repository.executeCountIncrement(id, lastExecuteTime);
+			return sfMapper.executeCountIncrement(id, lastExecuteTime);
 		}
-		return repository.executeCountIncrementAndExecuteTime(id, lastExecuteTime, nextExecuteTime);
+		return sfMapper.executeCountIncrementAndExecuteTime(id, lastExecuteTime, nextExecuteTime);
 		
 	}
 	
@@ -70,22 +62,20 @@ public class SpiderFlowService {
 	 * @param id 爬虫的ID
 	 * @param cron 定时器
 	 */
-	@Transactional
 	public void resetCornExpression(String id, String cron){
 		CronTrigger trigger = TriggerBuilder.newTrigger()
 				.withIdentity("Caclulate Next Execute Date")
 				.withSchedule(CronScheduleBuilder.cronSchedule(cron))
 				.build();
-		repository.resetCornExpression(id, cron, trigger.getStartTime());
+		sfMapper.resetCornExpression(id, cron, trigger.getStartTime());
 		spiderJobManager.remove(id);
-		SpiderFlow spiderFlow = get(id);
+		SpiderFlow spiderFlow = getById(id);
 		if("1".equals(spiderFlow.getEnabled()) && StringUtils.isNotEmpty(spiderFlow.getCron())){
 			spiderJobManager.addJob(spiderFlow);
 		}
 	}
 	
-	@Transactional
-	public void save(SpiderFlow spiderFlow){
+	public boolean save(SpiderFlow spiderFlow){
 		if(StringUtils.isNotEmpty(spiderFlow.getCron())){
 			CronTrigger trigger = TriggerBuilder.newTrigger()
 							.withIdentity("Caclulate Next Execute Date")
@@ -94,55 +84,51 @@ public class SpiderFlowService {
 			spiderFlow.setNextExecuteTime(trigger.getStartTime());
 		}
 		if(StringUtils.isNotEmpty(spiderFlow.getId())){	//修改
-			repository.updateSpiderFlow(spiderFlow.getId(), spiderFlow.getName(), spiderFlow.getXml());
+			sfMapper.updateSpiderFlow(spiderFlow.getId(), spiderFlow.getName(), spiderFlow.getXml());
 			spiderJobManager.remove(spiderFlow.getId());
-			spiderFlow = get(spiderFlow.getId());
+			spiderFlow = getById(spiderFlow.getId());
 			if("1".equals(spiderFlow.getEnabled()) && StringUtils.isNotEmpty(spiderFlow.getCron())){
 				spiderJobManager.addJob(spiderFlow);
 			}
 			
 		}else{
 			String id = UUID.randomUUID().toString().replace("-", "");
-			repository.insertSpiderFlow(id, spiderFlow.getName(), spiderFlow.getXml());
+			sfMapper.insertSpiderFlow(id, spiderFlow.getName(), spiderFlow.getXml());
 			spiderFlow.setId(id);
 		}
+		return true;
 	}
-	@Transactional
+	
 	public void stop(String id){
-		repository.resetSpiderStatus(id,"0");
+		sfMapper.resetSpiderStatus(id,"0");
 		spiderJobManager.remove(id);
 	}
-	@Transactional
+	
 	public void start(String id){
 		spiderJobManager.remove(id);
-		SpiderFlow spiderFlow = get(id);
+		SpiderFlow spiderFlow = getById(id);
 		spiderJobManager.addJob(spiderFlow);
-		repository.resetSpiderStatus(id,"1");
+		sfMapper.resetSpiderStatus(id,"1");
 	}
-	@Transactional
+	
 	public void run(String id){
 		spiderJobManager.run(id);
 	}
 	
-	@Transactional
 	public void resetExecuteCount(String id){
-		repository.resetExecuteCount(id);
+		sfMapper.resetExecuteCount(id);
 	}
 	public void remove(String id){
-		repository.deleteById(id);
+		sfMapper.deleteById(id);
 		spiderJobManager.remove(id);
 	}
 	
-	public SpiderFlow get(String id){
-		return repository.getOne(id);
-	}
-	
 	public List<SpiderFlow> selectOtherFlows(String id){
-		return repository.selectOtherFlows(id);
+		return sfMapper.selectOtherFlows(id);
 	}
 	
 	public List<SpiderFlow> selectFlows(){
-		return repository.selectFlows();
+		return sfMapper.selectFlows();
 	}
 
     /**

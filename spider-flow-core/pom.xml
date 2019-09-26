@@ -18,15 +18,6 @@
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>com.alibaba</groupId>
-		    <artifactId>druid-spring-boot-starter</artifactId>
-		    <version>1.1.16</version>
-		</dependency>
-		<dependency>
 		    <groupId>commons-io</groupId>
 		    <artifactId>commons-io</artifactId>
 		    <version>2.6</version>
@@ -51,10 +42,6 @@
 		    	</exclusion>
 		    </exclusions>
 		</dependency>  
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.spiderflow</groupId>
 			<artifactId>spider-flow-api</artifactId>

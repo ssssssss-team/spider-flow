@@ -2,25 +2,17 @@ package org.spiderflow.core.model;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * 爬虫持久化实体类
- * @author Administrator
- *
  */
-@Entity
-@Table(name = "sp_flow")
+@TableName("sp_flow")
 public class SpiderFlow {
 	
-	@Id
-	@GenericGenerator(name = "uuidGenerator",strategy = "uuid")
-	@GeneratedValue(generator = "uuidGenerator")
+	@TableId(type=IdType.UUID)
 	private String id;
 	
 	/**

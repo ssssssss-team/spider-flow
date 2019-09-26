@@ -10,13 +10,13 @@ import org.spiderflow.core.service.DataSourceService;
 import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.model.JsonBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RestController
 @RequestMapping("/datasource")
@@ -26,13 +26,13 @@ public class DataSourceController {
 	private DataSourceService dataSourceService;
 	
 	@RequestMapping("/list")
-	public Page<DataSource> list(@RequestParam(name = "page",defaultValue = "1")Integer page, @RequestParam(name = "limit",defaultValue = "1")Integer size){
-		return dataSourceService.findAll(PageRequest.of(page - 1, size,new Sort(Direction.DESC,"createDate")));
+	public IPage<DataSource> list(@RequestParam(name = "page",defaultValue = "1")Integer page, @RequestParam(name = "limit",defaultValue = "1")Integer size){
+		return dataSourceService.page(new Page<DataSource>(page, size), new QueryWrapper<DataSource>().orderByDesc("create_date"));
 	}
 	
 	@RequestMapping("/all")
 	public List<DataSource> all(){
-		return dataSourceService.selectAll();
+		return dataSourceService.list();
 	}
 	
 	@RequestMapping("/save")
@@ -40,18 +40,19 @@ public class DataSourceController {
 		if(StringUtils.isNotBlank(dataSource.getId())){
 			DataSourceUtils.remove(dataSource.getId());
 		}
-		return dataSourceService.save(dataSource).getId();
+		dataSourceService.saveOrUpdate(dataSource);
+		return dataSource.getId();
 	}
 	
 	@RequestMapping("/get")
 	public DataSource get(String id){
-		return dataSourceService.get(id);
+		return dataSourceService.getById(id);
 	}
 	
 	@RequestMapping("/remove")
 	public void remove(String id){
 		DataSourceUtils.remove(id);
-		dataSourceService.remove(id);
+		dataSourceService.removeById(id);
 	}
 	
 	@RequestMapping("/test")
@@ -87,7 +88,5 @@ public class DataSourceController {
 			}
 		}
 	}
-	
-	
 
 }

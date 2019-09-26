@@ -2,23 +2,14 @@ package org.spiderflow.core.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.GenericGenerator;
-
-@Entity
-@Table(name = "sp_datasource")
-@DynamicInsert
+@TableName("sp_datasource")
 public class DataSource {
-	
-	@Id
-	@GenericGenerator(name = "uuidGenerator",strategy = "uuid")
-	@GeneratedValue(generator = "uuidGenerator")
+
+	@TableId(type=IdType.UUID)
 	private String id;
 	
 	private String name;
@@ -31,7 +22,6 @@ public class DataSource {
 	
 	private String password;
 	
-	@Column(updatable = false)
 	private Date createDate;
 	
 	public DataSource() {

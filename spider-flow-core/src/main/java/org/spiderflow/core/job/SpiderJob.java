@@ -44,7 +44,7 @@ public class SpiderJob extends QuartzJobBean{
 	}
 	
 	public void run(String id){
-		run(spiderFlowService.get(id),null);
+		run(spiderFlowService.getById(id),null);
 	}
 	
 	public void run(SpiderFlow spiderFlow,Date nextExecuteTime){

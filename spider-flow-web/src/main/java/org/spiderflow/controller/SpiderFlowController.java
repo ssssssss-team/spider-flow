@@ -18,14 +18,14 @@ import org.spiderflow.model.Grammer;
 import org.spiderflow.model.JsonBean;
 import org.spiderflow.model.Shape;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * 爬虫Controller
@@ -83,8 +83,8 @@ public class SpiderFlowController {
 	 * @return Page<SpiderFlow> 所有爬虫的列表页
 	 */
 	@RequestMapping("/list")
-	public Page<SpiderFlow> list(@RequestParam(name = "page",defaultValue = "1")Integer page, @RequestParam(name = "limit",defaultValue = "1")Integer size){
-		return spiderFlowService.findAll(PageRequest.of(page - 1, size,new Sort(Direction.DESC,"createDate")));
+	public IPage<SpiderFlow> list(@RequestParam(name = "page",defaultValue = "1")Integer page, @RequestParam(name = "limit",defaultValue = "1")Integer size){
+		return spiderFlowService.page(new Page<SpiderFlow>(page, size), new QueryWrapper<SpiderFlow>().orderByDesc("create_date"));
 	}
 	
 	@RequestMapping("/save")
@@ -95,7 +95,7 @@ public class SpiderFlowController {
 	
 	@RequestMapping("/get")
 	public SpiderFlow get(String id){
-		return spiderFlowService.get(id);
+		return spiderFlowService.getById(id);
 	}
 	
 	@RequestMapping("/other")
@@ -133,13 +133,14 @@ public class SpiderFlowController {
 	
 	@RequestMapping("/xml")
 	public String xml(String id){
-		return spiderFlowService.get(id).getXml();
+		return spiderFlowService.getById(id).getXml();
 	}
 	
 	@RequestMapping("/shapes")
 	public List<Shape> shapes(){
 		return executors.stream().filter(e-> e.shape() !=null).map(executor -> executor.shape()).collect(Collectors.toList());
 	}
+	
 	@RequestMapping("/grammers")
 	public JsonBean<List<Grammer>> grammers(){
 		return new JsonBean<>(this.grammers);

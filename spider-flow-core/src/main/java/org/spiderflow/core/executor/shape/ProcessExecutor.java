@@ -2,8 +2,6 @@ package org.spiderflow.core.executor.shape;
 
 import java.util.Map;
 
-import javax.transaction.Transactional;
-
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.Spider;
 import org.spiderflow.core.model.SpiderFlow;
@@ -31,10 +29,9 @@ public class ProcessExecutor implements ShapeExecutor{
 	private Spider spider;
 	
 	@Override
-	@Transactional
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		String flowId = node.getStringJsonValue("flowId");
-		SpiderFlow spiderFlow = spiderFlowService.get(flowId);
+		SpiderFlow spiderFlow = spiderFlowService.getById(flowId);
 		if(spiderFlow != null){
 			context.debug("执行子流程:{}", spiderFlow.getName());
 			SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
