@@ -161,10 +161,15 @@ public class Parser {
 	private static Expression parseMapLiteral (TokenStream stream) {
 		Span openCurly = stream.expect(TokenType.LeftCurly).getSpan();
 
-		List<Span> keys = new ArrayList<>();
+		List<Token> keys = new ArrayList<>();
 		List<Expression> values = new ArrayList<>();
 		while (stream.hasMore() && !stream.match("}", false)) {
-			keys.add(stream.expect(TokenType.Identifier).getSpan());
+			if(stream.match(TokenType.StringLiteral, false)){
+				keys.add(stream.expect(TokenType.StringLiteral));
+			}else{
+				keys.add(stream.expect(TokenType.Identifier));
+			}
+			
 			stream.expect(":");
 			values.add(parseExpression(stream));
 			if (!stream.match("}", false)) stream.expect(TokenType.Comma);

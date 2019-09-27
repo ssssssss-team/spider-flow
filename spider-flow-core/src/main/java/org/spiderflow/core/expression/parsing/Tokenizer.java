@@ -38,7 +38,7 @@ public class Tokenizer {
 						re = null;
 					}catch(TemplateException e){
 						re = e;
-						if(e.getCause() != null && e.getCause() instanceof StringLiteralException){
+						if(e.getCause() != null || stream.hasMore()){
 							isContinue = true;
 						}
 					}
@@ -63,7 +63,8 @@ public class Tokenizer {
 
 		// match opening tag and throw it away
 		if (!stream.match("${", true)) ExpressionError.error("Expected ${", new Span(source, stream.getPosition(), stream.getPosition() + 1));
-
+		int leftCount = 0;
+		int rightCount = 0;
 		outer:
 		while (stream.hasMore()) {
 			// skip whitespace
@@ -99,19 +100,6 @@ public class Tokenizer {
 				continue;
 			}
 
-			/*// Character literal
-			if (stream.match("'", false)) {
-				stream.startSpan();
-				stream.consume();
-				// Note: escape sequences are parsed in CharacterLiteral
-				stream.match("\\", true);
-				stream.consume();
-				if (!stream.match("'", true)) Error.error("Expected closing ' for character literal.", stream.endSpan());
-				Span literalSpan = stream.endSpan();
-				tokens.add(new Token(TokenType.CharacterLiteral, literalSpan));
-				continue;
-			}*/
-			
 			// String literal
 			if (stream.match(TokenType.SingleQuote.getLiteral(), true)) {
 				stream.startSpan();
@@ -178,12 +166,19 @@ public class Tokenizer {
 			for (TokenType t : TokenType.getSortedValues()) {
 				if (t.getLiteral() != null) {
 					if (stream.match(t.getLiteral(), true)) {
+						if(t == TokenType.LeftCurly){
+							leftCount ++;
+						}
 						tokens.add(new Token(t, new Span(source, stream.getPosition() - t.getLiteral().length(), stream.getPosition())));
 						continue outer;
 					}
 				}
 			}
-
+			if(leftCount!=rightCount&&stream.match("}", true)){
+				rightCount++;
+				tokens.add(new Token(TokenType.RightCurly, new Span(source, stream.getPosition() - 1, stream.getPosition())));
+				continue outer;
+			}
 			// match closing tag
 			if (stream.match("}", false)) break;
 

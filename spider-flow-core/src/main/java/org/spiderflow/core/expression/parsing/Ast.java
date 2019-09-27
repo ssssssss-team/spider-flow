@@ -1135,16 +1135,16 @@ public abstract class Ast {
 
 	/** Represents a map literal of the form <code>{ key: value, key2: value, ... }</code> which can be nested. */
 	public static class MapLiteral extends Expression {
-		private final List<Span> keys;
+		private final List<Token> keys;
 		private final List<Expression> values;
 
-		public MapLiteral (Span span, List<Span> keys, List<Expression> values) {
+		public MapLiteral (Span span, List<Token> keys, List<Expression> values) {
 			super(span);
 			this.keys = keys;
 			this.values = values;
 		}
 
-		public List<Span> getKeys () {
+		public List<Token> getKeys () {
 			return keys;
 		}
 
@@ -1157,7 +1157,19 @@ public abstract class Ast {
 			Map<String, Object> map = new HashMap<>();
 			for (int i = 0, n = keys.size(); i < n; i++) {
 				Object value = values.get(i).evaluate(template, context);
-				map.put(keys.get(i).getText(), value);
+				Token tokenKey = keys.get(i);
+				String key = tokenKey.getSpan().getText();
+				if(tokenKey.getType() == TokenType.StringLiteral){
+					key = (String) new StringLiteral(tokenKey.getSpan()).evaluate(template, context);
+				}else if(key != null && key.startsWith("$")){
+					Object objKey = context.get(key.substring(1));
+					if(objKey != null){
+						key = objKey.toString();
+					}else{
+						key = null;
+					}
+				}
+				map.put(key, value);
 			}
 			return map;
 		}
