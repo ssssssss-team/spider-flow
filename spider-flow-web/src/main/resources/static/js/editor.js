@@ -701,7 +701,7 @@ function onCanvasViewerClick(e,source){
 	layer.open({
 	  type : 1,
 	  title : source +'内容',
-	  content: '<div class="message-content" style="padding:10px;'+(json ? '':'font-weight:bold;')+'">'+(json ? '' : msg.replace(/\n/g,'<br>'))+'</div>',
+	  content: '<div class="message-content" style="padding:10px;'+(json ? '':'font-weight: bold;font-family:Consolas;font-size:12px;')+'">'+(json ? '' : msg.replace(/\n/g,'<br>')).replace(/ /g,'&nbsp;').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;')+'</div>',
 	  shade : 0,
 	  area : json ? ['700px','500px'] : 'auto',
 	  maxmin : true,
