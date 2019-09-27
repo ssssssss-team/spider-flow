@@ -456,7 +456,7 @@ function bindToolbarClickAction(editor){
 		var testWindowIndex = layui.layer.open({
 			id : 'test-window',
 			content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="960" height="100"></canvas></div>',
-			area : ["980px","600px"],
+			area : ["980px","500px"],
 			shade : 0,
 			title : '测试窗口',
 			btn : ['关闭','显示/隐藏输出','显示/隐藏日志','停止'],
@@ -467,9 +467,9 @@ function bindToolbarClickAction(editor){
 					$output.show();
 					$output.find("canvas").each(function(){
 						if($log.is(":hidden")){
-							this.height = 420;
+							this.height = 320;
 						}else{
-							this.height = 300;
+							this.height = 200;
 						}
 					})
 					$log.attr('height',100)
@@ -479,7 +479,7 @@ function bindToolbarClickAction(editor){
 					}
 				}else{
 					$output.hide();
-					$log.attr('height',500);
+					$log.attr('height',400);
 					LogViewer.resize();
 					for(var tableId in tableMap){
 						tableMap[tableId].instance.resize();
@@ -492,9 +492,9 @@ function bindToolbarClickAction(editor){
 				var $log = $(".test-window-container .log-container");
 				if($log.is(":hidden")){
 					$log.show();
-					$log.attr('height',$output.is(":hidden") ? 500 : 100)
+					$log.attr('height',$output.is(":hidden") ? 400 : 100)
 					$output.find("canvas").each(function(){
-						this.height = 300;
+						this.height = 200;
 					});
 					LogViewer.resize();
 					for(var tableId in tableMap){
@@ -503,7 +503,7 @@ function bindToolbarClickAction(editor){
 				}else{
 					$log.hide();
 					$output.find("canvas").each(function(){
-						this.height = 420;
+						this.height = 320;
 					});
 					LogViewer.resize();
 					for(var tableId in tableMap){
@@ -586,7 +586,7 @@ function bindToolbarClickAction(editor){
 									$tab.find(".layui-tab-title").append('<li>输出-'+tableId+'</li>');
 									$tab.find(".layui-tab-content").append('<div class="layui-tab-item" data-output="'+tableId+'"></div>');
 								}
-								$table = $('<canvas width="960" height="300"/>').appendTo($(".test-window-container .output-container .layui-tab-item[data-output="+tableId+"]"));
+								$table = $('<canvas width="960" height="200"/>').appendTo($(".test-window-container .output-container .layui-tab-item[data-output="+tableId+"]"));
 								$table.attr('id',tableId);
 								tableMap[tableId].instance = new CanvasViewer({
 									element : document.getElementById(tableId),
@@ -706,7 +706,7 @@ function onCanvasViewerClick(e,source){
 	  area : json ? ['700px','500px'] : 'auto',
 	  maxmin : true,
 	  maxWidth : (json ? undefined : 700),
-	  maxHeight : (json ? undefined : 500),
+	  maxHeight : (json ? undefined : 400),
 	  success : function(dom,index){
 		 var $dom = $(dom).find(".message-content");
 		 if(json){
