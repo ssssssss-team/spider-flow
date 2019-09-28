@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.spiderflow.annotation.Comment;
 import org.spiderflow.annotation.Example;
@@ -21,6 +23,20 @@ public class UrlFunctionExecutor implements FunctionExecutor{
 	@Override
 	public String getFunctionPrefix() {
 		return "url";
+	}
+	
+	@Comment("获取url后面的参数")
+	@Example("${url.getParameters('http://www.baidu.com/s?wd=spider-flow')}")
+	public static Map<String,String> getParameters(String url){
+		int index = url.indexOf("?");
+        String param = url.substring(index+1);
+        String[] params = param.split("&");
+        Map<String,String> map = new HashMap<String,String>();
+        for (String item:params) {
+            String[] kv = item.split("=");
+            map.put(kv[0],kv[1]);
+        }
+		return map;
 	}
 	
 	@Comment("url编码")
