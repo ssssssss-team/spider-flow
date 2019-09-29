@@ -777,6 +777,10 @@ public abstract class Ast {
 					return ((short[])mapOrArray)[index];
 				else if (mapOrArray instanceof long[])
 					return ((long[])mapOrArray)[index];
+				else if (mapOrArray instanceof byte[])
+					return ((byte[])mapOrArray)[index];
+				else if (mapOrArray instanceof String)
+					return "" + ((String)mapOrArray).charAt(index);
 				else
 					return ((Object[])mapOrArray)[index];
 			}

@@ -81,18 +81,18 @@ public class Tokenizer {
 					while (stream.matchDigit(true))
 						;
 				}
-				if (stream.match("b", true)) {
+				if (stream.match("b", true) || stream.match("B", true)) {
 					if (type == TokenType.FloatLiteral) ExpressionError.error("Byte literal can not have a decimal point.", stream.endSpan());
 					type = TokenType.ByteLiteral;
-				} else if (stream.match("s", true)) {
+				} else if (stream.match("s", true) || stream.match("S", true)) {
 					if (type == TokenType.FloatLiteral) ExpressionError.error("Short literal can not have a decimal point.", stream.endSpan());
 					type = TokenType.ShortLiteral;
-				} else if (stream.match("l", true)) {
+				} else if (stream.match("l", true) || stream.match("L", true)) {
 					if (type == TokenType.FloatLiteral) ExpressionError.error("Long literal can not have a decimal point.", stream.endSpan());
 					type = TokenType.LongLiteral;
-				} else if (stream.match("f", true)) {
+				} else if (stream.match("f", true) || stream.match("F", true)) {
 					type = TokenType.FloatLiteral;
-				} else if (stream.match("d", true)) {
+				} else if (stream.match("d", true) || stream.match("D", true)) {
 					type = TokenType.DoubleLiteral;
 				}
 				Span numberSpan = stream.endSpan();
