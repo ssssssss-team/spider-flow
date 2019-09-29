@@ -11,6 +11,7 @@ import org.spiderflow.executor.FunctionExecutor;
 import org.springframework.stereotype.Component;
 
 @Component
+@Comment("数据抽取常用方法")
 public class ExtractFunctionExecutor implements FunctionExecutor{
 
 	@Override

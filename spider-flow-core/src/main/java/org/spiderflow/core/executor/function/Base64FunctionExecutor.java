@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
+@Comment("base64常用方法")
 public class Base64FunctionExecutor implements FunctionExecutor{
 	
 	@Override

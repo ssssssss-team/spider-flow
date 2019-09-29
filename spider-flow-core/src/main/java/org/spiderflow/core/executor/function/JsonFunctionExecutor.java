@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSON;
  *
  */
 @Component
+@Comment("json常用方法")
 public class JsonFunctionExecutor implements FunctionExecutor{
 	
 	@Override

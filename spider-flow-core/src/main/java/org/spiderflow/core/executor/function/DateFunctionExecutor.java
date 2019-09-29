@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
+@Comment("日期常用方法")
 public class DateFunctionExecutor implements FunctionExecutor{
 	
 	@Override

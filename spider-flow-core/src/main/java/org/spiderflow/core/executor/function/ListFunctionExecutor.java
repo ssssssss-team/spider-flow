@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
+@Comment("list常用方法")
 public class ListFunctionExecutor implements FunctionExecutor{
 	
 	@Override

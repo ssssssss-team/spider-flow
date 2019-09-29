@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
+@Comment("file常用方法")
 public class FileFunctionExecutor implements FunctionExecutor{
 	
 	@Override
