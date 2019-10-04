@@ -48,6 +48,9 @@ public class CharacterStream {
 	 * match and consume is true, the stream is advanced by the needle's length. */
 	public boolean match (String needle, boolean consume) {
 		int needleLength = needle.length();
+		if(needleLength + index >end){
+			return false;
+		}
 		for (int i = 0, j = index; i < needleLength; i++, j++) {
 			if (index >= end) return false;
 			if (needle.charAt(i) != source.charAt(j)) return false;
