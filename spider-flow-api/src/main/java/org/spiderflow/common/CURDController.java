@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-public abstract class CURDController<S extends ServiceImpl<M, T>,M extends BaseMapper<T>,T> {
+public abstract class CURDController<S extends ServiceImpl<M, T>,M extends BaseMapper<T>, T> {
 	
 	@Autowired
 	private S service;
