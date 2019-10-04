@@ -4,6 +4,7 @@ package org.spiderflow.core.expression.parsing;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.spiderflow.core.expression.ExpressionTemplate;
 import org.spiderflow.core.expression.ExpressionTemplateContext;
 import org.spiderflow.core.expression.interpreter.AstInterpreter;
 import org.spiderflow.core.expression.interpreter.Reflection;
+import org.spiderflow.expression.DynamicMethod;
 
 
 /** Templates are parsed into an abstract syntax tree (AST) nodes by a Parser. This class contains all AST node types. */
@@ -1060,7 +1062,17 @@ public abstract class Ast {
 					Expression expr = arguments.get(i);
 					argumentValues[i] = expr.evaluate(template, context);
 				}
-
+				if(object instanceof DynamicMethod){
+					try {
+						Object method = DynamicMethod.class.getDeclaredMethod("execute", new Class[]{String.class,List.class});
+						Object[] newArgumentValues = new Object[]{getMethod().getName().getText(),Arrays.asList(argumentValues)};
+						return Reflection.getInstance().callMethod(object, method, newArgumentValues);
+					} catch (Throwable t) {
+						ExpressionError.error(t.getMessage(), getSpan(), t);
+						return null; // never reached
+					} 
+				}
+				
 				// Otherwise try to find a corresponding method or field pointing to a lambda.
 				Object method = getCachedMethod();
 				if (method != null) {
@@ -1070,7 +1082,7 @@ public abstract class Ast {
 						// fall through
 					}
 				}
-
+				
 				method = Reflection.getInstance().getMethod(object, getMethod().getName().getText(), argumentValues);
 				if (method != null) {
 					// found the method on the object, call it
