@@ -48,6 +48,7 @@ spider-flow
 - [ ] Hbase插件
 - [x] [IP代理池插件](https://gitee.com/jmxd/spider-flow-proxypool)
 - [x] [OCR识别插件](https://gitee.com/jmxd/spider-flow-ocr)
+- [x] [电子邮箱插件](https://gitee.com/jmxd/spider-flow-mailbox)
 
 ### 项目部分截图
 ![GVP项目爬虫测试](https://images.gitee.com/uploads/images/2019/0730/171455_bfe1a97b_1253940.gif "spider-test.gif")
