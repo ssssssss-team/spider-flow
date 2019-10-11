@@ -264,6 +264,17 @@ public class JavaReflection extends Reflection {
 		if ((from == Character.class || from == char.class) && (to == char.class || to == Character.class)) return true;
 		return false;
 	}
+	
+	public static String[] getStringTypes(Object[] objects){
+		String[] parameterTypes = new String[objects == null ? 0: objects.length];
+		if(objects != null){
+			for(int i=0,len = objects.length;i<len;i++){
+				Object value = objects[i];
+				parameterTypes[i] = value == null ? "null" : value.getClass().getSimpleName();  
+			}
+		}
+		return parameterTypes;
+	}
 
 	/** Returns whether the from type can be coerced to the to type. The coercion rules follow those of Java. See JLS 5.1.2
 	 * https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html **/

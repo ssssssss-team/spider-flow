@@ -18,6 +18,7 @@ import org.spiderflow.core.expression.ExpressionError.TemplateException;
 import org.spiderflow.core.expression.ExpressionTemplate;
 import org.spiderflow.core.expression.ExpressionTemplateContext;
 import org.spiderflow.core.expression.interpreter.AstInterpreter;
+import org.spiderflow.core.expression.interpreter.JavaReflection;
 import org.spiderflow.core.expression.interpreter.Reflection;
 import org.spiderflow.expression.DynamicMethod;
 
@@ -1122,20 +1123,15 @@ public abstract class Ast {
 					// didn't find the method on the object, try to find a field pointing to a lambda
 					Object field = Reflection.getInstance().getField(object, getMethod().getName().getText());
 					if (field == null){
-						String[] parameterTypes = new String[argumentValues == null ? 0: argumentValues.length];
-						if(argumentValues != null){
-							for(int i=0,len = argumentValues.length;i<len;i++){
-								Object value = argumentValues[i];
-								parameterTypes[i] = value == null ? "null" : value.getClass().getSimpleName();  
-							}
-						}
-						ExpressionError.error("在'" + object.getClass() + "'中找不到方法 " + getMethod().getName().getText() + "(" + StringUtils.join(parameterTypes,",") + ")",
+						ExpressionError.error("在'" + object.getClass() + "'中找不到方法 " + getMethod().getName().getText() + "(" + StringUtils.join(JavaReflection.getStringTypes(argumentValues),",") + ")",
 							getSpan());
 					}
 					Object function = Reflection.getInstance().getFieldValue(object, field);
 					method = Reflection.getInstance().getMethod(function, null, argumentValues);
-					if (method == null) ExpressionError.error("在'" + object.getClass() + "'中找不到方法 '" + getMethod().getName().getText() + "'",
-							getSpan());
+					if (method == null){
+						ExpressionError.error("在'" + object.getClass() + "'中找不到方法 " + getMethod().getName().getText() + "("+ StringUtils.join(JavaReflection.getStringTypes(argumentValues),",") +")",
+								getSpan());
+					} 
 					try {
 						return Reflection.getInstance().callMethod(function, method, argumentValues);
 					} catch (Throwable t) {
