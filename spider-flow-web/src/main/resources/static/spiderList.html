@@ -72,7 +72,7 @@
 			align : 'center'
 		},{
 			title : '操作',
-			width : 120,
+			width : 200,
 			align : 'center',
 			templet : '#buttons'
 		}]]
@@ -141,6 +141,8 @@
 			})
 			layui.layer.close(index);
 		})
+	}).on('click','.btn-log',function(){
+		parent.openTab($(this).data('name') + '-日志','log.html?id=' + $(this).data('id'));
 	}).on('click','.btn-edit-cron',function(){
 		var id = $(this).data('id');
 		var value = $(this).data('cron') || '';
@@ -155,6 +157,7 @@
 </script>
 <script type="text/html" id="buttons">
 	<a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}">手动运行</a>
+	<a class="layui-btn layui-btn-sm btn-log" data-name="{{d.name}}" data-id="{{d.id}}">查看日志</a>
 	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
 </script>
 </body>

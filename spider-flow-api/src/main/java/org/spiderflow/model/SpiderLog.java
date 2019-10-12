@@ -2,6 +2,7 @@ package org.spiderflow.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -31,7 +32,7 @@ public class SpiderLog {
 	}
 	
 	public SpiderLog(String level,String message, Object ... variables) {
-		this(level,message,Arrays.asList(variables));
+		this(level,message,variables == null ? Collections.emptyList() : Arrays.asList(variables));
 	}
 	
 	public String getLevel() {

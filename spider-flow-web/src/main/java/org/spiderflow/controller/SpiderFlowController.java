@@ -1,5 +1,7 @@
 package org.spiderflow.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,7 +9,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.Grammerable;
 import org.spiderflow.annotation.Comment;
 import org.spiderflow.core.model.SpiderFlow;
@@ -21,6 +26,7 @@ import org.spiderflow.model.JsonBean;
 import org.spiderflow.model.Plugin;
 import org.spiderflow.model.Shape;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,7 +63,12 @@ public class SpiderFlowController {
 	@Autowired(required = false)
 	private List<PluginConfig> pluginConfigs;
 	
+	@Value("${spider.job.log.path:./}")
+	private String spiderLogPath;
+	
 	private final List<Grammer> grammers = new ArrayList<Grammer>();
+	
+	private static Logger logger = LoggerFactory.getLogger(SpiderFlowController.class);
 	
 	@PostConstruct
 	private void init(){
@@ -140,6 +151,20 @@ public class SpiderFlowController {
 	@RequestMapping("/xml")
 	public String xml(String id){
 		return spiderFlowService.getById(id).getXml();
+	}
+	
+	@RequestMapping("/log")
+	public String log(String id){
+		SpiderFlow flow = spiderFlowService.getById(id);
+		if(flow == null){
+			return "未找到此爬虫";
+		}
+		try {
+			return FileUtils.readFileToString(new File(spiderLogPath,id + ".log"), "UTF-8");
+		} catch (IOException e) {
+			logger.error("读取日志文件出错",e);
+			return "读取日志文件出错，" + e.getMessage();
+		}
 	}
 	
 	@RequestMapping("/shapes")

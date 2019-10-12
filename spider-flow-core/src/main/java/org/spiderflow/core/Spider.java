@@ -54,18 +54,17 @@ public class Spider {
 		executorMap = executors.stream().collect(Collectors.toMap(ShapeExecutor::supportShape, v -> v));
 	}
 
-	public List<SpiderOutput> run(SpiderFlow spiderFlow, Map<String, Object> variables) {
+	public List<SpiderOutput> run(SpiderFlow spiderFlow, SpiderContext context,Map<String, Object> variables) {
 		if (variables == null) {
 			variables = new HashMap<>();
 		}
 		SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
-		SpiderContext context = new SpiderContext();
 		executeRoot(root, context, variables);
 		return context.getOutputs();
 	}
 
-	public List<SpiderOutput> run(SpiderFlow spiderFlow) {
-		return run(spiderFlow, new HashMap<>());
+	public List<SpiderOutput> run(SpiderFlow spiderFlow, SpiderContext context) {
+		return run(spiderFlow, context, new HashMap<>());
 	}
 
 	public List<SpiderOutput> runWithTest(SpiderNode root, SpiderContext context) {
