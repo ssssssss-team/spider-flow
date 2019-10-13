@@ -7,10 +7,10 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.model.SpiderLog;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
-import org.spiderflow.utils.ThreadPool;
 
 /**
  * 爬虫上下文集合
@@ -29,7 +29,7 @@ public class SpiderContext extends HashMap<String, Object>{
 	 */
 	private List<SpiderOutput> outputs = new ArrayList<>();
 	
-	private ThreadPool threadPool;
+	private SubThreadPoolExecutor threadPool;
 	
 	private SpiderNode rootNode;
 	
@@ -57,11 +57,11 @@ public class SpiderContext extends HashMap<String, Object>{
 	}
 	
 	
-	public ThreadPool getThreadPool() {
+	public SubThreadPoolExecutor getThreadPool() {
 		return threadPool;
 	}
 
-	public void setThreadPool(ThreadPool threadPool) {
+	public void setThreadPool(SubThreadPoolExecutor threadPool) {
 		this.threadPool = threadPool;
 	}
 	

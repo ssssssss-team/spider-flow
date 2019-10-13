@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.ExpressionHolder;
+import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
+import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.utils.SpiderFlowUtils;
@@ -20,8 +22,8 @@ import org.spiderflow.listener.SpiderListener;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
 import org.spiderflow.utils.Maps;
-import org.spiderflow.utils.ThreadPool;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,12 +48,21 @@ public class Spider {
 
 	@Autowired(required = false)
 	private List<SpiderListener> listeners;
+	
+	@Value("${spider.thread.max:64}")
+	private Integer totalThreads;
+	
+	@Value("${spider.thread.default:8}")
+	private Integer defaultThreads;
 
 	private static Map<String, ShapeExecutor> executorMap = new HashMap<String, ShapeExecutor>();
+	
+	private static SpiderFlowThreadPoolExecutor executor;
 
 	@PostConstruct
 	private void init() {
 		executorMap = executors.stream().collect(Collectors.toMap(ShapeExecutor::supportShape, v -> v));
+		executor = new SpiderFlowThreadPoolExecutor(totalThreads);
 	}
 
 	public List<SpiderOutput> run(SpiderFlow spiderFlow, SpiderContext context,Map<String, Object> variables) {
@@ -75,8 +86,8 @@ public class Spider {
 	}
 
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
-		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), 8);
-		ThreadPool pool = ThreadPool.create(nThreads);
+		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
+		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
 		context.setRootNode(root);
 		context.setThreadPool(pool);
 		if (listeners != null) {
@@ -84,7 +95,7 @@ public class Spider {
 		}
 		try {
 			executeNode(pool, null, root, context, variables);
-			pool.shutdown();
+			pool.awaitTermination();
 		} finally {
 			if (listeners != null) {
 				listeners.forEach(listener -> listener.afterEnd(context));
@@ -94,13 +105,13 @@ public class Spider {
 	}
 
 	public void execute(int nThreads, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
-		ThreadPool pool = ThreadPool.create(nThreads);
+		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
 		context.setThreadPool(pool);
 		executeNode(pool, fromNode, node, context, variables);
-		pool.shutdown();
+		pool.awaitTermination();
 	}
 
-	private void executeaNextNodes(ThreadPool pool, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	private void executeaNextNodes(SubThreadPoolExecutor pool, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		List<SpiderNode> nextNodes = node.getNextNodes();
 		if (nextNodes != null) {
 			for (SpiderNode nextNode : nextNodes) {
@@ -109,7 +120,7 @@ public class Spider {
 		}
 	}
 
-	public void executeNode(ThreadPool pool, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	public void executeNode(SubThreadPoolExecutor pool, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String shape = node.getStringJsonValue("shape");
 		if (StringUtils.isBlank(shape)) {
 			executeaNextNodes(pool, node, context, variables);
