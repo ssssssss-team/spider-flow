@@ -1,7 +1,7 @@
 package org.spiderflow.concurrent;
 
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +22,7 @@ public class SpiderFlowThreadPoolExecutor {
 	public SpiderFlowThreadPoolExecutor(int maxThreads) {
 		super();
 		this.maxThreads = maxThreads;
-		this.executor = new ThreadPoolExecutor(maxThreads, maxThreads, 10, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(),new ThreadFactory() {
+		this.executor = new ThreadPoolExecutor(maxThreads, maxThreads, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),new ThreadFactory() {
 			
 			@Override
 			public Thread newThread(Runnable runnable) {
