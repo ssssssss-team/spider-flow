@@ -133,14 +133,14 @@ public class Spider {
 		int loopCount = 1;
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
 		if (StringUtils.isNotBlank(loopCountStr)) {
-			Object result = engine.execute(loopCountStr, variables);
-			if (result != null) {
+			try {
+				Object result = engine.execute(loopCountStr, variables);
+				result = result == null ? 0 : result;
 				context.debug("获取循环次数{}={}", loopCountStr, result);
-				try {
-					loopCount = Integer.valueOf(result.toString());
-				} catch (NumberFormatException e) {
-					loopCount = 0;
-				}
+				loopCount = Integer.valueOf(result.toString());
+			} catch (Throwable e) {
+				loopCount = 0;
+				context.error("获取循环次数失败,异常信息：",e);
 			}
 		}
 		if (loopCount > 0) {
@@ -156,9 +156,9 @@ public class Spider {
 								ExpressionHolder.setVariables(nVariables);
 								executor.execute(node, context, nVariables);
 								nVariables.put("ex", null);
-							} catch (Exception e) {
-								nVariables.put("ex", e);
-								context.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), e);
+							} catch (Throwable t) {
+								nVariables.put("ex", t);
+								context.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
 							} finally {
 								context.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
 								// 递归执行下一级
