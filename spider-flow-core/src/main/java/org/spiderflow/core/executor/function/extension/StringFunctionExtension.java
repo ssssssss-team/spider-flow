@@ -33,9 +33,33 @@ public class StringFunctionExtension implements FunctionExtension{
 	}
 	
 	@Comment("根据正则表达式提取String中的内容")
-	@Example("${strVar.regx('<h2>(.*?)</h2>')}")
+	@Example("${strVar.regx('<title>(.*?)</title>',1)}")
+	public static String regx(String source,String pattern,int groupIndex){
+		return ExtractUtils.getFirstMatcher(source, pattern, groupIndex);
+	}
+	
+	@Comment("根据正则表达式提取String中的内容")
+	@Example("${strVar.regx('<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
+	public static List<String> regx(String source,String pattern,List<Integer> groups){
+		return ExtractUtils.getFirstMatcher(source, pattern, groups);
+	}
+	
+	@Comment("根据正则表达式提取String中的内容")
+	@Example("${strVar.regxs('<h2>(.*?)</h2>')}")
 	public static List<String> regxs(String source,String pattern){
 		return ExtractUtils.getMatchers(source, pattern, true);
+	}
+	
+	@Comment("根据正则表达式提取String中的内容")
+	@Example("${strVar.regxs('<h2>(.*?)</h2>',1)}")
+	public static List<String> regxs(String source,String pattern,int groupIndex){
+		return ExtractUtils.getMatchers(source, pattern, groupIndex);
+	}
+	
+	@Comment("根据正则表达式提取String中的内容")
+	@Example("${strVar.regxs('<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
+	public static List<List<String>> regxs(String source,String pattern,List<Integer> groups){
+		return ExtractUtils.getMatchers(source, pattern, groups);
 	}
 	
 	@Comment("根据xpath在String变量中查找")

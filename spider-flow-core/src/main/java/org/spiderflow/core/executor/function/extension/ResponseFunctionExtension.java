@@ -47,9 +47,33 @@ public class ResponseFunctionExtension implements FunctionExtension{
 	}
 	
 	@Comment("根据正则表达式提取请求结果中的内容")
+	@Example("${resp.regx('<title>(.*?)</title>',1)}")
+	public static String regx(SpiderResponse response,String pattern,int groupIndex){
+		return ExtractUtils.getFirstMatcher(response.getHtml(), pattern, groupIndex);
+	}
+	
+	@Comment("根据正则表达式提取请求结果中的内容")
+	@Example("${resp.regx('<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
+	public static List<String> regx(SpiderResponse response,String pattern,List<Integer> groups){
+		return ExtractUtils.getFirstMatcher(response.getHtml(), pattern, groups);
+	}
+	
+	@Comment("根据正则表达式提取请求结果中的内容")
 	@Example("${resp.regxs('<h2>(.*?)</h2>')}")
 	public static List<String> regxs(SpiderResponse response,String pattern){
 		return ExtractUtils.getMatchers(response.getHtml(), pattern, true);
+	}
+	
+	@Comment("根据正则表达式提取请求结果中的内容")
+	@Example("${resp.regxs('<h2>(.*?)</h2>',1)}")
+	public static List<String> regxs(SpiderResponse response,String pattern,int groupIndex){
+		return ExtractUtils.getMatchers(response.getHtml(), pattern, groupIndex);
+	}
+	
+	@Comment("根据正则表达式提取请求结果中的内容")
+	@Example("${resp.regxs('<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
+	public static List<List<String>> regxs(SpiderResponse response,String pattern,List<Integer> groups){
+		return ExtractUtils.getMatchers(response.getHtml(), pattern, groups);
 	}
 	
 	@Comment("根据css选择器提取请求结果")

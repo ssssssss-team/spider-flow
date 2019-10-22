@@ -41,9 +41,33 @@ public class ElementFunctionExtension implements FunctionExtension{
 	}
 	
 	@Comment("根据正则表达式提取内容")
-	@Example("${elementVar.regx('<h2>(.*?)</h2>')}")
+	@Example("${elementVar.regx('<title>(.*?)</title>',1)}")
+	public static String regx(Element element,String regx,int groupIndex){
+		return ExtractUtils.getFirstMatcher(element.html(), regx, groupIndex);
+	}
+	
+	@Comment("根据正则表达式提取内容")
+	@Example("${elementVar.regx('<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
+	public static List<String> regx(Element element,String regx,List<Integer> groups){
+		return ExtractUtils.getFirstMatcher(element.html(), regx, groups);
+	}
+	
+	@Comment("根据正则表达式提取内容")
+	@Example("${elementVar.regxs('<h2>(.*?)</h2>')}")
 	public static List<String> regxs(Element element,String regx){
 		return ExtractUtils.getMatchers(element.html(), regx, true);
+	}
+	
+	@Comment("根据正则表达式提取内容")
+	@Example("${elementVar.regxs('<h2>(.*?)</h2>',1)}")
+	public static List<String> regxs(Element element,String regx,int groupIndex){
+		return ExtractUtils.getMatchers(element.html(), regx, groupIndex);
+	}
+	
+	@Comment("根据正则表达式提取内容")
+	@Example("${elementVar.regxs('<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
+	public static List<List<String>> regxs(Element element,String regx,List<Integer> groups){
+		return ExtractUtils.getMatchers(element.html(), regx, groups);
 	}
 	
 	@Comment("根据css选择器提取内容")

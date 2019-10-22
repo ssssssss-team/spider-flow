@@ -32,9 +32,33 @@ public class ExtractFunctionExecutor implements FunctionExecutor{
 	}
 	
 	@Comment("根据正则表达式提取内容")
+	@Example("${extract.regx(resp.html,'<title>(.*?)</title>',1)}")
+	public static String regx(String content,String pattern,int groupIndex){
+		return ExtractUtils.getFirstMatcher(content, pattern, groupIndex);
+	}
+	
+	@Comment("根据正则表达式提取内容")
+	@Example("${extract.regx(resp.html,'<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
+	public static List<String> regx(String content,String pattern,List<Integer> groups){
+		return ExtractUtils.getFirstMatcher(content, pattern, groups);
+	}
+	
+	@Comment("根据正则表达式提取内容")
 	@Example("${extract.regxs(resp.html,'<h2>(.*?)</h2>')}")
 	public static List<String> regxs(String content,String pattern){
 		return ExtractUtils.getMatchers(content, pattern, true);
+	}
+	
+	@Comment("根据正则表达式提取内容")
+	@Example("${extract.regxs(resp.html,'<h2>(.*?)</h2>',1)}")
+	public static List<String> regxs(String content,String pattern,int groupIndex){
+		return ExtractUtils.getMatchers(content, pattern, groupIndex);
+	}
+	
+	@Comment("根据正则表达式提取内容")
+	@Example("${extract.regxs(resp.html,'<a href=\"(.*?)\">(.*?)</a>',[1,2])}")
+	public static List<List<String>> regxs(String content,String pattern,List<Integer> groups){
+		return ExtractUtils.getMatchers(content, pattern, groups);
 	}
 	
 	@Comment("根据xpath提取内容")

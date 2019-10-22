@@ -12,7 +12,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.seimicrawler.xpath.JXDocument;
 import org.seimicrawler.xpath.JXNode;
-import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONPath;
 /**
@@ -34,24 +33,53 @@ public class ExtractUtils {
 	}
 	
 	public static List<String> getMatchers(String content,String regx,boolean isGroup){
+		return getMatchers(content,regx,isGroup ? 1: 0);
+	}
+	
+	public static List<String> getMatchers(String content,String regx,int groupIndex){
 		Matcher matcher = compile(regx).matcher(content);
 		List<String> results = new ArrayList<>();
 		while(matcher.find()){
-			String group = isGroup ? matcher.group(1) : matcher.group();
-			if(!StringUtils.isEmpty(group)){
-				results.add(group);
+			results.add(matcher.group(groupIndex));
+		}
+		return results;
+	}
+	
+	public static List<List<String>> getMatchers(String content,String regx,List<Integer> groups){
+		Matcher matcher = compile(regx).matcher(content);
+		List<List<String>> results = new ArrayList<>();
+		while(matcher.find()){
+			List<String> matches = new ArrayList<>();
+			for (Integer groupIndex : groups) {
+				matches.add(matcher.group(groupIndex));
 			}
+			results.add(matches);
 		}
 		return results;
 	}
 	
 	public static String getFirstMatcher(String content,String regx,boolean isGroup){
+		
+		return getFirstMatcher(content,regx,isGroup ? 1 : 0);
+	}
+	
+	public static String getFirstMatcher(String content,String regx,int groupIndex){
 		Matcher matcher = compile(regx).matcher(content);
-		while(matcher.find()){
-			String group = isGroup ? matcher.group(1) : matcher.group();
-			return group;
+		if(matcher.find()){
+			return matcher.group(groupIndex);
 		}
 		return null;
+	}
+	
+	public static List<String> getFirstMatcher(String content,String regx,List<Integer> groups){
+		Matcher matcher = compile(regx).matcher(content);
+		List<String> matches = new ArrayList<>();
+		if(matcher.find()){
+			for (Integer groupIndex : groups) {
+				matches.add(matcher.group(groupIndex));
+			}
+		}
+		return matches;
 	}
 	
 	public static String getHostFromURL(String url){
