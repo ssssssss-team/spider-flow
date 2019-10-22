@@ -38,6 +38,12 @@ public interface SpiderResponse {
 	@Example("${resp.contentType}")
 	public String getContentType();
 	
+	@Comment("获取当前url")
+	@Example("${resp.url}")
+	default String getUrl(){
+		return null;
+	}
+	
 	@Example("${resp.setCharset('UTF-8')}")
 	default void setCharset(String charset){
 		

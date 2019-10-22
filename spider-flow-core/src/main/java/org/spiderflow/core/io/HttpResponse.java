@@ -72,4 +72,9 @@ public class HttpResponse implements SpiderResponse{
 		this.response.charset(charset);
 	}
 
+	@Override
+	public String getUrl() {
+		return response.url().toExternalForm();
+	}
+
 }
