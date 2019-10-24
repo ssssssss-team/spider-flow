@@ -7,7 +7,6 @@ public class Plugin {
 	private String url;
 	
 	public Plugin(String name, String url) {
-		super();
 		this.name = name;
 		this.url = url;
 	}

@@ -36,7 +36,8 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	
 	@Autowired
 	private SpiderJobManager spiderJobManager;
-	
+
+	//项目启动后自动查询需要执行的任务进行爬取
 	@PostConstruct
 	private void initJobs(){
 		List<SpiderFlow> spiderFlows = sfMapper.selectList(new QueryWrapper<SpiderFlow>().eq("enabled", "1"));
@@ -76,6 +77,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	}
 	
 	public boolean save(SpiderFlow spiderFlow){
+		//解析corn,获取并设置任务的开始时间
 		if(StringUtils.isNotEmpty(spiderFlow.getCron())){
 			CronTrigger trigger = TriggerBuilder.newTrigger()
 							.withIdentity("Caclulate Next Execute Date")
@@ -83,15 +85,15 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 							.build();
 			spiderFlow.setNextExecuteTime(trigger.getStartTime());
 		}
-		if(StringUtils.isNotEmpty(spiderFlow.getId())){	//修改
+		//
+		if(StringUtils.isNotEmpty(spiderFlow.getId())){	//update 任务
 			sfMapper.updateSpiderFlow(spiderFlow.getId(), spiderFlow.getName(), spiderFlow.getXml());
 			spiderJobManager.remove(spiderFlow.getId());
 			spiderFlow = getById(spiderFlow.getId());
 			if("1".equals(spiderFlow.getEnabled()) && StringUtils.isNotEmpty(spiderFlow.getCron())){
 				spiderJobManager.addJob(spiderFlow);
 			}
-			
-		}else{
+		}else{//insert 任务
 			String id = UUID.randomUUID().toString().replace("-", "");
 			sfMapper.insertSpiderFlow(id, spiderFlow.getName(), spiderFlow.getXml());
 			spiderFlow.setId(id);
@@ -138,8 +140,8 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	 * @return
      */
 	public List<String> getRecentTriggerTime(String cron,int numTimes) {
-		List<String> list = new ArrayList<String>();
-		CronTrigger trigger = null;
+		List<String> list = new ArrayList<>();
+		CronTrigger trigger;
 		try {
 			trigger = TriggerBuilder.newTrigger()
 					.withSchedule(CronScheduleBuilder.cronSchedule(cron))

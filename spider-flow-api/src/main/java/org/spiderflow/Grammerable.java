@@ -5,6 +5,6 @@ import org.spiderflow.model.Grammer;
 
 public interface Grammerable {
 
-	public List<Grammer> grammers();
+	List<Grammer> grammers();
 	
 }

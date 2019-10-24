@@ -1,125 +1,123 @@
 package org.spiderflow.core.model;
 
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.util.Date;
 
 /**
  * 爬虫持久化实体类
  */
 @TableName("sp_flow")
 public class SpiderFlow {
-	
-	@TableId(type=IdType.UUID)
-	private String id;
-	
-	/**
-	 * 定时任务表达式
-	 */
-	private String cron;
-	
-	private String name;
-	
-	/**
-	 * xml流程图
-	 */
-	private String xml;
-	
-	private String enabled;
-	
-	private Date createDate;
-	
-	private Date lastExecuteTime;
-	
-	private Date nextExecuteTime;
-	
-	/**
-	 * 定时执行的执行次数
-	 */
-	private Integer executeCount;
-	
-	
-	public SpiderFlow() {
-		super();
-	}
 
-	public SpiderFlow(String id, String name) {
-		super();
-		this.id = id;
-		this.name = name;
-	}
+    @TableId(type = IdType.UUID)
+    private String id;
 
-	public String getId() {
-		return id;
-	}
+    /**
+     * 定时任务表达式
+     */
+    private String cron;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    /**
+     * xml流程图
+     */
+    private String xml;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    private String enabled;
 
-	public String getXml() {
-		return xml;
-	}
+    private Date createDate;
 
-	public void setXml(String xml) {
-		this.xml = xml;
-	}
+    private Date lastExecuteTime;
 
-	public String getCron() {
-		return cron;
-	}
+    private Date nextExecuteTime;
 
-	public void setCron(String cron) {
-		this.cron = cron;
-	}
+    /**
+     * 定时执行的执行次数
+     */
+    private Integer executeCount;
 
-	public String getEnabled() {
-		return enabled;
-	}
 
-	public void setEnabled(String enabled) {
-		this.enabled = enabled;
-	}
+    public SpiderFlow() {
+    }
 
-	public Date getCreateDate() {
-		return createDate;
-	}
+    public SpiderFlow(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public Date getLastExecuteTime() {
-		return lastExecuteTime;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setLastExecuteTime(Date lastExecuteTime) {
-		this.lastExecuteTime = lastExecuteTime;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Date getNextExecuteTime() {
-		return nextExecuteTime;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setNextExecuteTime(Date nextExecuteTime) {
-		this.nextExecuteTime = nextExecuteTime;
-	}
+    public String getXml() {
+        return xml;
+    }
 
-	public Integer getExecuteCount() {
-		return executeCount;
-	}
+    public void setXml(String xml) {
+        this.xml = xml;
+    }
 
-	public void setExecuteCount(Integer executeCount) {
-		this.executeCount = executeCount;
-	}
+    public String getCron() {
+        return cron;
+    }
+
+    public void setCron(String cron) {
+        this.cron = cron;
+    }
+
+    public String getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(String enabled) {
+        this.enabled = enabled;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getLastExecuteTime() {
+        return lastExecuteTime;
+    }
+
+    public void setLastExecuteTime(Date lastExecuteTime) {
+        this.lastExecuteTime = lastExecuteTime;
+    }
+
+    public Date getNextExecuteTime() {
+        return nextExecuteTime;
+    }
+
+    public void setNextExecuteTime(Date nextExecuteTime) {
+        this.nextExecuteTime = nextExecuteTime;
+    }
+
+    public Integer getExecuteCount() {
+        return executeCount;
+    }
+
+    public void setExecuteCount(Integer executeCount) {
+        this.executeCount = executeCount;
+    }
 }

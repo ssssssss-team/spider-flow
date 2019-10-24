@@ -31,7 +31,6 @@ public class SpiderWebSocketContext extends SpiderContext implements ObjectSeria
 	private SerializeConfig serializeConfig;
 	
 	public SpiderWebSocketContext(Session session) {
-		super();
 		this.session = session;
 		this.serializeConfig = new SerializeConfig();
 		this.serializeConfig.put(Long.TYPE, this);
