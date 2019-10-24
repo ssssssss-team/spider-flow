@@ -9,20 +9,17 @@ public class JsonBean<T> {
 	private T data;
 
 	public JsonBean(Integer code, String message, T data) {
-		super();
 		this.code = code;
 		this.message = message;
 		this.data = data;
 	}
 
 	public JsonBean(Integer code, String message) {
-		super();
 		this.code = code;
 		this.message = message;
 	}
 
 	public JsonBean(T data) {
-		super();
 		this.data = data;
 	}
 

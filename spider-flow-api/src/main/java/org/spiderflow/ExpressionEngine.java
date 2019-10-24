@@ -4,6 +4,6 @@ import java.util.Map;
 
 public interface ExpressionEngine {
 	
-	public Object execute(String expression,Map<String,Object> variables);
+	Object execute(String expression, Map<String, Object> variables);
 
 }

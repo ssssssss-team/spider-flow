@@ -10,6 +10,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface DataSourceMapper extends BaseMapper<DataSource>{
 	
 	@Select("select id,name from sp_datasource")
-	public List<DataSource> selectAll();
+	List<DataSource> selectAll();
 
 }
