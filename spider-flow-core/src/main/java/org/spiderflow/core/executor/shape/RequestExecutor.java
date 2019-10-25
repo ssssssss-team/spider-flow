@@ -68,6 +68,8 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 	public static final String FOLLOW_REDIRECT = "follow-redirect";
 	
 	public static final String TLS_VALIDATE = "tls-validate";
+
+	public static final String LAST_EXECUTE_TIME = "__last_execute_time";
 	
 	@Autowired
 	private ExpressionEngine engine;
@@ -85,10 +87,18 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 				Object value = engine.execute(sleepCondition, variables);
 				if(value != null){
 					long sleepTime = NumberUtils.toLong(value.toString(), 0L);
-					Thread.sleep(sleepTime);
+					synchronized (node.getNodeId().intern()){
+						//实际等待时间 = 上次执行时间 + 睡眠时间 - 当前时间
+						sleepTime = context.get(LAST_EXECUTE_TIME, 0L) + sleepTime - System.currentTimeMillis();
+						if(sleepTime > 0){
+							context.info("设置延迟时间:{}ms", sleepTime);
+							Thread.sleep(sleepTime);
+						}
+						context.put(LAST_EXECUTE_TIME,System.currentTimeMillis());
+					}
 				}
-			} catch (InterruptedException e) {
-				
+			} catch (Throwable t) {
+				context.error("设置延迟时间失败:{}", t);
 			}
 		}
 		HttpRequest request = HttpRequest.create();

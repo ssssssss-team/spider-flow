@@ -38,7 +38,15 @@ public class SpiderContext extends HashMap<String, Object>{
 	public List<SpiderOutput> getOutputs() {
 		return outputs;
 	}
-	
+
+	public <T> T get(String key){
+		return (T) super.get(key);
+	}
+
+	public <T> T get(String key,T defaultValue){
+		T value = this.get(key);
+		return value == null ? defaultValue : value;
+	}
 	
 	public boolean isRunning() {
 		return running;
