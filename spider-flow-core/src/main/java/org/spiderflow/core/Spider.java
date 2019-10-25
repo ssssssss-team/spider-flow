@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -55,9 +56,14 @@ public class Spider {
 	@Value("${spider.thread.default:8}")
 	private Integer defaultThreads;
 
+	@Value("${spider.detect.dead-cycle:5000}")
+	private Integer deadCycle;
+
 	private static Map<String, ShapeExecutor> executorMap = new HashMap<String, ShapeExecutor>();
 	
 	private static SpiderFlowThreadPoolExecutor executor;
+
+	private static final String ATOMIC_DEAD_CYCLE = "__atomic_dead_cycle";
 
 	@PostConstruct
 	private void init() {
@@ -79,9 +85,14 @@ public class Spider {
 	}
 
 	public List<SpiderOutput> runWithTest(SpiderNode root, SpiderContext context) {
-		// 开始不允许设置任何东西
+		AtomicInteger executeCount =  new AtomicInteger(0);
+		context.put(ATOMIC_DEAD_CYCLE, executeCount);
 		executeRoot(root, context, new HashMap<>());
-		context.info("测试完毕！");
+		if(executeCount.get() > deadCycle){
+			context.error("检测到可能出现死循环,测试终止");
+		}else{
+			context.info("测试完毕！");
+		}
 		return context.getOutputs();
 	}
 
@@ -111,7 +122,7 @@ public class Spider {
 		pool.awaitTermination();
 	}
 
-	private void executeaNextNodes(SubThreadPoolExecutor pool, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	private void executeNextNodes(SubThreadPoolExecutor pool, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		List<SpiderNode> nextNodes = node.getNextNodes();
 		if (nextNodes != null) {
 			for (SpiderNode nextNode : nextNodes) {
@@ -123,7 +134,7 @@ public class Spider {
 	public void executeNode(SubThreadPoolExecutor pool, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String shape = node.getStringJsonValue("shape");
 		if (StringUtils.isBlank(shape)) {
-			executeaNextNodes(pool, node, context, variables);
+			executeNextNodes(pool, node, context, variables);
 			return;
 		}
 		if (!executeCondition(fromNode, node, context, variables)) {
@@ -153,6 +164,12 @@ public class Spider {
 					Runnable runnable = () -> {
 						if (context.isRunning()) {
 							try {
+								//死循环检测，当执行节点次数大于阈值时，结束本次测试
+								AtomicInteger executeCount = (AtomicInteger) context.get(ATOMIC_DEAD_CYCLE);
+								if(executeCount != null && executeCount.incrementAndGet() > deadCycle){
+									context.setRunning(false);
+									return;
+								}
 								ExpressionHolder.setVariables(nVariables);
 								executor.execute(node, context, nVariables);
 								nVariables.put("ex", null);
@@ -162,7 +179,7 @@ public class Spider {
 							} finally {
 								context.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
 								// 递归执行下一级
-								executeaNextNodes(pool, node, context, nVariables);
+								executeNextNodes(pool, node, context, nVariables);
 							}
 						}
 					};
