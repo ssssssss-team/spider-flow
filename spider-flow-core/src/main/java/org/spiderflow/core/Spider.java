@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import org.spiderflow.ExpressionHolder;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.SpiderContext;
+import org.spiderflow.core.executor.shape.LoopExecutor;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.utils.SpiderFlowUtils;
 import org.spiderflow.executor.ShapeExecutor;
@@ -64,7 +66,7 @@ public class Spider {
 	private static SpiderFlowThreadPoolExecutor executor;
 
 	private static final String ATOMIC_DEAD_CYCLE = "__atomic_dead_cycle";
-
+	
 	@PostConstruct
 	private void init() {
 		executorMap = executors.stream().collect(Collectors.toMap(ShapeExecutor::supportShape, v -> v));
@@ -141,6 +143,10 @@ public class Spider {
 			return;
 		}
 		context.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
+		ShapeExecutor executor = executorMap.get(shape);
+		if(executor == null){
+			context.error("执行失败,找不到对应的执行器:{}",shape);
+		}
 		int loopCount = 1;
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
 		if (StringUtils.isNotBlank(loopCountStr)) {
@@ -151,16 +157,21 @@ public class Spider {
 				loopCount = Integer.valueOf(result.toString());
 			} catch (Throwable e) {
 				loopCount = 0;
-				context.error("获取循环次数失败,异常信息：",e);
+				context.error("获取循环次数失败,异常信息：{}",e);
 			}
 		}
 		if (loopCount > 0) {
+			Map<String, Object> nVariables = new HashMap<>(variables);
 			String loopVariableName = node.getStringJsonValue(ShapeExecutor.LOOP_VARIABLE_NAME);
-			ShapeExecutor executor = executorMap.get(shape);
+			if(executor instanceof LoopExecutor){
+				nVariables.put(LoopExecutor.LOOP_NODE_KEY + node.getNodeId(), new CountDownLatch(loopCount));
+			}
 			for (int i = 0; i < loopCount; i++) {
 				if (context.isRunning()) {
 					// 存入下标变量
-					Map<String, Object> nVariables = Maps.add(variables, loopVariableName, i);
+					if(loopVariableName != null){
+						nVariables.put(loopVariableName, i);
+					}
 					Runnable runnable = () -> {
 						if (context.isRunning()) {
 							try {
@@ -177,9 +188,13 @@ public class Spider {
 								nVariables.put("ex", t);
 								context.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
 							} finally {
-								context.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
-								// 递归执行下一级
-								executeNextNodes(pool, node, context, nVariables);
+								if(executor.allowExecuteNext(node, context, nVariables)){
+									context.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
+									// 递归执行下一级
+									executeNextNodes(pool, node, context, nVariables);
+								}else{
+									context.debug("执行节点[{}:{}]完毕，忽略执行下一节点", node.getNodeName(), node.getNodeId());
+								}
 							}
 						}
 					};

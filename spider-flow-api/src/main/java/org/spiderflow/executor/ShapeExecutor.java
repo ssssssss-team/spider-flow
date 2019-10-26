@@ -27,6 +27,7 @@ public interface ShapeExecutor {
 	 * @return 节点形状名称
 	 */
 	String supportShape();
+	
 	/**
 	 * 执行器具体的功能实现
 	 * @param node 当前要执行的爬虫节点
@@ -34,6 +35,10 @@ public interface ShapeExecutor {
 	 * @param variables 节点流程的全部变量的集合
 	 */
 	void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables);
+	
+	default boolean allowExecuteNext(SpiderNode node, SpiderContext context, Map<String, Object> variables){
+		return true;
+	}
 	
 	default boolean isThread(){
 		return true;
