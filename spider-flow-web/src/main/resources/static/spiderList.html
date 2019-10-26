@@ -146,7 +146,8 @@
 	}).on('click','.btn-edit-cron',function(){
 		var id = $(this).data('id');
 		var value = $(this).data('cron') || '';
-		layer.open({
+		parent.$table = $table;
+		parent.layer.open({
 			type: 2,
 			area: ['850px', '660px'],
 			fixed: false, //不固定
