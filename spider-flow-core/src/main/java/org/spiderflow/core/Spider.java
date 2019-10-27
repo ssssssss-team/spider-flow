@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -18,13 +19,13 @@ import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.executor.shape.LoopExecutor;
+import org.spiderflow.core.executor.shape.LoopJoinExecutor;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.utils.SpiderFlowUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.listener.SpiderListener;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
-import org.spiderflow.utils.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -161,13 +162,15 @@ public class Spider {
 			}
 		}
 		if (loopCount > 0) {
-			Map<String, Object> nVariables = new HashMap<>(variables);
+			
 			String loopVariableName = node.getStringJsonValue(ShapeExecutor.LOOP_VARIABLE_NAME);
 			if(executor instanceof LoopExecutor){
-				nVariables.put(LoopExecutor.LOOP_NODE_KEY + node.getNodeId(), new CountDownLatch(loopCount));
+				variables.put(LoopExecutor.LOOP_NODE_KEY + node.getNodeId(), new CountDownLatch(loopCount));
+				variables.put(LoopJoinExecutor.VARIABLE_CONTEXT + node.getNodeId(), new LinkedBlockingQueue<>(loopCount));
 			}
 			for (int i = 0; i < loopCount; i++) {
 				if (context.isRunning()) {
+					Map<String, Object> nVariables = new HashMap<>(variables);
 					// 存入下标变量
 					if(loopVariableName != null){
 						nVariables.put(loopVariableName, i);

@@ -1,0 +1,29 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">配置</li>
+  </ul>
+  <div class="layui-tab-content">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form editor-form-node">
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">节点名称</label>
+    			<div class="layui-input-block">
+    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+    			</div>
+    		</div>
+    		<div class="layui-form-item">
+    			<label class="layui-form-label">等待节点</label>
+    			<div class="layui-input-block">
+    				<select name="joinNode">
+    				{{# layui.each(d.model.cells,function(i,item){ }}
+    					{{# if(item.data&&item.data.object.shape == 'loop'){ }}
+    						<option value="{{item.id}}" {{item.id == d.data.object.joinNode ? 'selected' : ''}}>{{item.value}}</option>
+    					{{# } }}
+    				{{# }) }}
+    				</select>
+    			</div>
+    		</div>
+    	</form>
+    </div>
+  </div>
+</div>

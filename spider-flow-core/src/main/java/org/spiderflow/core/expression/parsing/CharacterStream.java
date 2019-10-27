@@ -75,7 +75,7 @@ public class CharacterStream {
 	public boolean matchIdentifierStart (boolean consume) {
 		if (index >= end) return false;
 		char c = source.charAt(index);
-		if (Character.isJavaIdentifierStart(c)) {
+		if (Character.isJavaIdentifierStart(c) || c == '@') {
 			if (consume) index++;
 			return true;
 		}
