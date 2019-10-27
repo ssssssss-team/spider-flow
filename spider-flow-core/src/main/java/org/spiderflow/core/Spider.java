@@ -165,6 +165,7 @@ public class Spider {
 			
 			String loopVariableName = node.getStringJsonValue(ShapeExecutor.LOOP_VARIABLE_NAME);
 			if(executor instanceof LoopExecutor){
+				variables.put(LoopExecutor.BEFORE_LOOP_VARIABLE, variables);
 				variables.put(LoopExecutor.LOOP_NODE_KEY + node.getNodeId(), new CountDownLatch(loopCount));
 				variables.put(LoopJoinExecutor.VARIABLE_CONTEXT + node.getNodeId(), new LinkedBlockingQueue<>(loopCount));
 			}

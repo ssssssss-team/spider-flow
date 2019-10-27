@@ -40,26 +40,31 @@ public class LoopJoinExecutor implements ShapeExecutor {
 		variableCollection.add(variables);
 		CountDownLatch countDownLatch = (CountDownLatch) variables.get(LoopExecutor.LOOP_NODE_KEY + joinNodeId);
 		if (countDownLatch != null) {
-			synchronized (countDownLatch) {
-				countDownLatch.countDown();
-				boolean isDone = countDownLatch.getCount() == 0L;
-				if(isDone){
-					//清空原有
-					variableCollection.stream()
-						.flatMap(map -> map.entrySet().stream())
-						.collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())))
-						.forEach((k,v)->{
-							String key = "@" + k;
-							if(variables.containsKey(key) == false || k.startsWith("@")){
-								if(key.startsWith("@@")){
-									key = k;
-								}
-								variables.put(key, v);
+			countDownLatch.countDown();
+			boolean isDone = countDownLatch.getCount() == 0L;
+			if(isDone){
+				Map<String, Object> beforeLoopVariable = (Map<String, Object>) variables.get(LoopExecutor.BEFORE_LOOP_VARIABLE);
+				variableCollection.stream()
+					.flatMap(map -> map.entrySet().stream())
+					.collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())))
+					.forEach((k,v)->{
+						String key = "@" + k;
+						if(variables.containsKey(key) == false || k.startsWith("@")){
+							if(key.startsWith("@@")){
+								key = k;
 							}
-						});
-				}
-
-				return isDone;
+							//清除掉原有变量
+							variables.remove(k);
+							variables.put(key, v);
+						}
+					});
+				//与循环前的变量进行合并
+				variables.putAll(beforeLoopVariable);
+				//删除掉多余出来的聚合变量
+				beforeLoopVariable.forEach((k,v)->{
+					variables.remove("@" + k);
+				});
+			return isDone;
 			}
 		} else {
 			context.error("找不到等待节点：{}" + node.getStringJsonValue(JOIN_NODE_ID));
