@@ -1,5 +1,6 @@
 package org.spiderflow.core.executor.shape;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,8 +60,22 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
 			sql = sql.replaceAll("#(.*?)#", "?");
 			int size = parameters.size();
 			Object[] params = new Object[size];
+			boolean hasList = false;
+			int parameterSize = 0;
+			//当参数中存在List或者数组时，认为是批量操作
 			for (int i = 0;i<size;i++) {
-				params[i] = engine.execute(parameters.get(i), variables);
+				Object parameter = engine.execute(parameters.get(i), variables);
+				if(parameter != null){
+					if(parameter instanceof List){
+						hasList = true;
+						parameterSize = Math.max(parameterSize, ((List<?>)parameter).size());
+					}else if((parameter!= null && parameter.getClass().isArray())){
+						hasList = true;
+						parameterSize = Math.max(parameterSize, Array.getLength(parameter));
+					}
+				}
+				
+				params[i] = parameter;
 			}
 			String statementType = node.getStringJsonValue(STATEMENT_TYPE);
 			context.debug("执行sql：{}",sql);
@@ -76,7 +91,21 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
 				}
 			}else if(STATEMENT_UPDATE.equals(statementType) || STATEMENT_INSERT.equals(statementType) || STATEMENT_DELETE.equals(statementType)){
 				try{
-					variables.put("rs", template.update(sql, params));
+					int updateCount = 0;
+					if(hasList){
+						/**
+						 * 批量操作时，将参数Object[]转化为List<Object[]>
+						 * 当参数不为数组或List时，自动转为Object[]
+						 * 当数组或List长度不足时，自动取最后一项补齐
+						 */
+						int[] rs = template.batchUpdate(sql, convertParameters(params,parameterSize));
+						if(rs != null){
+							updateCount = Arrays.stream(rs).sum();
+						}
+					}else{
+						updateCount = template.update(sql, params);
+					}
+					variables.put("rs", updateCount);
 				}catch(Exception e){
 					context.error("执行sql出错,异常信息:{}",e);
 					variables.put("rs", -1);
@@ -84,6 +113,39 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
 				}
 			}
 		}
+	}
+	
+	private List<Object[]> convertParameters(Object[] params,int length){
+		List<Object[]> result = new ArrayList<>(length);
+		int size = params.length;
+		for (int i = 0; i < length; i++) {
+			Object[] parameters = new Object[size];
+			for (int j = 0; j < size; j++) {
+				parameters[j] = getValue(params[j], i);
+			}
+			result.add(parameters);
+		}
+		return result;
+	}
+	
+	private Object getValue(Object object,int index){
+		if(object == null){
+			return null;
+		}else if(object instanceof List){
+			List<?> list = (List<?>) object;
+			int size = list.size();
+			if(size > 0){
+				return list.get(Math.min(list.size() - 1, index));
+			}
+		}else if(object.getClass().isArray()){
+			int size = Array.getLength(object);
+			if(size > 0){
+				Array.get(object, Math.min( - 1, index));
+			}
+		}else{
+			return object;
+		}
+		return null;
 	}
 
 	@Override
