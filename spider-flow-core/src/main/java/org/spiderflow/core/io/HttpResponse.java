@@ -1,5 +1,6 @@
 package org.spiderflow.core.io;
 
+import java.io.InputStream;
 import java.util.Map;
 
 import org.jsoup.Connection.Response;
@@ -77,4 +78,8 @@ public class HttpResponse implements SpiderResponse{
 		return response.url().toExternalForm();
 	}
 
+	@Override
+	public InputStream getStream() {
+		return response.bodyStream();
+	}
 }

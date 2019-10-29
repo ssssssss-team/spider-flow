@@ -1,5 +1,6 @@
 package org.spiderflow.io;
 
+import java.io.InputStream;
 import java.util.Map;
 
 import org.spiderflow.annotation.Comment;
@@ -47,5 +48,9 @@ public interface SpiderResponse {
 	@Example("${resp.setCharset('UTF-8')}")
 	default void setCharset(String charset){
 
+	}
+	@Example("${resp.stream}")
+	default InputStream getStream(){
+		return null;
 	}
 }

@@ -1,9 +1,6 @@
 package org.spiderflow.core.executor.function;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
@@ -11,6 +8,7 @@ import org.spiderflow.annotation.Comment;
 import org.spiderflow.annotation.Example;
 import org.spiderflow.executor.FunctionExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 /**
  * 文件读写 工具类 防止NPE 
@@ -55,10 +53,21 @@ public class FileFunctionExecutor implements FunctionExecutor{
 	@Comment("写出文件")
 	@Example("${file.write('e:/result.html',resp.bytes,false)}")
 	public static void write(String path,byte[] bytes,boolean append) throws IOException{
+		write(path, new ByteArrayInputStream(bytes),append);
+	}
+
+	@Comment("写出文件")
+	@Example("${file.write('e:/result.html',resp.stream,false)}")
+	public static void write(String path, InputStream stream, boolean append) throws IOException {
 		try(FileOutputStream fos = new FileOutputStream(getFile(path,true),append)){
-			fos.write(bytes);
-			fos.flush();
+			IOUtils.copyLarge(stream, fos);
 		}
+	}
+
+	@Comment("写出文件")
+	@Example("${file.write('e:/result.html',resp.bytes,false)}")
+	public static void write(String path, InputStream stream) throws IOException {
+		write(path, stream,false);
 	}
 	
 	@Comment("写出文件")
