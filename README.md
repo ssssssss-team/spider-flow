@@ -51,10 +51,7 @@ spider-flow
 - [x] [电子邮箱插件](https://gitee.com/jmxd/spider-flow-mailbox)
 
 ### 项目部分截图
-![GVP项目爬虫测试](https://images.gitee.com/uploads/images/2019/0730/171455_bfe1a97b_1253940.gif "spider-test.gif")
-![北京菜价爬虫测试](https://images.gitee.com/uploads/images/2019/0730/172647_3bce586e_1253940.gif "spider-food-price-test.gif")
-![xml编辑](https://images.gitee.com/uploads/images/2019/0730/172123_c6df6982_1253940.png "xml-edit.png")
-![爬虫列表](https://images.gitee.com/uploads/images/2019/0730/172152_64203e24_1253940.png "spider_list.png")
+![GVP项目爬虫测试](https://images.gitee.com/uploads/images/2019/1030/104033_0075e463_297689.gif "spider-test.gif")
 ![数据展示](https://images.gitee.com/uploads/images/2019/0716/184618_21bce697_297689.png "demo-2.png")
 
 ### 如有问题或者建议请提Issue
