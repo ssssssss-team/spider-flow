@@ -14,7 +14,7 @@
 		<version>2.0.7.RELEASE</version>
 	</parent>
 	<properties>
-		<spider-flow.version>0.1</spider-flow.version>
+		<spider-flow.version>0.1.0</spider-flow.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
