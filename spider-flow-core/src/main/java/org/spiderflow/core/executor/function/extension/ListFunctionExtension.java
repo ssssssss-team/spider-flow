@@ -1,5 +1,6 @@
 package org.spiderflow.core.executor.function.extension;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,13 @@ public class ListFunctionExtension implements FunctionExtension{
 	@Example("${listVar.join('-')}")
 	public static String join(List<?> list,String separator){
 		return StringUtils.join(list.toArray(),separator);
+	}
+
+	@Comment("将list打乱顺序")
+	@Example("${listVar.shuffle()}")
+	public static List<?> shuffle(List<?> list){
+		Collections.shuffle(list);
+		return list;
 	}
 	
 }
