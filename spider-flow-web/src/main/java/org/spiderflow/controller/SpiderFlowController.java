@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -100,8 +101,8 @@ public class SpiderFlowController {
 	 * @return Page<SpiderFlow> 所有爬虫的列表页
 	 */
 	@RequestMapping("/list")
-	public IPage<SpiderFlow> list(@RequestParam(name = "page",defaultValue = "1")Integer page, @RequestParam(name = "limit",defaultValue = "1")Integer size){
-		return spiderFlowService.page(new Page<SpiderFlow>(page, size), new QueryWrapper<SpiderFlow>().orderByDesc("create_date"));
+	public IPage<SpiderFlow> list(@RequestParam(name = "page", defaultValue = "1") Integer page, @RequestParam(name = "limit", defaultValue = "1") Integer size, @RequestParam(name = "name", defaultValue = "") String name) {
+		return spiderFlowService.page(new Page<>(page, size), new QueryWrapper<SpiderFlow>().like("name", name).orderByDesc("create_date"));
 	}
 	
 	@RequestMapping("/save")

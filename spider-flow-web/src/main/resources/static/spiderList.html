@@ -8,7 +8,17 @@
 	<script type="text/javascript" src="js/layui/layui.all.js" ></script>
 </head>
 <body style="padding:5px;">
-<a class="layui-btn layui-btn-sm layui-btn-normal" href="editor.html"><i class="layui-icon">&#xe654;</i> 添加爬虫</a>
+<div class="layui-form-item">
+	<label class="layui-form-label">爬虫名称</label>
+	<div class="layui-input-inline">
+		<input type="text" name="name" required  lay-verify="required" placeholder="请输入爬虫名称" autocomplete="off" class="layui-input">
+	</div>
+	<div class="layui-input-inline" style="margin-top:5px">
+		<a class="layui-btn layui-btn-sm layui-btn-normal btn-search"><i class="layui-icon">&#xe615;</i> 搜索</a>
+		<a class="layui-btn layui-btn-sm layui-btn-normal" href="editor.html"><i class="layui-icon">&#xe654;</i> 添加爬虫</a>
+	</div>
+</div>
+
 <hr>
 <table class="layui-table" id="table" lay-filter="table"></table>
 <script>
@@ -17,6 +27,7 @@
 		id : 'table',
 		elem : '#table',
 		url : 'spider/list',
+		method : 'post',
 		page : true,
 		parseData : function(resp){
 			return {
@@ -97,7 +108,19 @@
 			}
 		})
 	})
-	$("body").on('click','.btn-remove',function(){
+	function reloadTable(){
+		$table.reload({
+			where : {
+				name : $('input[name=name]').val()
+			},
+			page : {
+				curr : 1
+			}
+		})
+	}
+	$("body").on('click','.btn-search',function(){
+		reloadTable();
+	}).on('click','.btn-remove',function(){
 		var id = $(this).data('id');
 		layui.layer.confirm('您确定要删除此爬虫吗？',{
 			title : '删除'
