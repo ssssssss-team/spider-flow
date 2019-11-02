@@ -23,6 +23,8 @@ import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 /**
  * 请求执行器
  * @author Administrator
@@ -77,6 +79,12 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 	@Override
 	public String supportShape() {
 		return "request";
+	}
+
+	@PostConstruct
+	void init(){
+		//允许设置被限制的请求头
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 	}
 
 	@Override
