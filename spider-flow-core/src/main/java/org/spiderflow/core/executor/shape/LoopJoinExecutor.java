@@ -1,14 +1,14 @@
 package org.spiderflow.core.executor.shape;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
-
+import org.spiderflow.context.RunnableTreeNode;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 等待循环结束执行器
@@ -38,32 +38,33 @@ public class LoopJoinExecutor implements ShapeExecutor {
 		String joinNodeId = node.getStringJsonValue(JOIN_NODE_ID);
 		Collection<Map<String, Object>> variableCollection = (Collection<Map<String, Object>>) variables.get(VARIABLE_CONTEXT + joinNodeId);
 		variableCollection.add(variables);
-		CountDownLatch countDownLatch = (CountDownLatch) variables.get(LoopExecutor.LOOP_NODE_KEY + joinNodeId);
-		if (countDownLatch != null) {
-			countDownLatch.countDown();
-			boolean isDone = countDownLatch.getCount() == 0L;
+		RunnableTreeNode treeNode = (RunnableTreeNode) variables.get(LoopExecutor.LOOP_NODE_KEY + joinNodeId);
+		if(treeNode != null){
+ 			boolean isDone = treeNode.isDone();
 			if(isDone){
 				Map<String, Object> beforeLoopVariable = (Map<String, Object>) variables.get(LoopExecutor.BEFORE_LOOP_VARIABLE);
 				variableCollection.stream()
-					.flatMap(map -> map.entrySet().stream())
-					.collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())))
-					.forEach((k,v)->{
-						String key = "@" + k;
-						if(variables.containsKey(key) == false || k.startsWith("@")){
-							if(key.startsWith("@@")){
-								key = k;
+						.flatMap(map -> map.entrySet().stream())
+						.collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())))
+						.forEach((k,v)->{
+							String key = "@" + k;
+							if(variables.containsKey(key) == false || k.startsWith("@")){
+								if(key.startsWith("@@")){
+									key = k;
+								}
+								//清除掉原有变量
+								variables.remove(k);
+								variables.put(key, v);
 							}
-							//清除掉原有变量
-							variables.remove(k);
-							variables.put(key, v);
-						}
-					});
+						});
 				//与循环前的变量进行合并
 				variables.putAll(beforeLoopVariable);
 				//删除掉多余出来的聚合变量
 				beforeLoopVariable.forEach((k,v)->{
 					variables.remove("@" + k);
 				});
+				variables.remove(VARIABLE_CONTEXT + joinNodeId);
+				beforeLoopVariable.clear();
 			}
 			return isDone;
 		} else {
