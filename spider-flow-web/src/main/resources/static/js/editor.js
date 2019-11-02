@@ -586,12 +586,17 @@ function bindToolbarClickAction(editor){
 									index : 0
 								};
 								var $tab = $(".test-window-container .output-container .layui-tab")
+								var outputTitle = '输出-'+tableId;
+								var cell = editor.getModel().cells[message.nodeId];
+								if(cell){
+									outputTitle = cell.value;
+								}
 								if(first){
-									$tab.find(".layui-tab-title").append('<li  class="layui-this">输出-'+tableId+'</li>');
+									$tab.find(".layui-tab-title").append('<li  class="layui-this">' + outputTitle + '</li>');
 									$tab.find(".layui-tab-content").append('<div class="layui-tab-item layui-show" data-output="'+tableId+'"></div>');
 									first = false;
 								}else{
-									$tab.find(".layui-tab-title").append('<li>输出-'+tableId+'</li>');
+									$tab.find(".layui-tab-title").append('<li>' + outputTitle + '</li>');
 									$tab.find(".layui-tab-content").append('<div class="layui-tab-item" data-output="'+tableId+'"></div>');
 								}
 								$table = $('<canvas width="960" height="200"/>').appendTo($(".test-window-container .output-container .layui-tab-item[data-output="+tableId+"]"));
@@ -601,7 +606,7 @@ function bindToolbarClickAction(editor){
 									grid : true,
 									header : true,
 									style : {
-										font : '12px Arial'
+										font : 'bold 13px Consolas'
 									},
 									onClick : function(e){
 										onCanvasViewerClick(e,'表格');
@@ -627,9 +632,21 @@ function bindToolbarClickAction(editor){
 								click : true
 							})];
 							for(var i =0,len = message.outputNames.length;i<len;i++){
+								var displayText = message.values[i];
+								var variableType = 'string';
+								if(Array.isArray(displayText)){
+									variableType = 'array';
+									displayText = JSON.stringify(displayText);
+								}else{
+									variableType = typeof displayText;
+									if(variableType == 'object'){
+										displayText = JSON.stringify(displayText);
+									}
+								}
 								texts.push(new CanvasText({
-									text : message.values[i],
+									text : displayText,
 									maxWidth : 200,
+									color : colors[variableType] || 'black',
 									click : true
 								}));
 							}
