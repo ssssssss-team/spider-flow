@@ -168,7 +168,7 @@ public class Spider {
 			if(executor instanceof LoopExecutor){
 				variables.put(LoopExecutor.LOOP_NODE_KEY + node.getNodeId(), treeNode);
 				variables.put(LoopExecutor.LOOP_NODE_KEY, treeNode);
-				variables.put(LoopExecutor.BEFORE_LOOP_VARIABLE, variables);
+				variables.put(LoopExecutor.BEFORE_LOOP_VARIABLE + node.getNodeId(), variables);
 				variables.put(LoopJoinExecutor.VARIABLE_CONTEXT + node.getNodeId(), new LinkedBlockingQueue<>());
 			}
 			List<Runnable> runnables = new ArrayList<>();

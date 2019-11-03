@@ -42,7 +42,7 @@ public class LoopJoinExecutor implements ShapeExecutor {
 		if(treeNode != null){
  			boolean isDone = treeNode.isDone();
 			if(isDone){
-				Map<String, Object> beforeLoopVariable = (Map<String, Object>) variables.get(LoopExecutor.BEFORE_LOOP_VARIABLE);
+				Map<String, Object> beforeLoopVariable = (Map<String, Object>) variables.get(LoopExecutor.BEFORE_LOOP_VARIABLE + joinNodeId);
 				variableCollection.stream()
 						.flatMap(map -> map.entrySet().stream())
 						.collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())))
