@@ -31,3 +31,13 @@ CREATE TABLE `sp_datasource` (
   `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `sp_variable`;
+CREATE TABLE `sp_variable` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(32) DEFAULT NULL COMMENT '变量名',
+  `value` varchar(512) DEFAULT NULL COMMENT '变量值',
+  `description` varchar(255) DEFAULT NULL COMMENT '变量描述',
+  `create_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
