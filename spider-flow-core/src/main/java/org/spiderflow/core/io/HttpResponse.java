@@ -18,11 +18,6 @@ import com.alibaba.fastjson.JSON;
 public class HttpResponse implements SpiderResponse{
 	
 	private Response response;
-	
-
-	public HttpResponse() {
-		super();
-	}
 
 	public HttpResponse(Response response) {
 		super();
@@ -42,10 +37,6 @@ public class HttpResponse implements SpiderResponse{
 	@Override
 	public Object getJson(){
 		return JSON.parse(getHtml());
-	}
-	
-	public Document getDocument(){
-		return Jsoup.parse(getHtml());
 	}
 	
 	@Override

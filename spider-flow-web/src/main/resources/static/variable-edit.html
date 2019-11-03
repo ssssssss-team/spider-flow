@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>DataSource</title>
+	<link rel="stylesheet" href="js/layui/css/layui.css" />
+	<link rel="stylesheet" href="css/layui-blue.css" />
+	<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+	<script type="text/javascript" src="js/common.js" ></script>
+	<style type="text/css">
+		html,body{
+			width:100%;
+		}
+		.layui-form{
+			width : 700px;
+			margin-top:10px;
+		}
+		.layui-form-label{
+			width : 140px;
+		}
+		.layui-input-block{
+			margin-left : 170px;
+		}
+		.btns-submit{
+			text-align : center;
+		}
+	</style>
+</head>
+<body>
+<form class="layui-form" autocomplete="off" lay-filter="form">
+	<div class="layui-form-item">
+		<label class="layui-form-label">变量名</label>
+		<div class="layui-input-block">
+			<input type="text" name="name" placeholder="请输入变量名" autocomplete="off" class="layui-input" lay-verify="required"/>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">变量值</label>
+		<div class="layui-input-block">
+			<input type="text" name="value" placeholder="请输入变量值" autocomplete="off" class="layui-input" lay-verify="required"/>
+		</div>
+	</div>
+	<div class="layui-form-item layui-form-text">
+		<label class="layui-form-label">变量说明</label>
+		<div class="layui-input-block">
+			<textarea name="description" placeholder="请输入变量说明" autocomplete="off" class="layui-textarea"  lay-verify="required"></textarea>
+		</div>
+	</div>
+	<div class="btns-submit">
+		<button class="layui-btn layui-btn-normal" lay-submit lay-filter="save">保存</button>
+		<button class="layui-btn layui-btn-primary btn-return" type="button" onclick="history.go(-1);">返回</button>
+	</div>
+</form>
+<script type="text/javascript">
+	var $ = layui.$;
+	var varId = getQueryString('id');
+	if(varId){
+		$.ajax({
+			url : 'variable/get',
+			data : {
+				id : varId
+			},
+			success : function(json){
+				layui.form.val('form',json.data)
+			}
+		})
+	}
+	layui.form.on('submit(save)',function(){
+		$.ajax({
+			url : 'variable/save',
+			type : 'post',
+			data : {
+				id : varId,
+				name : $("input[name=name]").val(),
+				value : $("input[name=value]").val(),
+				description : $("textarea[name=description]").val()
+			},
+			success : function(json){
+				layui.layer.msg('保存成功',{
+					time : 800
+				},function(){
+					location.href = 'variables.html';
+				})
+			},
+			error : function(){
+				layui.layer.msg('请求失败');
+			}
+		})
+		return false;
+	})
+</script>
+</body>
+</html>

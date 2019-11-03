@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>DataSource</title>
+	<link rel="stylesheet" href="js/layui/css/layui.css" />
+	<link rel="stylesheet" href="css/layui-blue.css" />
+	<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+</head>
+<body style="padding:5px;">
+<a class="layui-btn layui-btn-sm layui-btn-normal" href="variable-edit.html"><i class="layui-icon">&#xe654;</i> 添加变量</a>
+<hr>
+<table class="layui-table" id="table" lay-filter="table"></table>
+<script>
+	var $ = layui.$;
+	var $table = layui.table.render({
+		id : 'table',
+		elem : '#table',
+		url : 'variable/list',
+		page : true,
+		parseData : function(resp){
+			return {
+				code : 0,
+				data : resp.records,
+				count : resp.total
+			}
+		},
+		cols : [[{
+			title : '序号',
+			width : 60,
+			type : 'numbers',
+			align : 'center'
+		},{
+			title : '变量名',
+			field : 'name'
+		},{
+			title : '变量值',
+			field : 'value'
+		},{
+			title : '变量描述',
+			field : 'description'
+		},{
+			title : '创建时间',
+			width : 160,
+			field : 'createDate',
+			align : 'center'
+		},{
+			title : '操作',
+			width : 120,
+			align : 'center',
+			templet : '#buttons'
+		}]]
+	})
+	$("body").on('click','.btn-remove',function(){
+		var id = $(this).data('id');
+		layui.layer.confirm('您确定要删除此变量吗？',{
+			title : '删除'
+		},function(index){
+			$table.reload();
+			$.ajax({
+				url : 'variable/delete',
+				data : {
+					id : id
+				},
+				success : function(){
+					layui.layer.msg('删除成功',{time : 500},function(){
+						$table.reload();
+					})
+				},
+				error : function(){
+					layui.layer.msg('删除失败')
+				}
+			})
+			layui.layer.close(index);
+		})
+	})
+</script>
+<script type="text/html" id="buttons">
+	<a class="layui-btn layui-btn-sm" href="variable-edit.html?id={{d.id}}">编辑</a>
+	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
+</script>
+</body>
+</html>
