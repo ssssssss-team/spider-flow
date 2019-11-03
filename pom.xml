@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.spiderflow</groupId>
 	<artifactId>spider-flow</artifactId>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 	<packaging>pom</packaging>
 	<name>spider-flow</name>
 	<url>https://gitee.com/jmxd/spider-flow</url>
@@ -14,25 +14,12 @@
 		<version>2.0.7.RELEASE</version>
 	</parent>
 	<properties>
-		<spider-flow.version>0.1.0</spider-flow.version>
+		<spider-flow.version>0.2.0</spider-flow.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 	<modules>
 		<module>spider-flow-api</module>
 		<module>spider-flow-core</module>
 		<module>spider-flow-web</module>
-  </modules>
+  	</modules>
 </project>
