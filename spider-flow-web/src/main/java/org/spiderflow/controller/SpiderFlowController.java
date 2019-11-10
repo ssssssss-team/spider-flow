@@ -1,16 +1,8 @@
 package org.spiderflow.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import org.apache.commons.io.FileUtils;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +14,8 @@ import org.spiderflow.executor.FunctionExecutor;
 import org.spiderflow.executor.FunctionExtension;
 import org.spiderflow.executor.PluginConfig;
 import org.spiderflow.executor.ShapeExecutor;
+import org.spiderflow.io.Line;
+import org.spiderflow.io.RandomAccessFileReader;
 import org.spiderflow.model.Grammer;
 import org.spiderflow.model.JsonBean;
 import org.spiderflow.model.Plugin;
@@ -33,9 +27,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 爬虫Controller
@@ -155,16 +155,14 @@ public class SpiderFlowController {
 	}
 	
 	@RequestMapping("/log")
-	public String log(String id){
-		SpiderFlow flow = spiderFlowService.getById(id);
-		if(flow == null){
-			return "未找到此爬虫";
-		}
-		try {
-			return FileUtils.readFileToString(new File(spiderLogPath,id + ".log"), "UTF-8");
+	public JsonBean<List<Line>> log(String id, String keywords, Long index, Integer count, Boolean reversed,Boolean matchcase,Boolean regx){
+		try (RandomAccessFileReader reader = new RandomAccessFileReader(new RandomAccessFile(new File(spiderLogPath,id + ".log"),"r"), index == null ? -1 : index, reversed == null || reversed)){
+			return new JsonBean<>(reader.readLine(count == null ? 10 : count,keywords,matchcase != null && matchcase,regx != null && regx));
+		} catch(FileNotFoundException e){
+			return new JsonBean<>(0,"日志文件不存在");
 		} catch (IOException e) {
 			logger.error("读取日志文件出错",e);
-			return "读取日志文件出错，" + e.getMessage();
+			return new JsonBean<>(-1,"读取日志文件出错");
 		}
 	}
 	

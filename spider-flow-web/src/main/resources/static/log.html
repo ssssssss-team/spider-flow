@@ -5,28 +5,227 @@
 		<title>SpiderFlow</title>
 		<script type="text/javascript" src="js/layui/layui.all.js" ></script>
 		<script type="text/javascript" src="js/common.js" ></script>
+		<script>$ = layui.$;</script>
+		<script type="text/javascript" src="js/log-viewer.js" ></script>
 		<style type="text/css">
-			html,body,.log-container{
+			*{
+				margin:0;
+				padding:0;
+			}
+			html,body{
 				width : 100%;
 				height : 100%;
-				font-weight: bold;
-			    font-family: Consolas;
-			    font-size: 12px;
+				overflow: hidden;
 			}
+			html,body{
+				overflow: hidden;
+			}
+			.log-container{
+				width : 100%;
+				position: absolute;
+                top : 0px;
+                bottom : 40px;
+				overflow: auto;
+				background-color: #000;
+			}
+            .toolbox-container{
+                width : 100%;
+                position: absolute;
+                height : 24px;
+                padding:8px 0;
+                bottom : 0px;
+                background: #3c3f41;
+            }
+            .toolbox-container .input-text{
+                outline: 0;
+                height: 24px;
+                line-height: 24px;
+                margin-left: 7px;
+                background: #45494a;
+                border: 1px solid #646464;
+                width: 300px;
+                color: #ddd;
+                padding-left: 5px;
+                font-size: 14px;
+                float : left;
+                margin-right: 20px;
+            }
+            .toolbox-container .input-text.search-finish{
+                background: #743a3a;
+            }
+            .toolbox-container .input-checkbox{
+                visibility: hidden;
+            }
+            .toolbox-container .input-checkbox +label{
+                color : #c9c9c9;
+                float : left;
+                font-size:12px;
+                height:24px;
+                line-height: 24px;
+                margin-left: 25px;
+                margin-right:5px;
+                user-select: none;
+            }
+            .toolbox-container .input-checkbox +label::before{
+                display: inline-block;
+                background: #43494a;
+                border:1px solid #6b6b6b;
+                content : '';
+                width : 16px;
+                height : 16px;
+                line-height: 16px;
+                position : absolute;
+                top : 12px;
+                margin-left:-22px;
+            }
+            .toolbox-container .input-checkbox:checked +label::before{
+                display : inline-block;
+                content : "\2714";
+                text-align: center;
+                font-size:12px;
+                color:#fff;
+            }
+            .toolbox-container .btn{
+                display: inline-block;
+                width : 24px;
+                height : 24px;
+                border-radius: 2px;
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAoklEQVQ4T63SwQnCQBCF4fdIN9qEZxEMgqnAGqzDDgSPCZgYgwcvVmGKEeLIGFZwHEWW7HX34x+WISIPIx2GhVV1Ggm7HYgb78kqTaetneyjqAjscgHG+pjAFZJkFr9Bi0LFwy9okYBZX5TcKz+hhxbzWaF3+0Oz9DB/oTCqh1nWxwsEE32k44WS/UWLWdbNVqEA62/IlDcgz8MuwD9rGF18AERoXOuD03ayAAAAAElFTkSuQmCC");
+                float : left;
+            }
+            .btn.btn-prev{
+                background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAoklEQVQ4T63SwQnCQBCF4fdIN9qEZxEMgqnAGqzDDgSPCZgYgwcvVmGKEeLIGFZwHEWW7HX34x+WISIPIx2GhVV1Ggm7HYgb78kqTaetneyjqAjscgHG+pjAFZJkFr9Bi0LFwy9okYBZX5TcKz+hhxbzWaF3+0Oz9DB/oTCqh1nWxwsEE32k44WS/UWLWdbNVqEA62/IlDcgz8MuwD9rGF18AERoXOuD03ayAAAAAElFTkSuQmCC");
+            }
+            .btn.btn-next{
+                background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAqElEQVQ4T73SzQ2CQBAF4PdCN9iEZ2MiMZEKrME67MDEIySASDx4sQotxgTHjLBIcOCwB/e6+2Xf/BCeh54O/jAvqwMEcwF269UynUqQnaoNIXuQV+bl+aZQgYDxGG5Rou8I3FkUlxCsEwFmY3iIIEH8qXEKWyiKFo+uORZuYkkXT39S1Mb9tmOI3Y3W1Ec/0IptIRM6LKyPIJ58BVsXrz8q/wX4+8q9AR2wXOs7tERxAAAAAElFTkSuQmCC");
+            }
+            .btn.btn-page-prev{
+                background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAABIElEQVQ4T92SP0sDQRDF31vSieA3sLMQrLQVvE7kktsVIljYWAgGsbDQwtZGGwsRNKUgQoTs3h9t4xew1MLSL6EW3kjucppcEu3danfe/N4Ms0OMOM65OajKogAfU5MT157nvZfTWA60w3CZoi5ATHc1QjqQdEdr/dyfOwC2w2STkEsAlZLhqwIbQeDfFfFv0EXJoYgcZYLgBcTM0D2VXWNqZ3knAKyLzkE2cje5QcomFDrZM4UHJVsA1zOAPNU1f482jFoA670WDkxQPbE2XuoHjak+2DDeB3DcM2/SRvEVBBsCrq0G/m3WwQiwG2+HSZ2QlgK2h6b6Gzh2qoUwruJ/Ap27nxV+PuX/yAVj/Mc/d/VnQMk8qd60XhnY0UL/AhYefjeyfy3+AAAAAElFTkSuQmCC");
+            }
+            .btn.btn-page-next{
+                background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAABGklEQVQ4T+VSsUoDQRSctwGxzCcICnZWfoBiIcjldlc/QQhWgihYGlsVC0VQmxSWajbvPIhoEX/AQgQ7wX+w9Ngn2VM4k80X+Kp9szMLOzOEMcN8PyPiJ4xZeYtRKAYy9+Y8ipdw52ne2uR5mBcVOne3AIV+KcSitY2nfyl0nG8DcqRAWuskG5gwzhzmPPUQBuSaOt3smIi2goHe769Z3YoJbx23lFJ7pbtyGeLoZPkhiewECHDkcVKNQxQ2CbBBQ3Rq02Swl+M4bwJyUW70Dsj06Bm7VjcOAqMa7E03X67Bn4No6m/g9AXy6zZNr37xkeYw92Y9FWcQLP3850MgzVWtH6uPRSvXbvcn6/XPDShVIykejDGvw5X7BuachnZstBghAAAAAElFTkSuQmCC");
+            }
+            .btn.btn-page-home{
+                background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA/klEQVQ4T9WRsUoDURBF7107O/0Av8DCP1CwsNnNMinW3kJELAzYpom9WKXTSmxEXzazlmJrY+cX+A2iguSN7BPDZvMghZVTDMPMPXNhhgDgxvoIw1ZdLwxCpZN1+CdwoUtEEBzboarLE2PPzFYkz05imjnQufsNLPlzGDYDQF58fb4fF0Xx1lwwA96OdDdJOITZalNksCf6yZGIPP/2p2Cp1cB76/8MeAjYsFV/ANyXPL0KijrdjcZnJHsAXuGxJ5I9uFKtnkme0TndRoJLAGsGFt08vQlgWeqBJ3YsYb+bpi/hRQ0wLK+qdXo7NeP1FIxdrQ22NdF3xBz/MfgNtRhyDx//lbEAAAAASUVORK5CYII=");
+            }
+            .btn.btn-page-end{
+                background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAA/0lEQVQ4T91SsU4CQRSct8QEjd/AF9DR0BJL73EsxoZYSUdl7LWhNcHCGGNBzxVsjruGggT/wMIv4AOws/PGcKgceqeJpVtt3pvZ93ZmBAXHhRFXLeur5EFyiyvgfyOOw/hYhB0auWh73lPeH8dxXJWEfUNMfV/vUnFSIhgAWCDBqbU6y4rjXHQAgyGACslBu9U8/1TVhfEJwHsAu4D0AN6ubdjcjZG+r95lWs165Jyr0ZRuBFLf8k5kmSTsHbV09FH/5mMQBPs75b1rkN31QDzg1ZxZe/iYfeynAFyJyHNJOFDVl6/pKSQWRXFrVTeJJiD0N/D76nPb1EY68S/EN0z7aw9vab4+AAAAAElFTkSuQmCC");
+            }
+            .toolbox-container .btn:hover{
+                background-color: #4c5052;
+            }
+            ::-webkit-input-placeholder {
+                color: #eee;
+            }
+			.log-row{
+				font-family: Consolas,serif;
+				font-size: 12px;
+				line-height: 14px;
+				height : 14px;
+				white-space: pre;
+				color: #e5e5e5;
+				background: #000;
+			}
+			.log-row::selection{
+				background: rgba(255,255,255,.998);
+				color : #000;
+			}
+            .log-row em.search-finded{
+                font-style: inherit;
+                background :#ff0 !important;
+                color : #000;
+            }
+            ::-webkit-scrollbar{
+                width : 8px;
+                height : 8px;
+                background: transparent;
+            }
+            ::-webkit-scrollbar-track{
+                border-radius: 2px;
+            }
+            ::-webkit-scrollbar-thumb{
+                border-radius: 2px;
+                background: #999;
+            }
 		</style>
 	</head>
 	<div class="log-container"></div>
+    <div class="toolbox-container">
+        <input type="text" id="keywords" placeholder="请输入关键词搜索定位日志" class="input-text"/>
+        <input type="checkbox" id="reversed" checked class="input-checkbox"/>
+        <label for="reversed">反向搜索</label>
+        <input type="checkbox" id="matchcase" checked class="input-checkbox"/>
+        <label for="matchcase">区分大小写</label>
+        <input type="checkbox" id="regx" class="input-checkbox"/>
+        <label for="regx">正则搜索</label>
+        <span class="btn btn-prev" title="上一个/上一行(↑)"></span>
+        <span class="btn btn-next" title="下一个/下一行(↓)"></span>
+        <span class="btn btn-page-prev" title="上一页(Page Up)"></span>
+        <span class="btn btn-page-next" title="下一页(Page Down)"></span>
+        <span class="btn btn-page-home" title="第一页/首页(Home)"></span>
+        <span class="btn btn-page-end" title="最后一页/尾页(End)"></span>
+    </div>
 	<script type="text/javascript">
-		var id = getQueryString('id');
-		layui.$.ajax({
-			url : 'spider/log',
-			data : {
-				id : id
-			},
-			dataType : 'text',
-			success : function(content){
-				layui.$('.log-container').html(content.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;'));
-			}
-		})
+		$(function(){
+			var viewer = new LogViewer({
+				url: 'spider/log',
+				maxLines : parseInt(($('.log-container').height() - 8) / 14),
+				logId : getQueryString('id'),
+				element : $('.log-container'),
+                onSearchFinish : function(hasData){
+				    if(hasData){
+                        $('.input-text').removeClass('search-finish');
+                    }else{
+                        $('.input-text').addClass('search-finish').focus();
+                    }
+                },
+                onLoad : function(hasData){
+                    if(!hasData){
+                        layui.layer.alert('日志文件不存在');
+                    }
+                }
+			})
+            var setOptions = function(){
+                viewer.setOptions('keywords',$('.toolbox-container .input-text').val());
+                viewer.setOptions('matchcase',$('#matchcase').is(':checked'));
+                viewer.setOptions('regx',$('#regx').is(':checked'));
+                viewer.setOptions('reversed',$('#reversed').is(':checked'));
+            }
+            $('.toolbox-container').on('keydown','.input-text',function(e){
+                setOptions();
+                if(e.keyCode === 13){
+                    viewer.search();
+                }
+                if(this.value === ''){
+                    $(this).removeClass('search-finish');
+                }
+            }).on('change','.input-checkbox',function(){
+                setOptions();
+            }).on('click','.btn-prev',function(){
+                if(viewer.keywords){
+                    viewer.search(true);
+                }else{
+                    viewer.scroll(true,1);
+                }
+            }).on('click','.btn-next',function(){
+                if(viewer.keywords){
+                    viewer.search(false);
+                }else{
+                    viewer.scroll(false,1);
+                }
+            }).on('click','.btn-page-prev',function(){
+                viewer.scroll(true,viewer.maxLines);
+            }).on('click','.btn-page-next',function(){
+                viewer.scroll(false,viewer.maxLines);
+            }).on('click','.btn-page-home',function(){
+                viewer.setOptions('reversed',false);
+                viewer.init();
+            }).on('click','.btn-page-end',function(){
+                viewer.setOptions('reversed',true);
+                viewer.init();
+            });
+		});
 	</script>
 </html>
