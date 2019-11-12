@@ -26,6 +26,8 @@
     			<div class="layui-input-block">
     				<select name="statementType">
     					<option value="select" {{d.data.object.statementType == 'select' ? 'selected':''}}>select</option>
+						<option value="selectOne" {{d.data.object.statementType == 'selectOne' ? 'selected':''}}>selectOne</option>
+						<option value="selectInt" {{d.data.object.statementType == 'selectInt' ? 'selected':''}}>selectInt</option>
     					<option value="insert" {{d.data.object.statementType == 'insert' ? 'selected':''}}>insert</option>
     					<option value="delete" {{d.data.object.statementType == 'delete' ? 'selected':''}}>delete</option>
     					<option value="update" {{d.data.object.statementType == 'update' ? 'selected':''}}>update</option>

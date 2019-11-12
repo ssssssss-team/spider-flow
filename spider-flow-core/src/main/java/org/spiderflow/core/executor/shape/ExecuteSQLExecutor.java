@@ -1,10 +1,7 @@
 package org.spiderflow.core.executor.shape;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -17,6 +14,7 @@ import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +33,10 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
 	public static final String STATEMENT_TYPE = "statementType";
 	
 	public static final String STATEMENT_SELECT = "select";
+
+	public static final String STATEMENT_SELECT_ONE = "selectOne";
+
+	public static final String STATEMENT_SELECT_INT = "selectInt";
 	
 	public static final String STATEMENT_INSERT = "insert";
 	
@@ -83,9 +85,27 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
 				List<Map<String, Object>> rs = null;
 				try{
 					rs = template.queryForList(sql, params);
-					rs = rs == null ? new ArrayList<>() : rs;
 					variables.put("rs", rs);
 				}catch(Exception e){
+					context.error("执行sql出错,异常信息:{}",e);
+					ExceptionUtils.wrapAndThrow(e);
+				}
+			}else if(STATEMENT_SELECT_ONE.equals(statementType)){
+				Map<String, Object> rs = null;
+				try {
+					rs = template.queryForMap(sql, params);
+					variables.put("rs", rs);
+				} catch (Exception e) {
+					context.error("执行sql出错,异常信息:{}",e);
+					ExceptionUtils.wrapAndThrow(e);
+				}
+			}else if(STATEMENT_SELECT_INT.equals(statementType)){
+				Integer rs = null;
+				try {
+					rs = template.queryForObject(sql, params, Integer.class);
+					rs = rs == null ? 0 : rs;
+					variables.put("rs", rs);
+				} catch (Exception e) {
 					context.error("执行sql出错,异常信息:{}",e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
