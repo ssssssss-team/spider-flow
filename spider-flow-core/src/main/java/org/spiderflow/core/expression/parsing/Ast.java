@@ -749,9 +749,13 @@ public abstract class Ast {
 		@Override
 		public Object evaluate (ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
 			Object mapOrArray = getMapOrArray().evaluate(template, context);
-			if (mapOrArray == null) ExpressionError.error("Couldn't find map or array in context.", getSpan());
+			if (mapOrArray == null) {
+				return null;
+			}
 			Object keyOrIndex = getKeyOrIndex().evaluate(template, context);
-			if (keyOrIndex == null) ExpressionError.error("Couldn't evaluate key or index.", getKeyOrIndex().getSpan());
+			if (keyOrIndex == null) {
+				return null;
+			}
 
 			if (mapOrArray instanceof Map) {
 				return ((Map)mapOrArray).get(keyOrIndex);
@@ -831,7 +835,9 @@ public abstract class Ast {
 		@Override
 		public Object evaluate (ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
 			Object object = getObject().evaluate(template, context);
-			if (object == null) ExpressionError.error("Couldn't find object in context.", getSpan());
+			if (object == null) {
+				return null;
+			}
 
 			// special case for array.length
 			if (object.getClass().isArray() && getName().getText().equals("length")) {
@@ -1055,7 +1061,9 @@ public abstract class Ast {
 		public Object evaluate (ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
 			try {
 				Object object = getObject().evaluate(template, context);
-				if (object == null) ExpressionError.error("对象为空", getSpan());
+				if (object == null) {
+					return null;
+				}
 
 				Object[] argumentValues = getCachedArguments();
 				List<Expression> arguments = getArguments();
