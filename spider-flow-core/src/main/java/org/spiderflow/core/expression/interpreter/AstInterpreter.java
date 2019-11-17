@@ -47,7 +47,7 @@ public class AstInterpreter {
 			if(node instanceof Text){
 				result += node.getSpan().getText();
 			}else if(value == null){
-				if(i + 1 == n){
+				if(i ==	 0 && i + 1 == n){
 					return null;
 				}
 				result += "null";
