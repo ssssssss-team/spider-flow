@@ -20,122 +20,133 @@ import org.springframework.stereotype.Component;
 
 /**
  * SQL执行器
- * @author jmxd
  *
+ * @author jmxd
  */
 @Component
-public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
-	
+public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
+
 	public static final String DATASOURCE_ID = "datasourceId";
-	
+
 	public static final String SQL = "sql";
-	
+
 	public static final String STATEMENT_TYPE = "statementType";
-	
+
 	public static final String STATEMENT_SELECT = "select";
 
 	public static final String STATEMENT_SELECT_ONE = "selectOne";
 
 	public static final String STATEMENT_SELECT_INT = "selectInt";
-	
+
 	public static final String STATEMENT_INSERT = "insert";
-	
+
 	public static final String STATEMENT_UPDATE = "update";
-	
+
 	public static final String STATEMENT_DELETE = "delete";
-	
+
 	@Autowired
 	private ExpressionEngine engine;
 
 	@Override
-	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
+	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String dsId = node.getStringJsonValue(DATASOURCE_ID);
 		String sql = node.getStringJsonValue(SQL);
-		if(!StringUtils.isNotBlank(dsId)){
+		if (!StringUtils.isNotBlank(dsId)) {
 			context.debug("数据源ID为空！");
-		}else if(!StringUtils.isNotBlank(sql)){
+		} else if (!StringUtils.isNotBlank(sql)) {
 			context.debug("sql为空！");
-		}else{
+		} else {
 			JdbcTemplate template = new JdbcTemplate(DataSourceUtils.getDataSource(dsId));
 			//把变量替换成占位符
 			List<String> parameters = ExtractUtils.getMatchers(sql, "#(.*?)#", true);
 			sql = sql.replaceAll("#(.*?)#", "?");
+			try {
+				Object sqlObject = engine.execute(sql, variables);
+				if(sqlObject == null){
+					context.debug("获取的sql为空！");
+					return;
+				}
+				sql = sqlObject.toString();
+			} catch (Exception e) {
+				context.error("获取sql出错,异常信息:{}", e);
+				ExceptionUtils.wrapAndThrow(e);
+			}
 			int size = parameters.size();
 			Object[] params = new Object[size];
 			boolean hasList = false;
 			int parameterSize = 0;
 			//当参数中存在List或者数组时，认为是批量操作
-			for (int i = 0;i<size;i++) {
+			for (int i = 0; i < size; i++) {
 				Object parameter = engine.execute(parameters.get(i), variables);
-				if(parameter != null){
-					if(parameter instanceof List){
+				if (parameter != null) {
+					if (parameter instanceof List) {
 						hasList = true;
-						parameterSize = Math.max(parameterSize, ((List<?>)parameter).size());
-					}else if((parameter!= null && parameter.getClass().isArray())){
+						parameterSize = Math.max(parameterSize, ((List<?>) parameter).size());
+					} else if (parameter.getClass().isArray()) {
 						hasList = true;
 						parameterSize = Math.max(parameterSize, Array.getLength(parameter));
 					}
 				}
-				
+
 				params[i] = parameter;
 			}
 			String statementType = node.getStringJsonValue(STATEMENT_TYPE);
-			context.debug("执行sql：{}",sql);
-			if(STATEMENT_SELECT.equals(statementType)){
+			context.debug("执行sql：{}", sql);
+			if (STATEMENT_SELECT.equals(statementType)) {
 				List<Map<String, Object>> rs = null;
-				try{
+				try {
 					rs = template.queryForList(sql, params);
 					variables.put("rs", rs);
-				}catch(Exception e){
-					context.error("执行sql出错,异常信息:{}",e);
+				} catch (Exception e) {
+					context.error("执行sql出错,异常信息:{}", e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
-			}else if(STATEMENT_SELECT_ONE.equals(statementType)){
+			} else if (STATEMENT_SELECT_ONE.equals(statementType)) {
 				Map<String, Object> rs = null;
 				try {
 					rs = template.queryForMap(sql, params);
 					variables.put("rs", rs);
 				} catch (Exception e) {
-					context.error("执行sql出错,异常信息:{}",e);
+					context.error("执行sql出错,异常信息:{}", e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
-			}else if(STATEMENT_SELECT_INT.equals(statementType)){
+			} else if (STATEMENT_SELECT_INT.equals(statementType)) {
 				Integer rs = null;
 				try {
 					rs = template.queryForObject(sql, params, Integer.class);
 					rs = rs == null ? 0 : rs;
 					variables.put("rs", rs);
 				} catch (Exception e) {
-					context.error("执行sql出错,异常信息:{}",e);
+					context.error("执行sql出错,异常信息:{}", e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
-			}else if(STATEMENT_UPDATE.equals(statementType) || STATEMENT_INSERT.equals(statementType) || STATEMENT_DELETE.equals(statementType)){
-				try{
+			} else if (STATEMENT_UPDATE.equals(statementType) || STATEMENT_INSERT.equals(statementType) || STATEMENT_DELETE.equals(statementType)) {
+				try {
 					int updateCount = 0;
-					if(hasList){
+					if (hasList) {
 						/**
 						 * 批量操作时，将参数Object[]转化为List<Object[]>
 						 * 当参数不为数组或List时，自动转为Object[]
 						 * 当数组或List长度不足时，自动取最后一项补齐
 						 */
-						int[] rs = template.batchUpdate(sql, convertParameters(params,parameterSize));
-						if(rs != null){
+						int[] rs = template.batchUpdate(sql, convertParameters(params, parameterSize));
+						if (rs != null) {
 							updateCount = Arrays.stream(rs).sum();
 						}
-					}else{
+					} else {
 						updateCount = template.update(sql, params);
 					}
 					variables.put("rs", updateCount);
-				}catch(Exception e){
-					context.error("执行sql出错,异常信息:{}",e);
+				} catch (Exception e) {
+					context.error("执行sql出错,异常信息:{}", e);
 					variables.put("rs", -1);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			}
 		}
 	}
-	
-	private List<Object[]> convertParameters(Object[] params,int length){
+
+	private List<Object[]> convertParameters(Object[] params, int length) {
 		List<Object[]> result = new ArrayList<>(length);
 		int size = params.length;
 		for (int i = 0; i < length; i++) {
@@ -147,22 +158,22 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
 		}
 		return result;
 	}
-	
-	private Object getValue(Object object,int index){
-		if(object == null){
+
+	private Object getValue(Object object, int index) {
+		if (object == null) {
 			return null;
-		}else if(object instanceof List){
+		} else if (object instanceof List) {
 			List<?> list = (List<?>) object;
 			int size = list.size();
-			if(size > 0){
+			if (size > 0) {
 				return list.get(Math.min(list.size() - 1, index));
 			}
-		}else if(object.getClass().isArray()){
+		} else if (object.getClass().isArray()) {
 			int size = Array.getLength(object);
-			if(size > 0){
-				Array.get(object, Math.min( - 1, index));
+			if (size > 0) {
+				Array.get(object, Math.min(-1, index));
 			}
-		}else{
+		} else {
 			return object;
 		}
 		return null;
@@ -178,9 +189,9 @@ public class ExecuteSQLExecutor implements ShapeExecutor,Grammerable{
 		Grammer grammer = new Grammer();
 		grammer.setComment("执行SQL结果");
 		grammer.setFunction("rs");
-		grammer.setReturns(Arrays.asList("List<Map<String,Object>>","int"));
+		grammer.setReturns(Arrays.asList("List<Map<String,Object>>", "int"));
 		return Arrays.asList(grammer);
 	}
 
-	
+
 }
