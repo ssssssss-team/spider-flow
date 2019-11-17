@@ -8,11 +8,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ExpressionGlobalVariables {
 
-	private static Map<String, Object> variables = new HashMap<>();
+	private static Map<String, String> variables = new HashMap<>();
 
 	private static ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
-	public static void reset(Map<String, Object> map){
+	public static void reset(Map<String, String> map){
 		Lock lock = readWriteLock.writeLock();
 		lock.lock();
 		try {
@@ -23,7 +23,7 @@ public class ExpressionGlobalVariables {
 		}
 	}
 
-	public static Map<String, Object> getVariables(){
+	public static Map<String, String> getVariables(){
 		Lock lock = readWriteLock.readLock();
 		lock.lock();
 		try {

@@ -30,7 +30,7 @@ public class VariableService extends ServiceImpl<VariableMapper, Variable> {
 
 	@PostConstruct
 	private void resetGlobalVariables(){
-		Map<String, Object> variables = this.list().stream().collect(Collectors.toMap(Variable::getName, Variable::getValue));
+		Map<String, String> variables = this.list().stream().collect(Collectors.toMap(Variable::getName, Variable::getValue));
 		ExpressionGlobalVariables.reset(variables);
 	}
 }

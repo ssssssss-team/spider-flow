@@ -38,7 +38,9 @@ public class DefaultExpressionEngine implements ExpressionEngine{
 		for (FunctionExecutor executor : functionExecutors) {
 			context.set(executor.getFunctionPrefix(), executor);
 		}
-		ExpressionGlobalVariables.getVariables().forEach(context::set);
+		ExpressionGlobalVariables.getVariables().entrySet().forEach(entry->{
+			context.set(entry.getKey(),ExpressionTemplate.create(entry.getValue()).render(context));
+		});
 		Object value = ExpressionTemplate.create(expression).render(context);
 		return value;
 	}
