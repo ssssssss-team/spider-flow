@@ -71,7 +71,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 	
 	public static final String TLS_VALIDATE = "tls-validate";
 
-	public static final String LAST_EXECUTE_TIME = "__last_execute_time";
+	public static final String LAST_EXECUTE_TIME = "__last_execute_time_";
 	
 	@Autowired
 	private ExpressionEngine engine;
@@ -97,12 +97,12 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 					long sleepTime = NumberUtils.toLong(value.toString(), 0L);
 					synchronized (node.getNodeId().intern()){
 						//实际等待时间 = 上次执行时间 + 睡眠时间 - 当前时间
-						sleepTime = context.get(LAST_EXECUTE_TIME, 0L) + sleepTime - System.currentTimeMillis();
+						sleepTime = context.get(LAST_EXECUTE_TIME + node.getNodeId(), 0L) + sleepTime - System.currentTimeMillis();
 						if(sleepTime > 0){
 							context.info("设置延迟时间:{}ms", sleepTime);
 							Thread.sleep(sleepTime);
 						}
-						context.put(LAST_EXECUTE_TIME,System.currentTimeMillis());
+						context.put(LAST_EXECUTE_TIME + node.getNodeId(),System.currentTimeMillis());
 					}
 				}
 			} catch (Throwable t) {
