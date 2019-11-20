@@ -296,6 +296,7 @@ $(function(){
 		if(id != null){
 			$.ajax({
 				url : 'spider/xml',
+				async : false,
 				data : {
 					id : id
 				},
