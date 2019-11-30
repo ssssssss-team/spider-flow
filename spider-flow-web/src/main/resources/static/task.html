@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>SpiderFlow</title>
+	<link rel="stylesheet" href="js/layui/css/layui.css" />
+	<link rel="stylesheet" href="css/layui-blue.css" />
+	<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+	<script type="text/javascript" src="js/common.js" ></script>
+</head>
+<body style="padding:5px;">
+<table class="layui-table" id="table" lay-filter="table"></table>
+<script>
+	var $ = layui.$;
+	var $table = layui.table.render({
+		id : 'table',
+		elem : '#table',
+		url : 'task/list?flowId=' + getQueryString('id'),
+		method : 'post',
+		page : true,
+		parseData : function(resp){
+			return {
+				code : 0,
+				data : resp.records,
+				count : resp.total
+			}
+		},
+		cols : [[{
+			title : '序号',
+			width : 60,
+			type : 'numbers',
+			align : 'center'
+		},{
+			title : '任务开始时间',
+			field : 'beginTime',
+			align : 'center'
+		},{
+			title : '任务结束时间',
+			field : 'endTime',
+			align : 'center'
+		},{
+			title : '操作',
+			width : 200,
+			align : 'center',
+			templet : '#buttons'
+		}]]
+	})
+	$("body").on('click','.btn-remove',function(){
+		var id = $(this).data('id');
+		layui.layer.confirm('您确定要删除此记录吗？',{
+			title : '删除'
+		},function(index){
+			$table.reload();
+			$.ajax({
+				url : 'task/remove',
+				data : {
+					id : id
+				},
+				success : function(){
+					layui.layer.msg('删除成功',{time : 500},function(){
+						$table.reload();
+					})
+				},
+				error : function(){
+					layui.layer.msg('删除失败')
+				}
+			})
+			layui.layer.close(index);
+		})
+	}).on('click','.btn-stop',function(){
+		var id = $(this).data('id');
+		layui.layer.confirm('您确定要停止该任务吗？',{
+			title : '停止任务'
+		},function(index){
+			$table.reload();
+			$.ajax({
+				url : 'task/stop',
+				data : {
+					id : id
+				},
+				success : function(){
+					layui.layer.msg('后台运行停止中...',{time : 500},function(){
+						$table.reload();
+					})
+				},
+				error : function(){
+					layui.layer.msg('停止任务失败')
+				}
+			})
+			layui.layer.close(index);
+		})
+	}).on('click','.btn-log',function(){
+		parent.openTab(decodeURIComponent(decodeURIComponent(getQueryString('name'))) + '-日志','log.html?id=' + $(this).data('id'));
+	})
+</script>
+<script type="text/html" id="buttons">
+	{{# if(!d.endTime){ }}
+		<a class="layui-btn layui-btn-sm btn-stop" data-id="{{d.id}}">停止</a>
+	{{# } }}
+	<a class="layui-btn layui-btn-sm btn-log" data-id="{{d.flowId}}">查看日志</a>
+	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除记录</a>
+</script>
+</body>
+</html>

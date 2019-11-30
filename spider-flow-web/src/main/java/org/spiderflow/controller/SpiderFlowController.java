@@ -102,7 +102,7 @@ public class SpiderFlowController {
 	 */
 	@RequestMapping("/list")
 	public IPage<SpiderFlow> list(@RequestParam(name = "page", defaultValue = "1") Integer page, @RequestParam(name = "limit", defaultValue = "1") Integer size, @RequestParam(name = "name", defaultValue = "") String name) {
-		return spiderFlowService.page(new Page<>(page, size), new QueryWrapper<SpiderFlow>().like("name", name).orderByDesc("create_date"));
+		return spiderFlowService.selectSpiderPage(new Page<>(page, size), name);
 	}
 	
 	@RequestMapping("/save")

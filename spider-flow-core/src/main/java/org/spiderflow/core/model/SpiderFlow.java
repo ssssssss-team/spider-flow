@@ -1,6 +1,7 @@
 package org.spiderflow.core.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -39,6 +40,9 @@ public class SpiderFlow {
      * 定时执行的执行次数
      */
     private Integer executeCount;
+
+    @TableField(exist = false)
+    private Integer running;
 
 
     public SpiderFlow() {
@@ -119,5 +123,13 @@ public class SpiderFlow {
 
     public void setExecuteCount(Integer executeCount) {
         this.executeCount = executeCount;
+    }
+
+    public Integer getRunning() {
+        return running;
+    }
+
+    public void setRunning(Integer running) {
+        this.running = running;
     }
 }

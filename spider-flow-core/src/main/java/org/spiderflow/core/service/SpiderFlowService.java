@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
@@ -48,6 +50,10 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 				}
 			}
 		}
+	}
+
+	public IPage<SpiderFlow> selectSpiderPage(Page<SpiderFlow> page, String name){
+		return sfMapper.selectSpiderPage(page,name);
 	}
 	
 	public int executeCountIncrement(String id, Date lastExecuteTime, Date nextExecuteTime){

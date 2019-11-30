@@ -3,6 +3,8 @@ package org.spiderflow.core.mapper;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -17,6 +19,20 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  *
  */
 public interface SpiderFlowMapper extends BaseMapper<SpiderFlow>{
+
+	@Select({
+			"<script>",
+				"select",
+					"id,name,enabled,last_execute_time,next_execute_time,cron,create_date,execute_count,",
+					"(select count(*) from sp_task where flow_id = sf.id and end_time is null) running",
+				"from sp_flow sf",
+				"<if test=\"name != null and name != ''\">",
+					"where name like concat('%',#{name},'%')",
+				"</if>",
+				"order by create_date desc",
+			"</script>"
+	})
+	IPage<SpiderFlow> selectSpiderPage(Page<SpiderFlow> page,@Param("name") String name);
 
 	@Insert("insert into sp_flow(id,name,xml,enabled) values(#{id},#{name},#{xml},'0')")
 	int insertSpiderFlow(@Param("id") String id, @Param("name") String name, @Param("xml") String xml);

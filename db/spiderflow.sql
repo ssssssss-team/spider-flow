@@ -43,3 +43,13 @@ CREATE TABLE `sp_variable` (
   `create_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+
+/* v0.3.0 新增 */
+DROP TABLE IF EXISTS `sp_task`;
+CREATE TABLE `sp_task` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `flow_id` varchar(32) NOT NULL,
+  `begin_time` datetime DEFAULT NULL,
+  `end_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
