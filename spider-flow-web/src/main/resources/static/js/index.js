@@ -1,8 +1,8 @@
 var $ = layui.$;
 function openTab(title,href){
-	if($(".layui-tab[lay-filter=admin-tab]").find("[lay-id="+title+"]").length > 0){	//判断是否已打开
+	if($(".layui-tab[lay-filter=admin-tab]").find("[lay-id='"+title+"']").length > 0){	//判断是否已打开
 		var $dom =  $(".layui-tab[lay-filter=admin-tab]");
-		var index = $dom.find("[lay-id="+title+"]").index();
+		var index = $dom.find("[lay-id='"+title+"']").index();
 		$dom.find(".layui-tab-content .layui-tab-item").eq(index).find("iframe").attr("src",href);
 	}else{
 		var html  = '<iframe src="'+href+'" width="100%" height="100%" scrolling="yes" frameborder="0"></iframe>';
