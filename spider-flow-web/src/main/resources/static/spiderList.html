@@ -72,10 +72,11 @@
 			field : 'lastExecuteTime',
 			align : 'center'
 		},{
-			title : '已执行',
-			width : 100,
+			title : '运行中/已完成',
+			width : 120,
 			field : 'executeCount',
-			align : 'center'
+			align : 'center',
+			templet : '#execute-count'
 		},{
 			title : '下次执行时间',
 			width : 160,
@@ -164,6 +165,8 @@
 			})
 			layui.layer.close(index);
 		})
+	}).on('click','.btn-task',function(){
+		parent.openTab($(this).data('name') + '-任务详情','task.html?id=' + $(this).data('id') + '&name=' + encodeURIComponent(encodeURIComponent($(this).data('name'))));
 	}).on('click','.btn-log',function(){
 		parent.openTab($(this).data('name') + '-日志','log.html?id=' + $(this).data('id'));
 	}).on('click','.btn-edit-cron',function(){
@@ -178,6 +181,9 @@
 			content: 'editCron.html?id=' + id + '&cron=' + value
 		});
 	})
+</script>
+<script type="text/html" id="execute-count">
+	<a class="layui-btn layui-btn-sm btn-task" data-name="{{d.name}}" data-id="{{d.id}}">{{d.running || 0}}/{{d.executeCount || 0}}</a>
 </script>
 <script type="text/html" id="buttons">
 	<a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}">手动运行</a>
