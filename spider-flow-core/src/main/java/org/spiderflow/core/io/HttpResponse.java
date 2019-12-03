@@ -19,9 +19,9 @@ public class HttpResponse implements SpiderResponse{
 	
 	private Response response;
 
-	private String html;
+	private String htmlValue;
 
-	private Object json;
+	private Object jsonValue;
 
 	public HttpResponse(Response response) {
 		super();
@@ -35,18 +35,18 @@ public class HttpResponse implements SpiderResponse{
 	
 	@Override
 	public String getHtml(){
-		if(html == null){
-			html =  response.body();
+		if(htmlValue == null){
+			htmlValue =  response.body();
 		}
-		return html;
+		return htmlValue;
 	}
 	
 	@Override
 	public Object getJson(){
-		if(json == null){
-			json = JSON.parse(getHtml());
+		if(jsonValue == null){
+			jsonValue = JSON.parse(getHtml());
 		}
-		return json;
+		return jsonValue;
 	}
 	
 	@Override
