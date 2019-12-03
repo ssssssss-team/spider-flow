@@ -2,6 +2,7 @@
   <ul class="layui-tab-title">
     <li class="layui-this">全局配置</li>
     <li>全局参数</li>
+	<li>全局Cookie</li>
     <li>全局Header</li>
   </ul>
   <div class="layui-tab-content editor-form-node">
@@ -44,6 +45,29 @@
 	    	</div>
 	    </form>
     </div>
+	<div class="layui-tab-item">
+	  <form class="layui-form">
+		  {{# layui.each(d.data.object['cookie-name'],function(index){ }}
+		  <div class="layui-form-item layui-form-relative">
+			  <i class="layui-icon layui-icon-close cookie-remove"></i>
+			  <label class="layui-form-label">Cookie名</label>
+			  <div class="layui-input-block">
+				  <input type="text" name="cookie-name" placeholder="请输入Cookie名" autocomplete="off" class="layui-input array" value="{{=d.data.object['cookie-name'][index]}}">
+			  </div>
+		  </div>
+		  <div class="layui-form-item">
+			  <label class="layui-form-label">Cookie值</label>
+			  <div class="layui-input-block array" placeholder="请输入Cookie值" codemirror="cookie-value" data-value="{{=d.data.object['cookie-value'][index]}}"></div>
+		  </div>
+		  <hr>
+		  {{# }) }}
+		  <div class="layui-form-item">
+			  <div class="layui-input-block">
+				  <button class="layui-btn cookie-add" type="button">添加一个Cookie</button>
+			  </div>
+		  </div>
+	  </form>
+	</div>
     <div class="layui-tab-item">
    		<form class="layui-form">
 	    	{{# layui.each(d.data.object['header-name'],function(index){ }}

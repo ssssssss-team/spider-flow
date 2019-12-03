@@ -45,6 +45,18 @@ public class HttpRequest {
 		}
 		return this;
 	}
+
+	public HttpRequest cookies(Map<String,String> cookies){
+		this.connection.cookies(cookies);
+		return this;
+	}
+
+	public HttpRequest cookie(String name, String value) {
+		if (value != null) {
+			this.connection.cookie(name, value);
+		}
+		return this;
+	}
 	
 	public HttpRequest contentType(String contentType){
 		this.connection.header("Content-Type", contentType);
@@ -110,7 +122,7 @@ public class HttpRequest {
 		this.connection.ignoreContentType(true);
 		this.connection.ignoreHttpErrors(true);
 		this.connection.maxBodySize(0);
-		
+
 		Response response = connection.execute();
 		return new HttpResponse(response);
 	}

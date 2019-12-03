@@ -85,6 +85,9 @@ iframe{
 .layui-nav .layui-this:after, .layui-nav-bar, .layui-nav-tree .layui-nav-itemed:after{
 	display: none;
 }
+.layui-tab-title li{
+	padding: 0 5px;
+}
 .layui-tab-title li .layui-tab-close{
 	visibility: hidden;
 }

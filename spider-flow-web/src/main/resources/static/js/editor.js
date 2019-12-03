@@ -54,7 +54,7 @@ function serializeForm(){
 			cell.data.set(name,value);
 		}
 	});
-	$(".properties-container form [lay-skin=switch]").each(function(){
+	$(".properties-container form input[type=checkbox]").each(function(){
 		cell.data.set(this.value,$(this).is(":checked") ? '1': '0');
 	});
 	cell.data.set('shape',shape);
@@ -163,7 +163,7 @@ $(function(){
 		if($('.sidebar-container')[0].scrollWidth>$('.sidebar-container')[0].clientWidth){
 			$('.sidebar-container').width($('.sidebar-container').width() + 3);
 		}
-		layui.form.on('switch',function(e){
+		layui.form.on('checkbox',function(e){
 			serializeForm();
 		});
 		//节点名称输入框事件
@@ -207,7 +207,7 @@ $(function(){
 		}).on("click",".editor-form-node .variable-add",function(){
 			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close variable-remove"></i><label class="layui-form-label">变量名</label><div class="layui-input-block"><input type="text" name="variable-name" placeholder="变量名称" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">变量值</label><div class="layui-input-block array" codemirror="variable-value" placeholder="请输入变量值"></div></div><hr>');
 			renderCodeMirror();
-		}).on("click",".editor-form-node .header-remove,.editor-form-node .parameter-remove,.editor-form-node .variable-remove,.editor-form-node .output-remove",function(){	//移除多行
+		}).on("click",".editor-form-node .header-remove,.editor-form-node .cookie-remove,.editor-form-node .parameter-remove,.editor-form-node .variable-remove,.editor-form-node .output-remove",function(){	//移除多行
 			var $dom = $(this).parent();
 			$dom.prev().remove();
 			$dom.next().remove();
@@ -218,6 +218,9 @@ $(function(){
 			renderCodeMirror();
 		}).on("click",".editor-form-node .parameter-add",function(){
 			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close parameter-remove"></i><label class="layui-form-label">参数名</label><div class="layui-input-block"><input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">参数值</label><div class="layui-input-block array" codemirror="parameter-value" placeholder="请输入参数值"></div></div><hr>');
+			renderCodeMirror();
+		}).on("click",".editor-form-node .cookie-add",function(){
+			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close cookie-remove"></i><label class="layui-form-label">Cookie名</label><div class="layui-input-block"><input type="text" name="cookie-name" placeholder="请输入Cookie名" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">Cookie值</label><div class="layui-input-block array" codemirror="cookie-value" placeholder="请输入Cookie值"></div></div><hr>');
 			renderCodeMirror();
 		}).on("click",".editor-form-node .output-add",function(){
 			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close output-remove"></i><label class="layui-form-label">输出项</label><div class="layui-input-block"><input type="text" name="output-name" placeholder="请输入输出项" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">输出值</label><div class="layui-input-block array" codemirror="output-value" placeholder="请输入输出值"></div></div><hr>');

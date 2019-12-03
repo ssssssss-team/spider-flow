@@ -33,7 +33,9 @@ public class SpiderContext extends HashMap<String, Object>{
 	
 	private SpiderNode rootNode;
 	
-	private boolean running = true; 
+	private boolean running = true;
+
+	private CookieContext cookieContext = new CookieContext();
 	
 	public List<SpiderOutput> getOutputs() {
 		return outputs;
@@ -107,7 +109,11 @@ public class SpiderContext extends HashMap<String, Object>{
 		}
 		this.log(new SpiderLog(level, message, variables));
 	}
-	
+
+	public CookieContext getCookieContext() {
+		return cookieContext;
+	}
+
 	public void log(SpiderLog log){
 		
 	}

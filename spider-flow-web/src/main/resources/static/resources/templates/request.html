@@ -2,6 +2,7 @@
   <ul class="layui-tab-title">
     <li class="layui-this">基本配置</li>
     <li>参数</li>
+	<li>Cookie</li>
     <li>Header</li>
     <li>Body</li>
   </ul>
@@ -66,15 +67,11 @@
     			</div>
     		</div>
     		<div class="layui-form-item">
-	   			<label class="layui-form-label">跟随重定向</label>
+	   			<label class="layui-form-label">请求设置</label>
 	   			<div class="layui-input-block">
-	   				<input type="checkbox" value="follow-redirect" lay-skin="switch" {{d.data.object['follow-redirect'] == '0' ? '' : 'checked'}}/>
-    			</div>
-	   		</div>
-	   		<div class="layui-form-item">
-	   			<label class="layui-form-label">TLS证书验证</label>
-	   			<div class="layui-input-block">
-	   				<input type="checkbox" value="tls-validate" lay-skin="switch" {{d.data.object['tls-validate'] == '0' ? '' : 'checked'}}/>
+	   				<input type="checkbox" title="跟随重定向" value="follow-redirect" lay-skin="primary" {{d.data.object['follow-redirect'] == '0' ? '' : 'checked'}}/>
+					<input type="checkbox" title="TLS证书验证" value="tls-validate" lay-skin="primary" {{d.data.object['tls-validate'] == '0' ? '' : 'checked'}}/>
+					<input type="checkbox" title="自动管理Cookie" value="cookie-auto-set" lay-skin="primary" {{d.data.object['cookie-auto-set'] == '0' ? '' : 'checked'}}/>
     			</div>
 	   		</div>
     	</form>
@@ -102,6 +99,29 @@
 	    	</div>
     	</form>
     </div>
+	  <div class="layui-tab-item">
+		  <form class="layui-form">
+			  {{# layui.each(d.data.object['cookie-name'],function(index){ }}
+			  <div class="layui-form-item layui-form-relative">
+				  <i class="layui-icon layui-icon-close cookie-remove"></i>
+				  <label class="layui-form-label">Cookie名</label>
+				  <div class="layui-input-block">
+					  <input type="text" name="cookie-name" placeholder="请输入Cookie名" autocomplete="off" class="layui-input array" value="{{=d.data.object['cookie-name'][index]}}">
+				  </div>
+			  </div>
+			  <div class="layui-form-item">
+				  <label class="layui-form-label">Cookie值</label>
+				  <div class="layui-input-block array" placeholder="请输入Cookie值" codemirror="cookie-value" data-value="{{=d.data.object['cookie-value'][index]}}"></div>
+			  </div>
+			  <hr>
+			  {{# }) }}
+			  <div class="layui-form-item">
+				  <div class="layui-input-block">
+					  <button class="layui-btn cookie-add" type="button">添加一个Cookie</button>
+				  </div>
+			  </div>
+		  </form>
+	  </div>
     <div class="layui-tab-item">
     	<form class="layui-form">
 	    	{{# layui.each(d.data.object['header-name'],function(index){ }}
