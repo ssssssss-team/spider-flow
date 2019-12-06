@@ -55,6 +55,12 @@ public class StringFunctionExecutor implements FunctionExecutor{
 		return content != null ? content.indexOf(str) : -1;
 	}
 
+	@Comment("查找指定字符在字符串中最后出现的位置")
+	@Example("${string.lastIndexOf(content,str)}")
+	public static int lastIndexOf(String content, String str) {
+		return content != null ? content.lastIndexOf(str) : -1;
+	}
+
 	@Comment("查找指定字符在字符串在中的位置")
 	@Example("${string.indexOf(content,str,fromIndex)}")
 	public static int indexOf(String content, String str, int fromIndex) {
@@ -166,5 +172,5 @@ public class StringFunctionExecutor implements FunctionExecutor{
 		}
 		return ids;
 	}
-	
+
 }

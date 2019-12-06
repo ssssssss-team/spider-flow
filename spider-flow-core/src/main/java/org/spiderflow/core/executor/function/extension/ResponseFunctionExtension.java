@@ -115,4 +115,13 @@ public class ResponseFunctionExtension implements FunctionExtension {
                 .filter(link -> pattern.matcher(link).matches())
                 .collect(Collectors.toList());
     }
+
+    @Comment("获取当前页面所有图片链接")
+    @Example("${resp.images()}")
+    public static List<String> images(SpiderResponse response) {
+        return ExtractUtils.getAttrBySelector(element(response), "img", "abs:src")
+                .stream()
+                .filter(link -> StringUtils.isNotBlank(link))
+                .collect(Collectors.toList());
+    }
 }

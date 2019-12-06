@@ -94,6 +94,10 @@ public class SpiderContext extends HashMap<String, Object>{
 	public void debug(String message,Object ... variables){
 		log("debug",message,variables);
 	}
+
+	public void warn(String message, Object... variables) {
+		log("warn", message, variables);
+	}
 	
 	public void error(String message,Object ... variables){
 		log("error",message,variables);
@@ -104,6 +108,8 @@ public class SpiderContext extends HashMap<String, Object>{
 			log.info(message,variables);
 		}else if("debug".equals(level) && log.isDebugEnabled()){
 			log.debug(message,variables);
+		}else if("warn".equals(level)){
+			log.warn(message, variables);
 		}else if("error".equals(level)){
 			log.error(message, variables);
 		}

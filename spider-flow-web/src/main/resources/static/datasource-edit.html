@@ -55,7 +55,7 @@
    		<div class="layui-form-item">
    			<label class="layui-form-label">密码</label>
    			<div class="layui-input-block">
-   				<input type="password" name="password" placeholder="请输入密码" autocomplete="off" class="layui-input" />
+   				<input type="password" name="password" placeholder="请输入密码" autocomplete="off" class="layui-input" lay-verify="required"/>
    			</div>
    		</div>
    		<div class="btns-submit">
@@ -73,10 +73,10 @@
 				data : {
 					id : dsId
 				},
-				success : function(data){
-					layui.form.val('form',data)
+				success : function(data) {
+					layui.form.val('form', data);
 				}
-			})
+			});
 		}
 		layui.form.on('submit(save)',function(){
 			$.ajax({
@@ -103,7 +103,7 @@
 			})
 			return false;
 		})
-		layui.form.on('submit(test)',function(){
+		layui.form.on('submit(test)', function () {
 			sf.ajax({
 				url : 'datasource/test',
 				type : 'post',
@@ -119,7 +119,7 @@
 				error : function(){
 					layui.layer.msg('请求失败');
 				}
-			})
+			});
 			return false;
 		})
 	</script>

@@ -14,6 +14,10 @@ public interface SpiderResponse {
 	@Example("${resp.statusCode}")
 	int getStatusCode();
 
+	@Comment("获取网页标题")
+	@Example("${resp.title}")
+	String getTitle();
+
 	@Comment("获取网页html")
 	@Example("${resp.html}")
 	String getHtml();
@@ -41,9 +45,7 @@ public interface SpiderResponse {
 
 	@Comment("获取当前url")
 	@Example("${resp.url}")
-	default String getUrl(){
-		return null;
-	}
+	String getUrl();
 
 	@Example("${resp.setCharset('UTF-8')}")
 	default void setCharset(String charset){

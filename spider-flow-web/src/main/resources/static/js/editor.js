@@ -213,6 +213,10 @@ $(function(){
 			$dom.next().remove();
 			$dom.remove();
 			serializeForm();
+		}).on("click",".editor-form-node .function-remove",function () {
+			var $dom = $(this).parent();
+			$dom.remove();
+			serializeForm();
 		}).on("click",".editor-form-node .header-add",function(){
 			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close header-remove"></i><label class="layui-form-label">header名</label><div class="layui-input-block"><input type="text" name="header-name" placeholder="header key" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">header值</label><div class="layui-input-block array" codemirror="header-value" placeholder="请输入header value"></div></div><hr>');
 			renderCodeMirror();
@@ -223,7 +227,10 @@ $(function(){
 			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close cookie-remove"></i><label class="layui-form-label">Cookie名</label><div class="layui-input-block"><input type="text" name="cookie-name" placeholder="请输入Cookie名" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">Cookie值</label><div class="layui-input-block array" codemirror="cookie-value" placeholder="请输入Cookie值"></div></div><hr>');
 			renderCodeMirror();
 		}).on("click",".editor-form-node .output-add",function(){
-			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close output-remove"></i><label class="layui-form-label">输出项</label><div class="layui-input-block"><input type="text" name="output-name" placeholder="请输入输出项" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">输出值</label><div class="layui-input-block array" codemirror="output-value" placeholder="请输入输出值"></div></div><hr>');
+			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close output-remove"></i><label class="layui-form-label">输出项</label><div class="layui-input-block"><input type="text" name="output-name" placeholder="请输入输出项" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">输出值</label><div class="layui-input-block array" codemirror="output-value" placeholder="请输入输出值"></div></div>');
+			renderCodeMirror();
+		}).on("click",".editor-form-node .function-add",function(){
+			$(this).parent().parent().before('<div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close function-remove"></i><label class="layui-form-label">执行函数</label><div class="layui-input-block array" codemirror="function" placeholder="执行函数"></div></div>');
 			renderCodeMirror();
 		}).on("click",".parameter-form-add",function(){
 			var html = '';
@@ -324,14 +331,11 @@ $(function(){
 				if(cell.data.shape != 'start'){
 					loadTemplate(cell.data.object.shape,cell,graph);	
 				}
-				
 			}
 		}else{
 			loadTemplate('root',graph.getModel().getRoot(),graph);
 		}
 	}
-	
-	
 	/**
 	 * 重置已设表单array（参数、变量、Headers）
 	 */
@@ -719,6 +723,8 @@ function bindToolbarClickAction(editor){
 		Save();
 	})
 }
+//最近点击打开的弹窗
+var index;
 function onCanvasViewerClick(e,source){
 	var msg = e.text;
 	var json;
@@ -736,7 +742,8 @@ function onCanvasViewerClick(e,source){
 		msg = temp.innerHTML;
 		temp = null;
 	}
-	layer.open({
+	layer.close(index);
+	index = layer.open({
 	  type : 1,
 	  title : source +'内容',
 	  content: '<div class="message-content" style="padding:10px;'+(json ? '':'font-weight: bold;font-family:Consolas;font-size:12px;')+'">'+(json ? '' : msg.replace(/\n/g,'<br>')).replace(/ /g,'&nbsp;').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;')+'</div>',
@@ -755,12 +762,7 @@ function onCanvasViewerClick(e,source){
 }
 function createWebSocket(options){
 	options = options || {};
-	var socket;
-	if(location.host === 'demo.spiderflow.org'){
-		socket = new WebSocket(options.url || 'ws://49.233.182.130:8088/ws');
-	}else{
-		socket = new WebSocket(options.url || (location.origin.replace("http",'ws') + '/ws'));
-	}
+	var socket = new WebSocket(options.url || (location.origin.replace("http",'ws') + '/ws'));
 	socket.onopen = options.onopen;
 	socket.onmessage = options.onmessage;
 	socket.onerror = options.onerror || function(){

@@ -1,5 +1,6 @@
 package org.spiderflow.core.executor.shape;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,13 +27,16 @@ public class FunctionExecutor implements ShapeExecutor{
 
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
-		String function = node.getStringJsonValue(FUNCTION);
-		if(StringUtils.isNotBlank(function)){
-			try {
-				engine.execute(function, variables);
-			} catch (Exception e) {
-				context.error("执行函数{}失败,异常信息:{}",function,e);
-				ExceptionUtils.wrapAndThrow(e);
+		List<Map<String, String>> functions = node.getListJsonValue(FUNCTION);
+		for (Map<String, String> item : functions) {
+			String function = item.get(FUNCTION);
+			if(StringUtils.isNotBlank(function)){
+				try {
+					engine.execute(function, variables);
+				} catch (Exception e) {
+					context.error("执行函数{}失败,异常信息:{}",function,e);
+					ExceptionUtils.wrapAndThrow(e);
+				}
 			}
 		}
 	}

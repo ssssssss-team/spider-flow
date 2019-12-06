@@ -52,9 +52,9 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 		String dsId = node.getStringJsonValue(DATASOURCE_ID);
 		String sql = node.getStringJsonValue(SQL);
 		if (!StringUtils.isNotBlank(dsId)) {
-			context.debug("数据源ID为空！");
+			context.warn("数据源ID为空！");
 		} else if (!StringUtils.isNotBlank(sql)) {
-			context.debug("sql为空！");
+			context.warn("sql为空！");
 		} else {
 			JdbcTemplate template = new JdbcTemplate(DataSourceUtils.getDataSource(dsId));
 			//把变量替换成占位符
@@ -63,7 +63,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 			try {
 				Object sqlObject = engine.execute(sql, variables);
 				if(sqlObject == null){
-					context.debug("获取的sql为空！");
+					context.warn("获取的sql为空！");
 					return;
 				}
 				sql = sqlObject.toString();

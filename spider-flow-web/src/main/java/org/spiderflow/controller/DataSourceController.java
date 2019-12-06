@@ -46,7 +46,9 @@ public class DataSourceController {
 	
 	@RequestMapping("/get")
 	public DataSource get(String id){
-		return dataSourceService.getById(id);
+		DataSource dataSource = dataSourceService.getById(id);
+		dataSource.setPassword(null);
+		return dataSource;
 	}
 	
 	@RequestMapping("/remove")

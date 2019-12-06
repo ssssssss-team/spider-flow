@@ -81,7 +81,8 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 			spiderJobManager.addJob(spiderFlow);
 		}
 	}
-	
+
+	@Override
 	public boolean save(SpiderFlow spiderFlow){
 		//解析corn,获取并设置任务的开始时间
 		if(StringUtils.isNotEmpty(spiderFlow.getCron())){
@@ -163,5 +164,4 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 		}
 		return list;
 	}
-
 }

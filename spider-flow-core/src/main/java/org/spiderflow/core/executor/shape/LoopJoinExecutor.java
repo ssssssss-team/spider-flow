@@ -68,7 +68,7 @@ public class LoopJoinExecutor implements ShapeExecutor {
 			}
 			return isDone;
 		} else {
-			context.error("找不到等待节点：{}" + node.getStringJsonValue(JOIN_NODE_ID));
+			context.warn("找不到等待节点：{}" + node.getStringJsonValue(JOIN_NODE_ID));
 		}
 		return false;
 	}

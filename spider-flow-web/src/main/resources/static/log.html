@@ -169,10 +169,11 @@
     </div>
 	<script type="text/javascript">
 		$(function(){
+		    var logId = getQueryString('id');
 			var viewer = new LogViewer({
 				url: 'spider/log',
 				maxLines : parseInt(($('.log-container').height() - 8) / 14),
-				logId : getQueryString('id'),
+				logId : logId,
 				element : $('.log-container'),
                 onSearchFinish : function(hasData){
 				    if(hasData){
@@ -186,13 +187,14 @@
                         layui.layer.alert('日志文件不存在');
                     }
                 }
-			})
+			});
             var setOptions = function(){
                 viewer.setOptions('keywords',$('.toolbox-container .input-text').val());
                 viewer.setOptions('matchcase',$('#matchcase').is(':checked'));
                 viewer.setOptions('regx',$('#regx').is(':checked'));
                 viewer.setOptions('reversed',$('#reversed').is(':checked'));
             }
+            var time;
             $('.toolbox-container').on('keydown','.input-text',function(e){
                 setOptions();
                 if(e.keyCode === 13){
@@ -223,8 +225,17 @@
                 viewer.setOptions('reversed',false);
                 viewer.init();
             }).on('click','.btn-page-end',function(){
-                viewer.setOptions('reversed',true);
-                viewer.init();
+                if (time == null) {
+                    time = window.setInterval(function () {
+                        if ($('#layuiTab', parent.document).find("li[lay-id='" + logId + "']").attr('class').indexOf("layui-this") >= 0) {
+                            viewer.setOptions('reversed',true);
+                            viewer.init();
+                        }
+                    }, 5000);
+                } else {
+                    window.clearInterval(time);
+                    time = null;
+                }
             });
 		});
 	</script>

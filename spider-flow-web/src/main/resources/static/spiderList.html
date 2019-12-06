@@ -50,7 +50,7 @@
 		},{
 			title : 'cron表达式',
 			field : 'cron',
-			width : 100,
+			width : 120,
 			templet : function(row){
 				return '<a class="layui-btn layui-btn-sm btn-edit-cron" data-id="'+row.id+'" data-cron="'+row.cron+'">'+(row.cron || '编辑cron')+'</a>';
 			}
@@ -72,11 +72,10 @@
 			field : 'lastExecuteTime',
 			align : 'center'
 		},{
-			title : '运行中/已完成',
-			width : 120,
+			title : '已执行',
+			width : 80,
 			field : 'executeCount',
-			align : 'center',
-			templet : '#execute-count'
+			align : 'center'
 		},{
 			title : '下次执行时间',
 			width : 160,
@@ -165,10 +164,8 @@
 			})
 			layui.layer.close(index);
 		})
-	}).on('click','.btn-task',function(){
-		parent.openTab($(this).data('name') + '-任务详情','task.html?id=' + $(this).data('id') + '&name=' + encodeURIComponent(encodeURIComponent($(this).data('name'))));
 	}).on('click','.btn-log',function(){
-		parent.openTab($(this).data('name') + '-日志','log.html?id=' + $(this).data('id'));
+		parent.openTab($(this).data('name') + '-日志',$(this).data('id'),'log.html?id=' + $(this).data('id'));
 	}).on('click','.btn-edit-cron',function(){
 		var id = $(this).data('id');
 		var value = $(this).data('cron') || '';
@@ -181,9 +178,6 @@
 			content: 'editCron.html?id=' + id + '&cron=' + value
 		});
 	})
-</script>
-<script type="text/html" id="execute-count">
-	<a class="layui-btn layui-btn-sm btn-task" data-name="{{d.name}}" data-id="{{d.id}}">{{d.running || 0}}/{{d.executeCount || 0}}</a>
 </script>
 <script type="text/html" id="buttons">
 	<a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}">手动运行</a>
