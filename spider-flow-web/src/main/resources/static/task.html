@@ -90,7 +90,7 @@
 			layui.layer.close(index);
 		})
 	}).on('click','.btn-log',function(){
-		parent.openTab(decodeURIComponent(decodeURIComponent(getQueryString('name'))) + '-日志','log.html?id=' + $(this).data('id'));
+		parent.openTab(decodeURIComponent(decodeURIComponent(getQueryString('name'))) + '-日志',$(this).data('id') + '-log','log.html?id=' + $(this).data('id'));
 	})
 </script>
 <script type="text/html" id="buttons">
