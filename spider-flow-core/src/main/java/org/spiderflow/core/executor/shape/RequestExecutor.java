@@ -100,14 +100,17 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 				Object value = engine.execute(sleepCondition, variables);
 				if(value != null){
 					long sleepTime = NumberUtils.toLong(value.toString(), 0L);
-					synchronized (node.getNodeId().intern()){
+					synchronized (node.getNodeId().intern()) {
 						//实际等待时间 = 上次执行时间 + 睡眠时间 - 当前时间
-						sleepTime = context.get(LAST_EXECUTE_TIME + node.getNodeId(), 0L) + sleepTime - System.currentTimeMillis();
-						if(sleepTime > 0){
+						Long lastExecuteTime = context.get(LAST_EXECUTE_TIME + node.getNodeId(), 0L);
+						if (lastExecuteTime != 0) {
+							sleepTime = lastExecuteTime + sleepTime - System.currentTimeMillis();
+						}
+						if (sleepTime > 0) {
 							context.info("设置延迟时间:{}ms", sleepTime);
 							Thread.sleep(sleepTime);
 						}
-						context.put(LAST_EXECUTE_TIME + node.getNodeId(),System.currentTimeMillis());
+						context.put(LAST_EXECUTE_TIME + node.getNodeId(), System.currentTimeMillis());
 					}
 				}
 			} catch (Throwable t) {
@@ -220,7 +223,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 			//结果存入变量
 			variables.put("resp", response);
 		} catch (IOException e) {
-			context.debug("请求{}出错,异常信息:{}",url,e);
+			context.error("请求{}出错,异常信息:{}",url,e);
 			ExceptionUtils.wrapAndThrow(e);
 		} finally{
 			if(streams != null){
@@ -261,7 +264,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 								request.data(parameterName, parameterFilename, stream);
 								context.debug("设置请求参数：{}={}",parameterName,parameterFilename);
 							}else{
-								context.debug("设置请求参数：{}失败，无二进制内容",parameterName);
+								context.warn("设置请求参数：{}失败，无二进制内容",parameterName);
 							}
 						}else{
 							request.data(parameterName, value);

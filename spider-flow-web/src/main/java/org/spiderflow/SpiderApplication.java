@@ -27,7 +27,7 @@ public class SpiderApplication implements ServletContextInitializer{
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		//设置文本缓存1M
-		servletContext.setInitParameter("org.apache.tomcat.websocket.textBufferSize", "" + (1024 * 1024));
+		servletContext.setInitParameter("org.apache.tomcat.websocket.textBufferSize", Integer.toString((1024 * 1024)));
 	}
 	
 	@Bean

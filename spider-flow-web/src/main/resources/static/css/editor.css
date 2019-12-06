@@ -90,6 +90,10 @@ html,body{
 	top : 30px;
 	color : #333;
 	cursor: pointer;
+	z-index: 1;
+}
+.properties-container .editor-form-node .layui-form-relative .layui-icon-close.function-remove{
+	top : 5px;
 }
 
 .toolbar-container ul li{

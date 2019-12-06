@@ -2,12 +2,15 @@ package org.spiderflow.core.executor.function;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.spiderflow.annotation.Comment;
 import org.spiderflow.annotation.Example;
+import org.spiderflow.core.utils.FileUtils;
 import org.spiderflow.executor.FunctionExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 /**
@@ -86,6 +89,16 @@ public class FileFunctionExecutor implements FunctionExecutor{
 	@Example("${file.write('e:/result.html',resp.bytes)}")
 	public static void write(String path,byte[] bytes) throws IOException{
 		write(path,bytes,false);
+	}
+
+	@Comment("下载Url资源")
+	@Example("${file.write('e:/result.html',urls)}")
+	public static void write(String path, List<String> urls) throws IOException{
+		if(!CollectionUtils.isEmpty(urls)) {
+			for (String url : urls) {
+				FileUtils.downloadFile(path, url, true);
+			}
+		}
 	}
 	
 	@Comment("读取文件")

@@ -2,6 +2,7 @@ package org.spiderflow.core.executor.function;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.spiderflow.annotation.Comment;
 import org.spiderflow.annotation.Example;
@@ -54,6 +55,21 @@ public class ListFunctionExecutor implements FunctionExecutor{
 	@Example("${list.sublist(listVar,fromIndex,toIndex)}")
 	public static List<?> sublist(List<?> list,int fromIndex,int toIndex){
 		return list!= null ? list.subList(fromIndex, toIndex) : new ArrayList<>();
+	}
+
+	@Comment("过滤字符串list元素")
+	@Example("${listVar.filterStr(pattern)}")
+	public static List<String> filterStr(List<String> list, String pattern) {
+		if (list == null || list.isEmpty()) {
+			return null;
+		}
+		List<String> result = new ArrayList<>(list.size());
+		for (String item : list) {
+			if (Pattern.matches(pattern, item)) {
+				result.add(item);
+			}
+		}
+		return result;
 	}
 		
 }
