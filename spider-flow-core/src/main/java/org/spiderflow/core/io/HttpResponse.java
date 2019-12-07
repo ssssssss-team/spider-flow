@@ -1,14 +1,13 @@
 package org.spiderflow.core.io;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSON;
 import org.jsoup.Connection.Response;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.spiderflow.io.SpiderResponse;
 
-import com.alibaba.fastjson.JSON;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * 响应对象包装类
@@ -23,20 +22,17 @@ public class HttpResponse implements SpiderResponse{
 
 	private String urlLink;
 
-	private Document document;
-
 	private String htmlValue;
 
 	private String titleName;
 
 	private Object jsonValue;
 
-	public HttpResponse(Response response) throws IOException {
+	public HttpResponse(Response response){
 		super();
 		this.response = response;
 		this.statusCode = response.statusCode();
 		this.urlLink = response.url().toExternalForm();
-		document = response.parse();
 	}
 	
 	@Override
@@ -47,7 +43,9 @@ public class HttpResponse implements SpiderResponse{
 	@Override
 	public String getTitle() {
 		if (titleName == null) {
-			titleName = document.title();
+			synchronized (this){
+				titleName = Jsoup.parse(getHtml()).title();
+			}
 		}
 		return titleName;
 	}
@@ -55,7 +53,9 @@ public class HttpResponse implements SpiderResponse{
 	@Override
 	public String getHtml(){
 		if(htmlValue == null){
-			htmlValue = document.body().html();
+			synchronized (this){
+				htmlValue = response.body();
+			}
 		}
 		return htmlValue;
 	}

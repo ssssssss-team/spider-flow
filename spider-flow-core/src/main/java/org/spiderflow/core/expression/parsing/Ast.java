@@ -3,6 +3,7 @@ package org.spiderflow.core.expression.parsing;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.Map;
 import javax.xml.transform.Source;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.spiderflow.core.expression.ExpressionError;
 import org.spiderflow.core.expression.ExpressionError.TemplateException;
 import org.spiderflow.core.expression.ExpressionTemplate;
@@ -872,12 +874,24 @@ public abstract class Ast {
 				try {
 					return methodCall.evaluate(template, context);
 				} catch (TemplateException e) {
+					if(ExceptionUtils.indexOfThrowable(e, InvocationTargetException.class) > -1){
+						ExpressionError.error(String.format("在%s中调用方法get%s发生异常"
+								,object.getClass()
+								,methodName), getSpan(),e);
+						return null;
+					}
 					access = new MemberAccess(this.object, new Span("is" + methodName));
 					methodCall = new MethodCall(getName(),access, Collections.emptyList());
 					try {
 						return methodCall.evaluate(template, context);
 					} catch (TemplateException e1) {
-						ExpressionError.error(String.format("在%s中找不到属性%s或者方法get%s、方法is%s" 
+						if(ExceptionUtils.indexOfThrowable(e1, InvocationTargetException.class) > -1){
+							ExpressionError.error(String.format("在%s中调用方法is%s发生异常"
+									,object.getClass()
+									,methodName), getSpan(),e);
+							return null;
+						}
+						ExpressionError.error(String.format("在%s中找不到属性%s或者方法get%s、方法is%s"
 								,object.getClass()
 								,getName().getText()
 								,methodName
@@ -1073,7 +1087,7 @@ public abstract class Ast {
 				}
 				if(object instanceof DynamicMethod){
 					try {
-						Object method = DynamicMethod.class.getDeclaredMethod("execute", new Class[]{String.class,List.class});
+						Object method = DynamicMethod.class.getDeclaredMethod("execute", String.class,List.class);
 						Object[] newArgumentValues = new Object[]{getMethod().getName().getText(),Arrays.asList(argumentValues)};
 						return Reflection.getInstance().callMethod(object, method, newArgumentValues);
 					} catch (Throwable t) {
