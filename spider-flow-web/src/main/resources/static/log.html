@@ -225,17 +225,8 @@
                 viewer.setOptions('reversed',false);
                 viewer.init();
             }).on('click','.btn-page-end',function(){
-                if (time == null) {
-                    time = window.setInterval(function () {
-                        if ($('#layuiTab', parent.document).find("li[lay-id='" + logId + "']").attr('class').indexOf("layui-this") >= 0) {
-                            viewer.setOptions('reversed',true);
-                            viewer.init();
-                        }
-                    }, 5000);
-                } else {
-                    window.clearInterval(time);
-                    time = null;
-                }
+                viewer.setOptions('reversed',true);
+                viewer.init();
             });
 		});
 	</script>
