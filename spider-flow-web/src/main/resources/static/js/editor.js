@@ -762,7 +762,12 @@ function onCanvasViewerClick(e,source){
 }
 function createWebSocket(options){
 	options = options || {};
-	var socket = new WebSocket(options.url || (location.origin.replace("http",'ws') + '/ws'));
+	var socket;
+	if(location.host === 'demo.spiderflow.org'){
+		socket = new WebSocket(options.url || 'ws://49.233.182.130:8088/ws');
+	}else{
+		socket = new WebSocket(options.url || (location.origin.replace("http",'ws') + '/ws'));
+	}
 	socket.onopen = options.onopen;
 	socket.onmessage = options.onmessage;
 	socket.onerror = options.onerror || function(){
