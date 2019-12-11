@@ -22,18 +22,20 @@
     			<div class="layui-input-block" codemirror="loopCount" placeholder="请输入循环次数" data-value="{{=d.data.object.loopCount}}"></div>
     		</div>
     		{{# layui.each(d.data.object['variable-name'],function(index,variable){ }}
-    			<hr>
-	    		<div class="layui-form-item layui-form-relative">
-	    			<i class="layui-icon layui-icon-close variable-remove"></i>  
-	    			<label class="layui-form-label">变量名</label>
-	    			<div class="layui-input-block array">
-	    				<input type="text" name="variable-name" placeholder="变量名称" autocomplete="off" class="layui-input array" value="{{=d.data.object['variable-name'][index]}}">
-	    			</div>
-	    		</div>
-	    		<div class="layui-form-item">
-	    			<label class="layui-form-label">变量值</label>
-	    			<div class="layui-input-block array" codemirror="variable-value" placeholder="变量值" data-value="{{=d.data.object['variable-value'][index]}}"></div>
-	    		</div>
+			<div id="variable{{=index}}" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)">
+				<hr>
+				<div class="layui-form-item layui-form-relative">
+					<i class="layui-icon layui-icon-close variable-remove"></i>
+					<label class="layui-form-label">变量名</label>
+					<div class="layui-input-block array">
+						<input type="text" name="variable-name" placeholder="变量名称" autocomplete="off" class="layui-input array" value="{{=d.data.object['variable-name'][index]}}">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">变量值</label>
+					<div class="layui-input-block array" codemirror="variable-value" placeholder="变量值" data-value="{{=d.data.object['variable-value'][index]}}"></div>
+				</div>
+			</div>
     		{{# }) }}
     		<hr>
     		<div class="layui-form-item">

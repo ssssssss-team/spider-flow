@@ -26,8 +26,8 @@ public class DataSourceController {
 	private DataSourceService dataSourceService;
 	
 	@RequestMapping("/list")
-	public IPage<DataSource> list(@RequestParam(name = "page",defaultValue = "1")Integer page, @RequestParam(name = "limit",defaultValue = "1")Integer size){
-		return dataSourceService.page(new Page<DataSource>(page, size), new QueryWrapper<DataSource>().orderByDesc("create_date"));
+	public IPage<DataSource> list(@RequestParam(name = "page",defaultValue = "1")Integer page, @RequestParam(name = "limit",defaultValue = "1")Integer size) {
+		return dataSourceService.page(new Page<DataSource>(page, size), new QueryWrapper<DataSource>().select("id", "name", "driver_class_name", "create_date").orderByDesc("create_date"));
 	}
 	
 	@RequestMapping("/all")

@@ -23,10 +23,12 @@
     		</div>
 			<hr>
 			{{# layui.each(d.data.object['function'],function(index,item){ }}
-			<div class="layui-form-item layui-form-relative">
-				<i class="layui-icon layui-icon-close function-remove"></i>
-				<label class="layui-form-label">执行函数</label>
-				<div class="layui-input-block array" codemirror="function" placeholder="执行函数" data-value="{{=d.data.object['function'][index]}}"></div>
+			<div id="function{{=index}}" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)">
+				<div class="layui-form-item layui-form-relative">
+					<i class="layui-icon layui-icon-close function-remove"></i>
+					<label class="layui-form-label">执行函数</label>
+					<div class="layui-input-block array" codemirror="function" placeholder="执行函数" data-value="{{=d.data.object['function'][index]}}"></div>
+				</div>
 			</div>
 			{{# }) }}
 			<div class="layui-form-item">

@@ -95,6 +95,9 @@ html,body{
 .properties-container .editor-form-node .layui-form-relative .layui-icon-close.function-remove{
 	top : 5px;
 }
+.properties-container .editor-form-node .layui-form-relative .layui-icon-close.cmd-remove{
+	top : 5px;
+}
 
 .toolbar-container ul li{
 	float : left;
