@@ -36,4 +36,13 @@ public class ObjectFunctionExtension implements FunctionExtension{
 		return ExtractUtils.getValueByJsonPath(obj, path);
 	}
 
+	@Comment("睡眠等待一段时间")
+	@Example("${objVar.sleep(1000)}")
+	public static Object sleep(Object obj, int millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException ignored) {
+		}
+		return obj;
+	}
 }
