@@ -74,7 +74,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 				.withIdentity("Caclulate Next Execute Date")
 				.withSchedule(CronScheduleBuilder.cronSchedule(cron))
 				.build();
-		sfMapper.resetCornExpression(id, cron, trigger.getStartTime());
+		sfMapper.resetCornExpression(id, cron, trigger.getFireTimeAfter(null));
 		spiderJobManager.remove(id);
 		SpiderFlow spiderFlow = getById(id);
 		if("1".equals(spiderFlow.getEnabled()) && StringUtils.isNotEmpty(spiderFlow.getCron())){
