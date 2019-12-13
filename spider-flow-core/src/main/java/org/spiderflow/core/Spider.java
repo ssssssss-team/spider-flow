@@ -3,7 +3,6 @@ package org.spiderflow.core;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.spiderflow.ExpressionEngine;
-import org.spiderflow.ExpressionHolder;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.RunnableNode;
@@ -110,7 +109,6 @@ public class Spider {
 			if (listeners != null) {
 				listeners.forEach(listener -> listener.afterEnd(context));
 			}
-			ExpressionHolder.remove();
 		}
 	}
 
@@ -191,7 +189,6 @@ public class Spider {
 									context.setRunning(false);
 									return;
 								}
-								ExpressionHolder.setVariables(nVariables);
 								//执行节点具体逻辑
 								executor.execute(node, context, nVariables);
 								nVariables.put("ex", null);
