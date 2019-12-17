@@ -86,9 +86,11 @@ $(function(){
 	    });        
 	};
 	$.ctrl('S', function() {
+		$('input,textarea').blur();
 		Save();
 	});
 	$.ctrl('Q', function() {
+		$('input,textarea').blur();
 		$(".btn-test").click();
 	});
 	var resize = $('.resize-container')[0]
@@ -189,7 +191,7 @@ $(function(){
 				skin : 'codemirror',
 				area : '800px'
 			})
-		}).on("keyup","input,textarea",function(){
+		}).on("blur","input,textarea",function(){
 			var $input = $(this);
 			if($input.attr('name') == 'value'){
 				var cell = editor.getSelectedCell();
