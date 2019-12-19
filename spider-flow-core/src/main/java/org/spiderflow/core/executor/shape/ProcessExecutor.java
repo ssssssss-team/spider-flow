@@ -35,11 +35,10 @@ public class ProcessExecutor implements ShapeExecutor{
 		if(spiderFlow != null){
 			context.debug("执行子流程:{}", spiderFlow.getName());
 			SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
-			spider.executeNode(context.getThreadPool(),null,root,context,variables);
+			spider.executeNode(null,root,context,variables);
 		}else{
 			context.debug("执行子流程:{}", flowId);
 		}
-		
 	}
 
 	@Override

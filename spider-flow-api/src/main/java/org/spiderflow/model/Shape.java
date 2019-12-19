@@ -10,6 +10,8 @@ public class Shape {
 	
 	private String image;
 
+	private String desc;
+
 	public String getName() {
 		return name;
 	}
@@ -40,5 +42,13 @@ public class Shape {
 
 	public void setImage(String image) {
 		this.image = image;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 }

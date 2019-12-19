@@ -33,7 +33,11 @@ public class ListFunctionExtension implements FunctionExtension{
 	@Comment("将list用separator拼接起来")
 	@Example("${listVar.join('-')}")
 	public static String join(List<?> list,String separator){
-		return StringUtils.join(list.toArray(),separator);
+		if(list.size() == 1){
+			return list.get(0).toString();
+		}else{
+			return StringUtils.join(list.toArray(),separator);
+		}
 	}
 
 	@Comment("将list打乱顺序")

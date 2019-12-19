@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Component
 public class LoopJoinExecutor implements ShapeExecutor {
 
-	private static final String JOIN_NODE_ID = "joinNode";
+	public static final String JOIN_NODE_ID = "joinNode";
 	
 	public static final String VARIABLE_CONTEXT = "__variable_context";
 	

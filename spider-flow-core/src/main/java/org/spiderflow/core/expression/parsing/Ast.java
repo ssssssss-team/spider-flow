@@ -61,12 +61,13 @@ public abstract class Ast {
 
 			CharacterStream stream = new CharacterStream(unescapedValue);
 			while (stream.hasMore()) {
-				if (stream.match("\\{", true))
+				if (stream.match("\\{", true)) {
 					builder.append('{');
-				else if (stream.match("\\}", true))
+				} else if (stream.match("\\}", true)) {
 					builder.append('}');
-				else
+				} else {
 					builder.append(stream.consume());
+				}
 			}
 			content = builder.toString();
 		}
@@ -97,9 +98,15 @@ public abstract class Ast {
 			Not, Negate, Positive;
 
 			public static UnaryOperator getOperator (Token op) {
-				if (op.getType() == TokenType.Not) return UnaryOperator.Not;
-				if (op.getType() == TokenType.Plus) return UnaryOperator.Positive;
-				if (op.getType() == TokenType.Minus) return UnaryOperator.Negate;
+				if (op.getType() == TokenType.Not) {
+					return UnaryOperator.Not;
+				}
+				if (op.getType() == TokenType.Plus) {
+					return UnaryOperator.Positive;
+				}
+				if (op.getType() == TokenType.Minus) {
+					return UnaryOperator.Negate;
+				}
 				ExpressionError.error("Unknown unary operator " + op + ".", op.getSpan());
 				return null; // not reached
 			}
@@ -127,24 +134,26 @@ public abstract class Ast {
 			Object operand = getOperand().evaluate(template, context);
 
 			if (getOperator() == UnaryOperator.Negate) {
-				if (operand instanceof Integer)
+				if (operand instanceof Integer) {
 					return -(Integer)operand;
-				else if (operand instanceof Float)
+				} else if (operand instanceof Float) {
 					return -(Float)operand;
-				else if (operand instanceof Double)
+				} else if (operand instanceof Double) {
 					return -(Double)operand;
-				else if (operand instanceof Byte)
+				} else if (operand instanceof Byte) {
 					return -(Byte)operand;
-				else if (operand instanceof Short)
+				} else if (operand instanceof Short) {
 					return -(Short)operand;
-				else if (operand instanceof Long)
+				} else if (operand instanceof Long) {
 					return -(Long)operand;
-				else {
+				} else {
 					ExpressionError.error("Operand of operator '" + getOperator().name() + "' must be a number, got " + operand, getSpan());
 					return null; // never reached
 				}
 			} else if (getOperator() == UnaryOperator.Not) {
-				if (!(operand instanceof Boolean)) ExpressionError.error("Operand of operator '" + getOperator().name() + "' must be a boolean", getSpan());
+				if (!(operand instanceof Boolean)) {
+					ExpressionError.error("Operand of operator '" + getOperator().name() + "' must be a boolean", getSpan());
+				}
 				return !(Boolean)operand;
 			} else {
 				return operand;
@@ -160,21 +169,51 @@ public abstract class Ast {
 			Addition, Subtraction, Multiplication, Division, Modulo, Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual, And, Or, Xor, Assignment;
 
 			public static BinaryOperator getOperator (Token op) {
-				if (op.getType() == TokenType.Plus) return BinaryOperator.Addition;
-				if (op.getType() == TokenType.Minus) return BinaryOperator.Subtraction;
-				if (op.getType() == TokenType.Asterisk) return BinaryOperator.Multiplication;
-				if (op.getType() == TokenType.ForwardSlash) return BinaryOperator.Division;
-				if (op.getType() == TokenType.Percentage) return BinaryOperator.Modulo;
-				if (op.getType() == TokenType.Equal) return BinaryOperator.Equal;
-				if (op.getType() == TokenType.NotEqual) return BinaryOperator.NotEqual;
-				if (op.getType() == TokenType.Less) return BinaryOperator.Less;
-				if (op.getType() == TokenType.LessEqual) return BinaryOperator.LessEqual;
-				if (op.getType() == TokenType.Greater) return BinaryOperator.Greater;
-				if (op.getType() == TokenType.GreaterEqual) return BinaryOperator.GreaterEqual;
-				if (op.getType() == TokenType.And) return BinaryOperator.And;
-				if (op.getType() == TokenType.Or) return BinaryOperator.Or;
-				if (op.getType() == TokenType.Xor) return BinaryOperator.Xor;
-				if (op.getType() == TokenType.Assignment) return BinaryOperator.Assignment;
+				if (op.getType() == TokenType.Plus) {
+					return BinaryOperator.Addition;
+				}
+				if (op.getType() == TokenType.Minus) {
+					return BinaryOperator.Subtraction;
+				}
+				if (op.getType() == TokenType.Asterisk) {
+					return BinaryOperator.Multiplication;
+				}
+				if (op.getType() == TokenType.ForwardSlash) {
+					return BinaryOperator.Division;
+				}
+				if (op.getType() == TokenType.Percentage) {
+					return BinaryOperator.Modulo;
+				}
+				if (op.getType() == TokenType.Equal) {
+					return BinaryOperator.Equal;
+				}
+				if (op.getType() == TokenType.NotEqual) {
+					return BinaryOperator.NotEqual;
+				}
+				if (op.getType() == TokenType.Less) {
+					return BinaryOperator.Less;
+				}
+				if (op.getType() == TokenType.LessEqual) {
+					return BinaryOperator.LessEqual;
+				}
+				if (op.getType() == TokenType.Greater) {
+					return BinaryOperator.Greater;
+				}
+				if (op.getType() == TokenType.GreaterEqual) {
+					return BinaryOperator.GreaterEqual;
+				}
+				if (op.getType() == TokenType.And) {
+					return BinaryOperator.And;
+				}
+				if (op.getType() == TokenType.Or) {
+					return BinaryOperator.Or;
+				}
+				if (op.getType() == TokenType.Xor) {
+					return BinaryOperator.Xor;
+				}
+				if (op.getType() == TokenType.Assignment) {
+					return BinaryOperator.Assignment;
+				}
 				ExpressionError.error("Unknown binary operator " + op + ".", op.getSpan());
 				return null; // not reached
 			}
@@ -204,13 +243,27 @@ public abstract class Ast {
 		}
 
 		private Object evaluateAddition (Object left, Object right) {
-			if (left instanceof String || right instanceof String) return left.toString() + right.toString();
-			if (left instanceof Double || right instanceof Double) return ((Number)left).doubleValue() + ((Number)right).doubleValue();
-			if (left instanceof Float || right instanceof Float) return ((Number)left).floatValue() + ((Number)right).floatValue();
-			if (left instanceof Long || right instanceof Long) return ((Number)left).longValue() + ((Number)right).longValue();
-			if (left instanceof Integer || right instanceof Integer) return ((Number)left).intValue() + ((Number)right).intValue();
-			if (left instanceof Short || right instanceof Short) return ((Number)left).shortValue() + ((Number)right).shortValue();
-			if (left instanceof Byte || right instanceof Byte) return ((Number)left).byteValue() + ((Number)right).byteValue();
+			if (left instanceof String || right instanceof String) {
+				return left.toString() + right.toString();
+			}
+			if (left instanceof Double || right instanceof Double) {
+				return ((Number)left).doubleValue() + ((Number)right).doubleValue();
+			}
+			if (left instanceof Float || right instanceof Float) {
+				return ((Number)left).floatValue() + ((Number)right).floatValue();
+			}
+			if (left instanceof Long || right instanceof Long) {
+				return ((Number)left).longValue() + ((Number)right).longValue();
+			}
+			if (left instanceof Integer || right instanceof Integer) {
+				return ((Number)left).intValue() + ((Number)right).intValue();
+			}
+			if (left instanceof Short || right instanceof Short) {
+				return ((Number)left).shortValue() + ((Number)right).shortValue();
+			}
+			if (left instanceof Byte || right instanceof Byte) {
+				return ((Number)left).byteValue() + ((Number)right).byteValue();
+			}
 
 			ExpressionError.error("Operands for addition operator must be numbers or strings, got " + left + ", " + right + ".", getSpan());
 			return null; // never reached
@@ -369,30 +422,50 @@ public abstract class Ast {
 		}
 
 		private Object evaluateAnd (Object left, ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
-			if (!(left instanceof Boolean)) ExpressionError.error("Left operand must be a boolean, got " + left + ".", getLeftOperand().getSpan());
-			if (!(Boolean)left) return false;
+			if (!(left instanceof Boolean)) {
+				ExpressionError.error("Left operand must be a boolean, got " + left + ".", getLeftOperand().getSpan());
+			}
+			if (!(Boolean)left) {
+				return false;
+			}
 			Object right = getRightOperand().evaluate(template, context);
-			if (!(right instanceof Boolean)) ExpressionError.error("Right operand must be a boolean, got " + right + ".", getRightOperand().getSpan());
+			if (!(right instanceof Boolean)) {
+				ExpressionError.error("Right operand must be a boolean, got " + right + ".", getRightOperand().getSpan());
+			}
 			return (Boolean)left && (Boolean)right;
 		}
 
 		private Object evaluateOr (Object left, ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
-			if (!(left instanceof Boolean)) ExpressionError.error("Left operand must be a boolean, got " + left + ".", getLeftOperand().getSpan());
-			if ((Boolean)left) return true;
+			if (!(left instanceof Boolean)) {
+				ExpressionError.error("Left operand must be a boolean, got " + left + ".", getLeftOperand().getSpan());
+			}
+			if ((Boolean)left) {
+				return true;
+			}
 			Object right = getRightOperand().evaluate(template, context);
-			if (!(right instanceof Boolean)) ExpressionError.error("Right operand must be a boolean, got " + right + ".", getRightOperand().getSpan());
+			if (!(right instanceof Boolean)) {
+				ExpressionError.error("Right operand must be a boolean, got " + right + ".", getRightOperand().getSpan());
+			}
 			return (Boolean)left || (Boolean)right;
 		}
 
 		private Object evaluateXor (Object left, Object right) {
-			if (!(left instanceof Boolean)) ExpressionError.error("Left operand must be a boolean, got " + left + ".", getLeftOperand().getSpan());
-			if (!(right instanceof Boolean)) ExpressionError.error("Right operand must be a boolean, got " + right + ".", getRightOperand().getSpan());
+			if (!(left instanceof Boolean)) {
+				ExpressionError.error("Left operand must be a boolean, got " + left + ".", getLeftOperand().getSpan());
+			}
+			if (!(right instanceof Boolean)) {
+				ExpressionError.error("Right operand must be a boolean, got " + right + ".", getRightOperand().getSpan());
+			}
 			return (Boolean)left ^ (Boolean)right;
 		}
 
 		private Object evaluateEqual (Object left, Object right) {
-			if (left != null) return left.equals(right);
-			if (right != null) return right.equals(left);
+			if (left != null) {
+				return left.equals(right);
+			}
+			if (right != null) {
+				return right.equals(left);
+			}
 			return true;
 		}
 
@@ -403,7 +476,9 @@ public abstract class Ast {
 		@Override
 		public Object evaluate (ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
 			if (getOperator() == BinaryOperator.Assignment) {
-				if (!(getLeftOperand() instanceof VariableAccess)) ExpressionError.error("Can only assign to top-level variables in context.", getLeftOperand().getSpan());
+				if (!(getLeftOperand() instanceof VariableAccess)) {
+					ExpressionError.error("Can only assign to top-level variables in context.", getLeftOperand().getSpan());
+				}
 				Object value = getRightOperand().evaluate(template, context);
 				context.set(((VariableAccess)getLeftOperand()).getVariableName().getText(), value);
 				return null;
@@ -476,7 +551,9 @@ public abstract class Ast {
 		@Override
 		public Object evaluate (ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
 			Object condition = getCondition().evaluate(template, context);
-			if (!(condition instanceof Boolean)) ExpressionError.error("Condition of ternary operator must be a boolean, got " + condition + ".", getSpan());
+			if (!(condition instanceof Boolean)) {
+				ExpressionError.error("Condition of ternary operator must be a boolean, got " + condition + ".", getSpan());
+			}
 			return ((Boolean)condition) ? getTrueExpression().evaluate(template, context) : getFalseExpression().evaluate(template, context);
 		}
 	}
@@ -538,7 +615,9 @@ public abstract class Ast {
 		public FloatLiteral (Span literal) {
 			super(literal);
 			String text = literal.getText();
-			if (text.charAt(text.length() - 1) == 'f') text = text.substring(0, text.length() - 1);
+			if (text.charAt(text.length() - 1) == 'f') {
+				text = text.substring(0, text.length() - 1);
+			}
 			this.value = Float.parseFloat(text);
 		}
 
@@ -637,17 +716,17 @@ public abstract class Ast {
 
 			String text = literal.getText();
 			if (text.length() > 3) {
-				if (text.charAt(2) == 'n')
+				if (text.charAt(2) == 'n') {
 					value = '\n';
-				else if (text.charAt(2) == 'r')
+				} else if (text.charAt(2) == 'r') {
 					value = '\r';
-				else if (text.charAt(2) == 't')
+				} else if (text.charAt(2) == 't') {
 					value = '\t';
-				else if (text.charAt(2) == '\\')
+				} else if (text.charAt(2) == '\\') {
 					value = '\\';
-				else if (text.charAt(2) == '\'')
+				} else if (text.charAt(2) == '\'') {
 					value = '\'';
-				else {
+				} else {
 					ExpressionError.error("Unknown escape sequence '" + literal.getText() + "'.", literal);
 					value = 0; // never reached
 				}
@@ -678,18 +757,19 @@ public abstract class Ast {
 
 			CharacterStream stream = new CharacterStream(unescapedValue);
 			while (stream.hasMore()) {
-				if (stream.match("\\\\", true))
+				if (stream.match("\\\\", true)) {
 					builder.append('\\');
-				else if (stream.match("\\n", true))
+				} else if (stream.match("\\n", true)) {
 					builder.append('\n');
-				else if (stream.match("\\r", true))
+				} else if (stream.match("\\r", true)) {
 					builder.append('\r');
-				else if (stream.match("\\t", true))
+				} else if (stream.match("\\t", true)) {
 					builder.append('\t');
-				else if (stream.match("\\\"", true))
+				} else if (stream.match("\\\"", true)) {
 					builder.append('"');
-				else
+				} else {
 					builder.append(stream.consume());
+				}
 			}
 			value = builder.toString();
 		}
@@ -772,26 +852,27 @@ public abstract class Ast {
 					ExpressionError.error("Array index must be an integer, but was " + keyOrIndex.getClass().getSimpleName(), getKeyOrIndex().getSpan());
 				}
 				int index = ((Number)keyOrIndex).intValue();
-				if (mapOrArray instanceof int[])
+				if (mapOrArray instanceof int[]) {
 					return ((int[])mapOrArray)[index];
-				else if (mapOrArray instanceof float[])
+				} else if (mapOrArray instanceof float[]) {
 					return ((float[])mapOrArray)[index];
-				else if (mapOrArray instanceof double[])
+				} else if (mapOrArray instanceof double[]) {
 					return ((double[])mapOrArray)[index];
-				else if (mapOrArray instanceof boolean[])
+				} else if (mapOrArray instanceof boolean[]) {
 					return ((boolean[])mapOrArray)[index];
-				else if (mapOrArray instanceof char[])
+				} else if (mapOrArray instanceof char[]) {
 					return ((char[])mapOrArray)[index];
-				else if (mapOrArray instanceof short[])
+				} else if (mapOrArray instanceof short[]) {
 					return ((short[])mapOrArray)[index];
-				else if (mapOrArray instanceof long[])
+				} else if (mapOrArray instanceof long[]) {
 					return ((long[])mapOrArray)[index];
-				else if (mapOrArray instanceof byte[])
+				} else if (mapOrArray instanceof byte[]) {
 					return ((byte[])mapOrArray)[index];
-				else if (mapOrArray instanceof String)
-					return "" + ((String)mapOrArray).charAt(index);
-				else
+				} else if (mapOrArray instanceof String) {
+					return Character.toString(((String)mapOrArray).charAt(index));
+				} else {
 					return ((Object[])mapOrArray)[index];
+				}
 			}
 		}
 	}
@@ -956,8 +1037,9 @@ public abstract class Ast {
 		/** Must be invoked when this node is done evaluating so we don't leak memory **/
 		public void clearCachedArguments () {
 			Object[] args = getCachedArguments();
-			for (int i = 0; i < args.length; i++)
+			for (int i = 0; i < args.length; i++) {
 				args[i] = null;
+			}
 		}
 
 		@Override
@@ -993,7 +1075,9 @@ public abstract class Ast {
 						}
 					}
 					method = Reflection.getInstance().getMethod(function, null, argumentValues);
-					if (method == null) ExpressionError.error("Couldn't find function.", getSpan());
+					if (method == null) {
+						ExpressionError.error("Couldn't find function.", getSpan());
+					}
 					setCachedFunction(method);
 					try {
 						return Reflection.getInstance().callMethod(function, method, argumentValues);
@@ -1067,8 +1151,9 @@ public abstract class Ast {
 		/** Must be invoked when this node is done evaluating so we don't leak memory **/
 		public void clearCachedArguments () {
 			Object[] args = getCachedArguments();
-			for (int i = 0; i < args.length; i++)
+			for (int i = 0; i < args.length; i++) {
 				args[i] = null;
+			}
 		}
 
 		@Override

@@ -3,6 +3,7 @@ package org.spiderflow.core;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.spiderflow.ExpressionEngine;
+import org.spiderflow.concurrent.CountableThreadPool;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.RunnableNode;
@@ -24,6 +25,7 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -63,7 +65,7 @@ public class Spider {
 	private static SpiderFlowThreadPoolExecutor executor;
 
 	private static final String ATOMIC_DEAD_CYCLE = "__atomic_dead_cycle";
-	
+
 	@PostConstruct
 	private void init() {
 		executorMap = executors.stream().collect(Collectors.toMap(ShapeExecutor::supportShape, v -> v));
@@ -96,15 +98,17 @@ public class Spider {
 
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
-		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
+		SubThreadPoolExecutor flowPool = executor.createSubThreadPoolExecutor(nThreads);
+		CountableThreadPool taskPool = new CountableThreadPool(nThreads);
 		context.setRootNode(root);
-		context.setThreadPool(pool);
+		context.setFlowPool(flowPool);
+		context.setTaskPool(taskPool);
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
 		try {
-			executeNode(pool, null, root, context, variables);
-			pool.awaitTermination();
+			executeNode(null, root, context, variables);
+			flowPool.awaitTermination();
 		} finally {
 			if (listeners != null) {
 				listeners.forEach(listener -> listener.afterEnd(context));
@@ -113,25 +117,26 @@ public class Spider {
 	}
 
 	public void execute(int nThreads, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
-		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
-		context.setThreadPool(pool);
-		executeNode(pool, fromNode, node, context, variables);
-		pool.awaitTermination();
+		SubThreadPoolExecutor flowPool = executor.createSubThreadPoolExecutor(nThreads);
+		CountableThreadPool taskPool = new CountableThreadPool(nThreads);
+		context.setFlowPool(flowPool);
+		context.setTaskPool(taskPool);
+		executeNode(fromNode, node, context, variables);
 	}
 
-	private void executeNextNodes(SubThreadPoolExecutor pool, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	private void executeNextNodes(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		List<SpiderNode> nextNodes = node.getNextNodes();
 		if (nextNodes != null) {
 			for (SpiderNode nextNode : nextNodes) {
-				executeNode(pool, node, nextNode, context, variables);
+				executeNode(node, nextNode, context, variables);
 			}
 		}
 	}
 
-	public void executeNode(SubThreadPoolExecutor pool, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	public void executeNode(SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String shape = node.getStringJsonValue("shape");
 		if (StringUtils.isBlank(shape)) {
-			executeNextNodes(pool, node, context, variables);
+			executeNextNodes(node, context, variables);
 			return;
 		}
 		//判断条件，如果不成立则不执行
@@ -196,24 +201,32 @@ public class Spider {
 								nVariables.put("ex", t);
 								context.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
 							} finally {
-								synchronized (context){
-									//设置当前线程为已完成状态
-									runnableNode.setState(RunnableNode.State.DONE);
-									//判断是否允许执行后续节点
-									if (executor.allowExecuteNext(node, context, nVariables)) {
-										context.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
-										// 递归执行下一级节点
-										executeNextNodes(pool, node, context, nVariables);
-									} else {
-										context.debug("执行节点[{}:{}]完毕，忽略执行下一节点", node.getNodeName(), node.getNodeId());
-									}
+								if(node.isSync()){
+									context.lock();
+								}
+								//设置当前线程为已完成状态
+								runnableNode.setState(RunnableNode.State.DONE);
+								//判断是否允许执行后续节点
+								if (executor.allowExecuteNext(node, context, nVariables)) {
+									context.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
+									// 递归执行下一级节点
+									executeNextNodes(node, context, nVariables);
+								} else {
+									context.debug("执行节点[{}:{}]完毕，忽略执行下一节点", node.getNodeName(), node.getNodeId());
+								}
+								if(node.isSync()){
+									context.unlock();
 								}
 							}
 						}
 					});
 				}
 			}
-			runnables.forEach(executor.isThread() ? pool::submit : Runnable::run);
+			if (node.getNextNodes() == null || node.getNextNodes().isEmpty()) {
+				runnables.forEach(executor.isThread() ? context.getTaskPool()::execute : Runnable::run);
+			} else {
+				runnables.forEach(executor.isThread() ? context.getFlowPool()::submit : Runnable::run);
+			}
 		}
 	}
 

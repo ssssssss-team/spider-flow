@@ -36,7 +36,8 @@ public class SpiderNode {
 	 * 节点ID
 	 */
 	private String nodeId;
-	
+
+	private boolean sync = false;
 	
 	public String getNodeId() {
 		return nodeId;
@@ -112,6 +113,14 @@ public class SpiderNode {
 
 	public void setCondition(String fromNodeId,String condition) {
 		this.condition.put(fromNodeId, condition);
+	}
+
+	public boolean isSync() {
+		return sync;
+	}
+
+	public void setSync(boolean sync) {
+		this.sync = sync;
 	}
 
 	@Override

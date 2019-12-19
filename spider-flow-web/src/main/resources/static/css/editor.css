@@ -225,3 +225,6 @@ html,body{
 	padding:2px 5px;
 	color : #000;
 }
+.layui-layer-tips{
+	word-break: break-all;
+}

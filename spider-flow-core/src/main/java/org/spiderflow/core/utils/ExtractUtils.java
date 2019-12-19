@@ -1,5 +1,6 @@
 package org.spiderflow.core.utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,12 +9,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.seimicrawler.xpath.JXDocument;
-import org.seimicrawler.xpath.JXNode;
 
 import com.alibaba.fastjson.JSONPath;
+import us.codecraft.xsoup.Xsoup;
+
 /**
  * 抽取数据工具类
  * @author jmxd
@@ -90,7 +94,7 @@ public class ExtractUtils {
 		element = getFirstElement(element,selector);
 		return element == null ? null : element.html();
 	}
-	
+
 	public static String getFirstOuterHTMLBySelector(Element element,String selector){
 		element = getFirstElement(element,selector);
 		return element == null ? null : element.outerHtml();
@@ -155,55 +159,26 @@ public class ExtractUtils {
 	}
 	
 	public static List<String> getValuesByXPath(Element element,String xpath){
-		JXDocument jXdocument = JXDocument.create(new Elements(element));
-		List<JXNode> nodes = jXdocument.selN(xpath);
-		if(nodes != null){
-			List<String> result = new ArrayList<>();
-			for (JXNode node : nodes) {
-				result.add(node.asString());
-			}
-			return result;
-		}
-		return Collections.emptyList();
+		return Xsoup.select(element,xpath).list();
+	}
+
+	public static List<String> getValuesByXPath(Elements elements,String xpath){
+		return Xsoup.select(elements.html(),xpath).list();
 	}
 	
 	public static String getValueByXPath(Element element,String xpath){
-		JXDocument jXdocument = JXDocument.create(new Elements(element));
-		JXNode node = jXdocument.selNOne(xpath);
-		if(node != null){
-			return node.asString();
-		}
-		return null;
+		return Xsoup.select(element,xpath).get();
+	}
+
+	public static String getValueByXPath(Elements elements,String xpath){
+		return Xsoup.select(elements.html(),xpath).get();
 	}
 	
 	public static String getElementByXPath(Element element,String xpath){
-		JXDocument jXdocument = JXDocument.create(new Elements(element));
-		JXNode node = jXdocument.selNOne(xpath);
-		if(node != null){
-			return node.asString();
-		}
-		return null;
+		return Xsoup.select(element,xpath).get();
 	}
 	
-	public static Object getObjectValueByXPath(Element element,String xpath){
-		return getObjectValueByXPath(new Elements(element),xpath);
-	}
-	
-	public static List<Object> getObjectValuesByXPath(Element element,String xpath){
-		return getObjectValuesByXPath(new Elements(element),xpath);
-	}
-	
-	public static Object getObjectValueByXPath(Elements elements,String xpath){
-		JXDocument jXdocument = JXDocument.create(elements);
-		return jXdocument.selOne(xpath);
-	}
-	
-	public static List<Object> getObjectValuesByXPath(Elements elements,String xpath){
-		JXDocument jXdocument = JXDocument.create(elements);
-		return jXdocument.sel(xpath);
-	}
-	
-	public static boolean isNumber(String str) {  
+	public static boolean isNumber(String str) {
         return compile("^(\\-|\\+)?\\d+(\\.\\d+)?$").matcher(str).matches();  
 	}
 	

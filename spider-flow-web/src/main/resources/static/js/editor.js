@@ -478,14 +478,18 @@ $(function(){
 			name : 'process',
 			image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACMklEQVRYR+2WwXHTQBSGv+fMkNwIB7BvMRVgV0DoIFRAUoGlCpJUsKICnApCB4QKcCrAvslwwEebGfyYp2g1QgmytBmPOaCjtLv/t+/9+neFHT+yY31aAxw6PdwXzgVOgH5lA1OEcTqSy6Ybaw3QdZqIMKoTUOX9PJaoCUQIwEKEp7+U4fdYJmWR504He8IXYJpG8tK+9RJVP0ZhIkKSjuTKv9sOgDJLY8naUwYog6yUN4tYFq0Bek4vEM5ry6tcprFclMeYd57AcQcShCOrxjySYWsAWzTzgZlQOPoDRJkB46p4FeQAJtlc5SwIoIm56sa8cHrSEa4zTzx2sZD51o4D4YfN3QlAz2kf4evOAIoWKLetKxCShD2np2ksY9txXn7Lin6QCdsmoYkjfFgqz/Y7vBYlMXFVbuexDB6sQNdphPBOYOBNlkaSje06bZyEXrxqVBNfwfG9IMrL+6ksHASQJ2EVwIQFEt+OeybsOrWsfoUyW0P0E26MsryDtknoIXwFq9UoWmBlF8GZ+BIGVeHyxLZJWDZhHUC2+7Xy9lssH0MCJmROUQF/aplb63YfIlI3598B8AbcWQsKE8J0qQx9G3pO7Xg99WUMScJGLchD5u43hKkK0WrN5/zUGqeRnBV3gW3dCbPdwU0OUQXPINokYRPDPhjF9t8qWC5YNe4e5cpa0QigdCfcBLHxNMx+z1zcFmubhI8HqJiw8EHgnfCvSbiJdFvfN7ZgW8J+3f8AvwFIqFFyobd5IgAAAABJRU5ErkJggg==',
 			title : '子流程'
-		}]
+		}];
 		var addShape = function(shape){
 			var image = new Image();
 			image.src = shape.image;
 			image.title = shape.title;
-			if(shape.hidden){
-				
-			}else{
+			image.id = shape.name;
+			image.onclick = function (ev) {
+				if(shape.desc){
+					layer.tips("(" + shape.name + ")" + shape.title + "<hr/>" + shape.desc, '#' + shape.name);
+				}
+			}
+			if(!shape.hidden){
 				container.appendChild(image);
 			}
 			
@@ -838,12 +842,7 @@ function onCanvasViewerClick(e,source){
 }
 function createWebSocket(options){
 	options = options || {};
-	var socket;
-	if(location.host === 'demo.spiderflow.org'){
-		socket = new WebSocket(options.url || 'ws://49.233.182.130:8088/ws');
-	}else{
-		socket = new WebSocket(options.url || (location.origin.replace("http",'ws') + '/ws'));
-	}
+	var socket = new WebSocket(options.url || (location.origin.replace("http",'ws') + '/ws'));
 	socket.onopen = options.onopen;
 	socket.onmessage = options.onmessage;
 	socket.onerror = options.onerror || function(){

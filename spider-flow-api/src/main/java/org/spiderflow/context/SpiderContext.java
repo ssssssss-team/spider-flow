@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spiderflow.concurrent.CountableThreadPool;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.model.SpiderLog;
 import org.spiderflow.model.SpiderNode;
@@ -28,9 +30,22 @@ public class SpiderContext extends HashMap<String, Object>{
 	 * 爬虫输出参数列表
 	 */
 	private List<SpiderOutput> outputs = new ArrayList<>();
-	
-	private SubThreadPoolExecutor threadPool;
-	
+
+	/**
+	 * 流程执行线程(异步执行)
+	 */
+	private SubThreadPoolExecutor flowPool;
+
+	/**
+	 * 末端任务执行线程(同步执行)
+	 */
+	private CountableThreadPool taskPool;
+
+	/**
+	 * 处理流程同步锁
+	 */
+	private ReentrantLock lock = new ReentrantLock();
+
 	private SpiderNode rootNode;
 	
 	private boolean running = true;
@@ -65,16 +80,23 @@ public class SpiderContext extends HashMap<String, Object>{
 	public void addOutput(SpiderOutput output){
 		this.outputs.add(output);
 	}
-	
-	
-	public SubThreadPoolExecutor getThreadPool() {
-		return threadPool;
+
+	public SubThreadPoolExecutor getFlowPool() {
+		return flowPool;
 	}
 
-	public void setThreadPool(SubThreadPoolExecutor threadPool) {
-		this.threadPool = threadPool;
+	public void setFlowPool(SubThreadPoolExecutor flowPool) {
+		this.flowPool = flowPool;
 	}
-	
+
+	public CountableThreadPool getTaskPool() {
+		return taskPool;
+	}
+
+	public void setTaskPool(CountableThreadPool taskPool) {
+		this.taskPool = taskPool;
+	}
+
 	public SpiderNode getRootNode() {
 		return rootNode;
 	}
@@ -122,5 +144,13 @@ public class SpiderContext extends HashMap<String, Object>{
 
 	public void log(SpiderLog log){
 		
+	}
+
+	public void lock(){
+		lock.lock();
+	}
+
+	public void unlock(){
+		lock.unlock();
 	}
 }

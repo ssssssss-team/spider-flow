@@ -22,16 +22,16 @@ public class ElementFunctionExtension implements FunctionExtension{
 	@Comment("根据xpath提取内容")
 	@Example("${elementVar.xpath('//title/text()')}")
 	@Return({Element.class,String.class})
-	public static Object xpath(Element element,String xpath){
-		return ExtractUtils.getObjectValueByXPath(element, xpath);
+	public static String xpath(Element element,String xpath){
+		return ExtractUtils.getValueByXPath(element, xpath);
 	}
 	
 
 	@Comment("根据xpath提取内容")
 	@Example("${elementVar.xpaths('//h2/text()')}")
 	@Return({Element.class,String.class})
-	public static List<Object> xpaths(Element element,String xpath){
-		return ExtractUtils.getObjectValuesByXPath(element, xpath);
+	public static List<String> xpaths(Element element,String xpath){
+		return ExtractUtils.getValuesByXPath(element, xpath);
 	}
 	
 	@Comment("根据正则表达式提取内容")
