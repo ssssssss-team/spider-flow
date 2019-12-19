@@ -24,7 +24,7 @@ public class ThreadFunctionExecutor implements FunctionExecutor {
         try {
             Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
-
+            e.printStackTrace();
         }
     }
 }

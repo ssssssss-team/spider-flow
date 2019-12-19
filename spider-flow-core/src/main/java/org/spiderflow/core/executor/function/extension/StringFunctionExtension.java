@@ -65,14 +65,14 @@ public class StringFunctionExtension implements FunctionExtension{
 	@Comment("根据xpath在String变量中查找")
 	@Example("${strVar.xpath('//title/text()')}")
 	@Return({Element.class,String.class})
-	public static Object xpath(String source,String xpath){
-		return ExtractUtils.getObjectValueByXPath(Jsoup.parse(source), xpath);
+	public static String xpath(String source,String xpath){
+		return ExtractUtils.getValueByXPath(Jsoup.parse(source), xpath);
 	}
 	
 	@Comment("根据xpath在String变量中查找")
 	@Example("${resp.xpaths('//a/@href')}")
-	public static List<Object> xpaths(String source,String xpath){
-		return ExtractUtils.getObjectValuesByXPath(Jsoup.parse(source), xpath);
+	public static List<String> xpaths(String source,String xpath){
+		return ExtractUtils.getValuesByXPath(Jsoup.parse(source), xpath);
 	}
 	
 	@Comment("将String变量转为Element对象")
@@ -92,7 +92,7 @@ public class StringFunctionExtension implements FunctionExtension{
 	public static Elements selectors(String source,String cssQuery){
 		return element(source).select(cssQuery);
 	}
-	
+
 	@Comment("将string转为json对象")
 	@Example("${strVar.json()}")
 	public static Object json(String source){

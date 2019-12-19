@@ -10,6 +10,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.spiderflow.core.executor.shape.LoopJoinExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.util.CollectionUtils;
 
@@ -43,10 +44,14 @@ public class SpiderFlowUtils {
 			node.setNodeId(nodeId);
 			nodeMap.put(nodeId, node);
 			if(element.hasAttr("edge")){	//判断是否是连线
-				edgeMap.put(nodeId, Collections.singletonMap(element.attr("source"),element.attr("target")));
-			}else if(jsonProperty != null && node.getStringJsonValue("shape") != null){
-				if("start".equals(node.getStringJsonValue("shape"))){
+				edgeMap.put(nodeId, Collections.singletonMap(element.attr("source"), element.attr("target")));
+			} else if (jsonProperty != null && node.getStringJsonValue("shape") != null) {
+				if ("start".equals(node.getStringJsonValue("shape"))) {
 					root = node;
+				} else if ("loopJoin".equals(node.getStringJsonValue("shape"))) {
+					String joinNodeId = node.getStringJsonValue(LoopJoinExecutor.JOIN_NODE_ID);
+					node.setSync(true);
+					nodeMap.get(joinNodeId).setSync(true);
 				}
 			}
 			if("0".equals(nodeId)){

@@ -92,7 +92,7 @@ public class FileFunctionExecutor implements FunctionExecutor{
 	}
 
 	@Comment("下载Url资源")
-	@Example("${file.write('e:/result.html',urls)}")
+	@Example("${file.write('e:/downloadPath',urls)}")
 	public static void write(String path, List<String> urls) throws IOException{
 		if(!CollectionUtils.isEmpty(urls)) {
 			for (String url : urls) {

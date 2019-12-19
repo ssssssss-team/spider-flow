@@ -33,14 +33,14 @@ public class ResponseFunctionExtension implements FunctionExtension {
     @Comment("根据xpath在请求结果中查找")
     @Example("${resp.xpath('//title/text()')}")
     @Return({Element.class, String.class})
-    public static Object xpath(SpiderResponse response, String xpath) {
-        return ExtractUtils.getObjectValueByXPath(element(response), xpath);
+    public static String xpath(SpiderResponse response, String xpath) {
+        return ExtractUtils.getValueByXPath(element(response), xpath);
     }
 
     @Comment("根据xpath在请求结果中查找")
     @Example("${resp.xpaths('//a/@href')}")
-    public static List<Object> xpaths(SpiderResponse response, String xpath) {
-        return ExtractUtils.getObjectValuesByXPath(element(response), xpath);
+    public static List<String> xpaths(SpiderResponse response, String xpath) {
+        return ExtractUtils.getValuesByXPath(element(response), xpath);
     }
 
     @Comment("根据正则表达式提取请求结果中的内容")
@@ -119,9 +119,20 @@ public class ResponseFunctionExtension implements FunctionExtension {
     @Comment("获取当前页面所有图片链接")
     @Example("${resp.images()}")
     public static List<String> images(SpiderResponse response) {
-        return ExtractUtils.getAttrBySelector(element(response), "img", "abs:src")
+        return ExtractUtils.getAttrBySelector(element(response), "img", "src")
                 .stream()
                 .filter(link -> StringUtils.isNotBlank(link))
                 .collect(Collectors.toList());
+    }
+
+    @Comment("暂停当前线程")
+    @Example("${resp.sleep(1000L)}")
+    public static SpiderResponse sleep(SpiderResponse response,Long sleep) {
+        try {
+            Thread.sleep(sleep);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 }
