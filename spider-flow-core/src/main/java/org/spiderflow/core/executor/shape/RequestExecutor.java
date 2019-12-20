@@ -168,6 +168,15 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		//设置本节点Cookie
 		cookies = getRequestCookie(request, node.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
 		if(!cookies.isEmpty()){
+			cookies.entrySet().forEach(entry->{
+				try {
+					Object value = engine.execute(entry.getValue(), variables);
+					entry.setValue(Objects.toString(value));
+				} catch (Exception e) {
+					context.error("设置Cookie出错:{}",e);
+				}
+
+			});
 			context.debug("设置Cookie：{}", cookies);
 			request.cookies(cookies);
 		}
