@@ -98,7 +98,7 @@ public class Spider {
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
 		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
 		context.setRootNode(root);
-		context.setPool(pool);
+		context.setThreadPool(pool);
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
@@ -114,8 +114,9 @@ public class Spider {
 
 	public void execute(int nThreads, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
-		context.setPool(pool);
+		context.setThreadPool(pool);
 		executeNode(fromNode, node, context, variables);
+		pool.awaitTermination();
 	}
 
 	private void executeNextNodes(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
@@ -216,7 +217,7 @@ public class Spider {
 					});
 				}
 			}
-			runnables.forEach(executor.isThread() ? context.getPool()::submit : Runnable::run);
+			runnables.forEach(executor.isThread() ? context.getThreadPool()::submit : Runnable::run);
 		}
 	}
 

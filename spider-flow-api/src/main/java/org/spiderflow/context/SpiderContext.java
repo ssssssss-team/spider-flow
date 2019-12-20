@@ -33,7 +33,7 @@ public class SpiderContext extends HashMap<String, Object>{
 	/**
 	 * 流程执行线程
 	 */
-	private SubThreadPoolExecutor pool;
+	private SubThreadPoolExecutor threadPool;
 
 	/**
 	 * 处理流程同步锁
@@ -75,12 +75,12 @@ public class SpiderContext extends HashMap<String, Object>{
 		this.outputs.add(output);
 	}
 
-	public SubThreadPoolExecutor getPool() {
-		return pool;
+	public SubThreadPoolExecutor getThreadPool() {
+		return threadPool;
 	}
 
-	public void setPool(SubThreadPoolExecutor pool) {
-		this.pool = pool;
+	public void setThreadPool(SubThreadPoolExecutor threadPool) {
+		this.threadPool = threadPool;
 	}
 
 	public SpiderNode getRootNode() {
