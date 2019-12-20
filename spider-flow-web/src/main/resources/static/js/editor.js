@@ -296,6 +296,48 @@ $(function(){
 					}
 				}
 			})
+		}).on("click",".editor-form-node .parameter-batch",function () {
+			layui.layer.open({
+				type : 1,
+				title : '请输入参数',
+				content : `<textarea id="paramters" name="paramters" placeholder="请输入参数，一行一个，冒号( : )、等号（ = ）、空格（  ）或tab（ \t ）分割name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
+				area : '800px',
+				btn : ['关闭','设置'],
+				btn2 : function(){
+					var paramterStr = $("#paramters").val();
+					var paramterArr = paramterStr.split("\n");
+					var appendFlag = true;
+					var appendDiv = "";
+					var length = $(".draggable").length;
+					for (var i = 0; i < paramterArr.length; i++) {
+						var paramterItem = paramterArr[i];
+						var index = paramterItem.indexOf(":");
+						if(index < 0){
+							index = paramterItem.indexOf("=");
+						}
+						if(index < 0){
+							index = paramterItem.indexOf(" ");
+						}
+						if(index < 0){
+							index = paramterItem.indexOf("\t");
+						}
+						if (index < 0) {
+							layer.alert('参数数据格式错误');
+							appendFlag = false;
+							return;
+						} else {
+							var name = paramterItem.substring(0, index);
+							var value = paramterItem.substring(index + 1);
+							appendDiv += `<div id="paramterr` + (length + i) + `" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close parameter-remove"></i><label class="layui-form-label">参数名</label><div class="layui-input-block"><input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array" value="` + $.trim(name) + `"></div></div><div class="layui-form-item"><label class="layui-form-label">参数值</label><div class="layui-input-block array" codemirror="parameter-value" placeholder="请输入参数值" data-value="` + $.trim(value) + `"></div></div><hr></div>`;
+						}
+					}
+					if (appendFlag) {
+						$("#addParamterBtn").before(appendDiv);
+						renderCodeMirror();
+						serializeForm();
+					}
+				}
+			})
 		}).on("click",".editor-form-node .output-add",function(){
 			var index = $(".draggable").length;
 			$(this).parent().parent().before('<div id="output' + index + '"class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close output-remove"></i><label class="layui-form-label">输出项</label><div class="layui-input-block"><input type="text" name="output-name" placeholder="请输入输出项" autocomplete="off" class="layui-input array"></div></div><div class="layui-form-item"><label class="layui-form-label">输出值</label><div class="layui-input-block array" codemirror="output-value" placeholder="请输入输出值"></div></div></div>');
