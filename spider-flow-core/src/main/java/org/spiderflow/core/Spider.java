@@ -3,7 +3,6 @@ package org.spiderflow.core;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.spiderflow.ExpressionEngine;
-import org.spiderflow.concurrent.CountableThreadPool;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.RunnableNode;
@@ -25,7 +24,6 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -98,17 +96,15 @@ public class Spider {
 
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
-		SubThreadPoolExecutor flowPool = executor.createSubThreadPoolExecutor(nThreads);
-		CountableThreadPool taskPool = new CountableThreadPool(nThreads);
+		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
 		context.setRootNode(root);
-		context.setFlowPool(flowPool);
-		context.setTaskPool(taskPool);
+		context.setPool(pool);
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
 		try {
 			executeNode(null, root, context, variables);
-			flowPool.awaitTermination();
+			pool.awaitTermination();
 		} finally {
 			if (listeners != null) {
 				listeners.forEach(listener -> listener.afterEnd(context));
@@ -117,10 +113,8 @@ public class Spider {
 	}
 
 	public void execute(int nThreads, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
-		SubThreadPoolExecutor flowPool = executor.createSubThreadPoolExecutor(nThreads);
-		CountableThreadPool taskPool = new CountableThreadPool(nThreads);
-		context.setFlowPool(flowPool);
-		context.setTaskPool(taskPool);
+		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
+		context.setPool(pool);
 		executeNode(fromNode, node, context, variables);
 	}
 
@@ -222,11 +216,7 @@ public class Spider {
 					});
 				}
 			}
-			if (node.getNextNodes() == null || node.getNextNodes().isEmpty()) {
-				runnables.forEach(executor.isThread() ? context.getTaskPool()::execute : Runnable::run);
-			} else {
-				runnables.forEach(executor.isThread() ? context.getFlowPool()::submit : Runnable::run);
-			}
+			runnables.forEach(executor.isThread() ? context.getPool()::submit : Runnable::run);
 		}
 	}
 
