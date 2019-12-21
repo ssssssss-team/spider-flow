@@ -1,15 +1,16 @@
 package org.spiderflow.logback;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.FileAppender;
+import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.context.SpiderContextHolder;
-import org.spiderflow.core.job.SpiderJobContext;
 import org.spiderflow.model.SpiderLog;
 import org.spiderflow.model.SpiderWebSocketContext;
 
-import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class SpiderFlowWebSocketAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
@@ -18,7 +19,12 @@ public class SpiderFlowWebSocketAppender extends UnsynchronizedAppenderBase<ILog
 		SpiderContext context = SpiderContextHolder.get();
 		if(context instanceof SpiderWebSocketContext){
 			SpiderWebSocketContext socketContext = (SpiderWebSocketContext) context;
-			socketContext.log(new SpiderLog(event.getLevel().levelStr,event.getMessage(),event.getArgumentArray()));
+			List<Object> arguments = new ArrayList<>(Arrays.asList(event.getArgumentArray()));
+			ThrowableProxy throwableProxy = (ThrowableProxy) event.getThrowableProxy();
+			if(throwableProxy != null){
+				arguments.add(throwableProxy.getThrowable());
+			}
+			socketContext.log(new SpiderLog(event.getLevel().levelStr.toLowerCase(),event.getMessage(),arguments));
 		}
 	}
 }
