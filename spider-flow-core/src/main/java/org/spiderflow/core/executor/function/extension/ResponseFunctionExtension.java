@@ -124,15 +124,4 @@ public class ResponseFunctionExtension implements FunctionExtension {
                 .filter(link -> StringUtils.isNotBlank(link))
                 .collect(Collectors.toList());
     }
-
-    @Comment("暂停当前线程")
-    @Example("${resp.sleep(1000L)}")
-    public static SpiderResponse sleep(SpiderResponse response,Long sleep) {
-        try {
-            Thread.sleep(sleep);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
 }
