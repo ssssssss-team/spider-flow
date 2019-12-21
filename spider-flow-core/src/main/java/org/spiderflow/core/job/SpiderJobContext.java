@@ -25,25 +25,15 @@ public class SpiderJobContext extends SpiderContext{
 		this.outputstream = outputstream;
 	}
 	
-	@Override
-	public void log(SpiderLog log) {
-		StringBuffer stringBuffer = new StringBuffer();
-		stringBuffer.append("[").append(log.getLevel()).append("] ")
-			.append(DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"))
-			.append(" ").append(MessageFormatter.arrayFormat(log.getMessage(), log.getVariables().toArray()).getMessage())
-			.append("\r\n");
-		try {
-			outputstream.write(stringBuffer.toString().getBytes("UTF-8"));
-			outputstream.flush();
-		} catch (Exception e) {
-		}
-	}
-	
 	public void close(){
 		try {
 			this.outputstream.close();
 		} catch (Exception e) {
 		}
+	}
+
+	public OutputStream getOutputstream(){
+		return this.outputstream;
 	}
 	
 	public static SpiderJobContext create(String directory,String file){

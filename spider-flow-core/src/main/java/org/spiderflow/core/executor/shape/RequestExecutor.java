@@ -8,6 +8,8 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.Grammerable;
 import org.spiderflow.context.CookieContext;
@@ -76,6 +78,8 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 	public static final String LAST_EXECUTE_TIME = "__last_execute_time_";
 
 	public static final String COOKIE_AUTO_SET = "cookie-auto-set";
+
+	private static final Logger logger = LoggerFactory.getLogger(RequestExecutor.class);
 	
 	@Autowired
 	private ExpressionEngine engine;
@@ -107,14 +111,14 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 							sleepTime = lastExecuteTime + sleepTime - System.currentTimeMillis();
 						}
 						if (sleepTime > 0) {
-							context.info("设置延迟时间:{}ms", sleepTime);
+							logger.debug("设置延迟时间:{}ms", sleepTime);
 							Thread.sleep(sleepTime);
 						}
 						context.put(LAST_EXECUTE_TIME + node.getNodeId(), System.currentTimeMillis());
 					}
 				}
 			} catch (Throwable t) {
-				context.error("设置延迟时间失败:{}", t);
+				logger.error("设置延迟时间失败:{}", t);
 			}
 		}
 		HttpRequest request = HttpRequest.create();
@@ -123,30 +127,30 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		try {
 			url = engine.execute(node.getStringJsonValue(URL), variables).toString();
 		} catch (Exception e) {
-			context.error("设置请求url出错，异常信息：{}", e);
+			logger.error("设置请求url出错，异常信息：{}", e);
 			ExceptionUtils.wrapAndThrow(e);
 		}
-		context.debug("设置请求url:{}", url);
+		logger.info("设置请求url:{}", url);
 		request.url(url);
 		//设置请求超时时间
 		int timeout = NumberUtils.toInt(node.getStringJsonValue(TIMEOUT), 60000);
-		context.debug("设置请求超时时间:{}", timeout);
+		logger.debug("设置请求超时时间:{}", timeout);
 		request.timeout(timeout);
 		
 		String method = Objects.toString(node.getStringJsonValue(REQUEST_METHOD), "GET");
 		//设置请求方法
 		request.method(method);
-		context.debug("设置请求方法:{}", method);
+		logger.debug("设置请求方法:{}", method);
 		
 		//是否跟随重定向
 		boolean followRedirects = !"0".equals(node.getStringJsonValue(FOLLOW_REDIRECT));
 		request.followRedirect(followRedirects);
-		context.debug("设置跟随重定向：{}", followRedirects);
+		logger.debug("设置跟随重定向：{}", followRedirects);
 		
 		//是否验证TLS证书,默认是验证
 		if("0".equals(node.getStringJsonValue(TLS_VALIDATE))){
 			request.validateTLSCertificates(false);
-			context.debug("设置TLS证书验证：{}", false);
+			logger.debug("设置TLS证书验证：{}", false);
 		}
 		SpiderNode root = context.getRootNode();
 		//设置请求header
@@ -156,14 +160,14 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		//设置全局Cookie
 		Map<String, String> cookies = getRequestCookie(request, root.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
 		if(!cookies.isEmpty()){
-			context.debug("设置全局Cookie：{}", cookies);
+			logger.info("设置全局Cookie：{}", cookies);
 			request.cookies(cookies);
 		}
 		//设置自动管理的Cookie
 		boolean cookieAutoSet = !"0".equals(node.getStringJsonValue(COOKIE_AUTO_SET));
-		if(cookieAutoSet){
+		if(cookieAutoSet && !cookieContext.isEmpty()){
 			request.cookies(cookieContext);
-			context.debug("自动设置Cookie：{}", cookieContext);
+			logger.info("自动设置Cookie：{}", cookieContext);
 		}
 		//设置本节点Cookie
 		cookies = getRequestCookie(request, node.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
@@ -173,11 +177,11 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 					Object value = engine.execute(entry.getValue(), variables);
 					entry.setValue(Objects.toString(value));
 				} catch (Exception e) {
-					context.error("设置Cookie出错:{}",e);
+					logger.error("设置Cookie出错:{}",e);
 				}
 
 			});
-			context.debug("设置Cookie：{}", cookies);
+			logger.debug("设置Cookie：{}", cookies);
 			request.cookies(cookies);
 		}
 		if(cookieAutoSet){
@@ -192,9 +196,9 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 			try {
 				Object requestBody = engine.execute(node.getStringJsonValue(REQUEST_BODY), variables);
 				request.data(requestBody);
-				context.debug("设置请求Body:{}", requestBody);
+				logger.info("设置请求Body:{}", requestBody);
 			} catch (Exception e) {
-				context.debug("设置请求Body出错:{}", e);
+				logger.debug("设置请求Body出错:{}", e);
 			}
 		}else if("form-data".equals(bodyType)){
 			List<Map<String, String>> formParameters = node.getListJsonValue(PARAMETER_FORM_NAME,PARAMETER_FORM_VALUE,PARAMETER_FORM_TYPE,PARAMETER_FORM_FILENAME);
@@ -211,13 +215,13 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 				Object value = engine.execute(proxy, variables);
 				if(value != null){
 					String[] proxyArr = value.toString().split(":");
-					if(proxyArr != null && proxyArr.length == 2){
+					if(proxyArr.length == 2){
 						request.proxy(proxyArr[0], Integer.parseInt(proxyArr[1]));
-						context.debug("设置代理：{}",proxy);
+						logger.info("设置代理：{}",proxy);
 					}
 				}
 			} catch (Exception e) {
-				context.error("设置代理出错，异常信息:{}",e);
+				logger.error("设置代理出错，异常信息:{}",e);
 			}
 		}
 		try {
@@ -225,14 +229,14 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 			String charset = node.getStringJsonValue(RESPONSE_CHARSET);
 			if(StringUtils.isNotBlank(charset)){
 				response.setCharset(charset);
-				context.debug("设置response charset:{}",charset);
+				logger.debug("设置response charset:{}",charset);
 			}
 			//cookie存入cookieContext
 			cookieContext.putAll(response.getCookies());
 			//结果存入变量
 			variables.put("resp", response);
 		} catch (IOException e) {
-			context.error("请求{}出错,异常信息:{}",url,e);
+			logger.error("请求{}出错,异常信息:{}",url,e);
 			ExceptionUtils.wrapAndThrow(e);
 		} finally{
 			if(streams != null){
@@ -271,17 +275,17 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 							if(stream != null){
 								streams.add(stream);
 								request.data(parameterName, parameterFilename, stream);
-								context.debug("设置请求参数：{}={}",parameterName,parameterFilename);
+								logger.info("设置请求参数：{}={}",parameterName,parameterFilename);
 							}else{
-								context.warn("设置请求参数：{}失败，无二进制内容",parameterName);
+								logger.warn("设置请求参数：{}失败，无二进制内容",parameterName);
 							}
 						}else{
 							request.data(parameterName, value);
-							context.debug("设置请求参数：{}={}",parameterName,value);
+							logger.info("设置请求参数：{}={}",parameterName,value);
 						}
 						
 					} catch (Exception e) {
-						context.error("设置请求参数：{}出错,异常信息:{}",parameterName,e);
+						logger.error("设置请求参数：{}出错,异常信息:{}",parameterName,e);
 					}
 				}
 			}
@@ -301,10 +305,10 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 						value = engine.execute(cookieValue, variables);
 						if (value != null) {
 							cookieMap.put(cookieName, cookieValue);
-							context.debug("设置请求Cookie：{}={}", cookieName, value);
+							logger.info("设置请求Cookie：{}={}", cookieName, value);
 						}
 					} catch (Exception e) {
-						context.error("设置请求Cookie：{}出错,异常信息：{}", cookieName, e);
+						logger.error("设置请求Cookie：{}出错,异常信息：{}", cookieName, e);
 					}
 				}
 			}
@@ -321,9 +325,9 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 					String parameterValue = nameValue.get(PARAMETER_VALUE);
 					try {
 						value = engine.execute(parameterValue, variables);
-						context.debug("设置请求参数：{}={}", parameterName, value);
+						logger.info("设置请求参数：{}={}", parameterName, value);
 					} catch (Exception e) {
-						context.error("设置请求参数：{}出错,异常信息：{}", parameterName, e);
+						logger.error("设置请求参数：{}出错,异常信息：{}", parameterName, e);
 					}
 					request.data(parameterName, value);
 				}
@@ -340,9 +344,9 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 					String headerValue = nameValue.get(HEADER_VALUE);
 					try {
 						value = engine.execute(headerValue, variables);
-						context.debug("设置请求Header：{}={}", headerName, value);
+						logger.info("设置请求Header：{}={}", headerName, value);
 					} catch (Exception e) {
-						context.error("设置请求Header：{}出错,异常信息：{}", headerName, e);
+						logger.error("设置请求Header：{}出错,异常信息：{}", headerName, e);
 					}
 					request.header(headerName, value);
 				}

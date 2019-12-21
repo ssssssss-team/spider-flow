@@ -103,10 +103,6 @@ public class SpiderNode {
 		return nextNodes;
 	}
 
-	public void setNextNodes(List<SpiderNode> nextNodes) {
-		this.nextNodes = nextNodes;
-	}
-
 	public String getCondition(String fromNodeId) {
 		return condition.get(fromNodeId);
 	}

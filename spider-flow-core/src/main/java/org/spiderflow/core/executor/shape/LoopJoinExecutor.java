@@ -1,5 +1,7 @@
 package org.spiderflow.core.executor.shape;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.context.RunnableTreeNode;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.executor.ShapeExecutor;
@@ -22,6 +24,8 @@ public class LoopJoinExecutor implements ShapeExecutor {
 	public static final String JOIN_NODE_ID = "joinNode";
 	
 	public static final String VARIABLE_CONTEXT = "__variable_context";
+
+	private static final Logger logger = LoggerFactory.getLogger(LoopJoinExecutor.class);
 	
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
@@ -68,7 +72,7 @@ public class LoopJoinExecutor implements ShapeExecutor {
 			}
 			return isDone;
 		} else {
-			context.warn("找不到等待节点：{}" + node.getStringJsonValue(JOIN_NODE_ID));
+			logger.warn("找不到等待节点：{}" + node.getStringJsonValue(JOIN_NODE_ID));
 		}
 		return false;
 	}

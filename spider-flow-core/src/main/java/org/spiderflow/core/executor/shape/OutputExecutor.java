@@ -3,6 +3,8 @@ package org.spiderflow.core.executor.shape;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.executor.ShapeExecutor;
@@ -22,6 +24,8 @@ public class OutputExecutor implements ShapeExecutor{
 	public static final String OUTPUT_NAME = "output-name";
 	
 	public static final String OUTPUT_VALUE = "output-value";
+
+	private static Logger logger = LoggerFactory.getLogger(OutputExecutor.class);
 	
 	@Autowired
 	private ExpressionEngine engine;
@@ -38,9 +42,9 @@ public class OutputExecutor implements ShapeExecutor{
 			String outputName = item.get(OUTPUT_NAME);
 			try {
 				value = engine.execute(outputValue, variables);
-				context.debug("输出{}={}", outputName,value);
+				logger.debug("输出{}={}", outputName,value);
 			} catch (Exception e) {
-				context.error("输出{}出错，异常信息：{}", outputName,e);
+				logger.error("输出{}出错，异常信息：{}", outputName,e);
 			}
 			output.addOutput(outputName, value);
 		}
