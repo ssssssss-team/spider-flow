@@ -234,7 +234,7 @@ $(function(){
 			layui.layer.open({
 				type : 1,
 				title : '请输入Cookie',
-				content : `<textarea id="cookies" name="cookies" placeholder="请输入Cookies，逗号( : )分隔Cookie，等于号( = )分隔name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
+				content : `<textarea id="cookies" name="cookies" placeholder="请输入Cookies，分号( ; )分隔Cookie，等于号( = )分隔name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
 				area : '800px',
 				btn : ['关闭','设置'],
 				btn2 : function(){
@@ -311,15 +311,19 @@ $(function(){
 					var length = $(".draggable").length;
 					for (var i = 0; i < paramterArr.length; i++) {
 						var paramterItem = paramterArr[i];
-						var index = paramterItem.indexOf(":");
-						if(index < 0){
-							index = paramterItem.indexOf("=");
-						}
-						if(index < 0){
-							index = paramterItem.indexOf(" ");
-						}
-						if(index < 0){
-							index = paramterItem.indexOf("\t");
+						var index = -1;
+						var indexArr = [];
+						indexArr.push(paramterItem.indexOf(":"));
+						indexArr.push(paramterItem.indexOf("="));
+						indexArr.push(paramterItem.indexOf(" "));
+						indexArr.push(paramterItem.indexOf("\t"));
+						for (var j = 0; j < indexArr.length; j++) {
+							if (indexArr[j] >= 0) {
+								if (index < 0) {
+									index = indexArr[j];
+								}
+								index = Math.min(index, indexArr[j]);
+							}
 						}
 						if (index < 0) {
 							layer.alert('参数数据格式错误');
