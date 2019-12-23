@@ -30,7 +30,7 @@ public class SpiderJobManager {
 	public final static String JOB_PARAM_NAME = "SPIDER_FLOW";
 	
 	@Autowired
-	private SpiderJob spioderJob;
+	private SpiderJob spiderJob;
 	
 	/**
 	 * 调度器
@@ -42,20 +42,6 @@ public class SpiderJobManager {
 		return JobKey.jobKey(JOB_NAME + id);
 	}
 	
-	/**
-	 * 获取定时任务触发器Cron
-	 * @param id CronTrigger的ID
-	 * @return CronTrigger触发器
-	 */
-	public CronTrigger getCronTrigger(String id) {
-        try {
-            return (CronTrigger) scheduler.getTrigger(getTriggerKey(id));
-        } catch (SchedulerException e) {
-        	logger.error("获取CronTrigger出错",e);
-            return null;
-        }
-    }
-
 	private TriggerKey getTriggerKey(String id){
 		return TriggerKey.triggerKey(JOB_NAME + id);
 	}
@@ -83,26 +69,9 @@ public class SpiderJobManager {
 		}
 	}
 	
-	public boolean updateJob(SpiderFlow spiderFlow){
-		try {
-			if(getCronTrigger(spiderFlow.getId()) != null){
-				TriggerKey triggerKey = getTriggerKey(spiderFlow.getId());
-				CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(spiderFlow.getCron())
-			    		.withMisfireHandlingInstructionDoNothing();
-				CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(spiderFlow.getId())).withSchedule(cronScheduleBuilder).build();
-				trigger.getJobDataMap().put(JOB_PARAM_NAME, spiderFlow);
-				scheduler.rescheduleJob(triggerKey, trigger);
-			}
-			return true;
-		} catch (SchedulerException e) {
-			logger.error("修改定时任务失败",e);
-			return false;
-		}
-	}
-	
 	public void run(String id){
 		new Thread(()->{
-			spioderJob.run(id);
+			spiderJob.run(id);
 		}).start();
 	}
 	

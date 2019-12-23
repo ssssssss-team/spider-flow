@@ -45,5 +45,11 @@
 		    <artifactId>druid-spring-boot-starter</artifactId>
 		    <version>1.1.16</version>
 		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>transmittable-thread-local</artifactId>
+			<version>2.11.2</version>
+		</dependency>
+
 	</dependencies>
 </project>

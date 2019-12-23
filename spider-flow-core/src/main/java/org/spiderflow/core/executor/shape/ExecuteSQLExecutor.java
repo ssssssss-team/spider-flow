@@ -5,6 +5,8 @@ import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.Grammerable;
 import org.spiderflow.context.SpiderContext;
@@ -44,6 +46,8 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 
 	public static final String STATEMENT_DELETE = "delete";
 
+	private static final Logger logger = LoggerFactory.getLogger(ExecuteSQLExecutor.class);
+
 	@Autowired
 	private ExpressionEngine engine;
 
@@ -52,9 +56,9 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 		String dsId = node.getStringJsonValue(DATASOURCE_ID);
 		String sql = node.getStringJsonValue(SQL);
 		if (!StringUtils.isNotBlank(dsId)) {
-			context.warn("数据源ID为空！");
+			logger.warn("数据源ID为空！");
 		} else if (!StringUtils.isNotBlank(sql)) {
-			context.warn("sql为空！");
+			logger.warn("sql为空！");
 		} else {
 			JdbcTemplate template = new JdbcTemplate(DataSourceUtils.getDataSource(dsId));
 			//把变量替换成占位符
@@ -63,12 +67,12 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 			try {
 				Object sqlObject = engine.execute(sql, variables);
 				if(sqlObject == null){
-					context.warn("获取的sql为空！");
+					logger.warn("获取的sql为空！");
 					return;
 				}
 				sql = sqlObject.toString();
 			} catch (Exception e) {
-				context.error("获取sql出错,异常信息:{}", e);
+				logger.error("获取sql出错,异常信息:{}", e);
 				ExceptionUtils.wrapAndThrow(e);
 			}
 			int size = parameters.size();
@@ -91,14 +95,14 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 				params[i] = parameter;
 			}
 			String statementType = node.getStringJsonValue(STATEMENT_TYPE);
-			context.debug("执行sql：{}", sql);
+			logger.debug("执行sql：{}", sql);
 			if (STATEMENT_SELECT.equals(statementType)) {
 				List<Map<String, Object>> rs = null;
 				try {
 					rs = template.queryForList(sql, params);
 					variables.put("rs", rs);
 				} catch (Exception e) {
-					context.error("执行sql出错,异常信息:{}", e);
+					logger.error("执行sql出错,异常信息:{}", e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_SELECT_ONE.equals(statementType)) {
@@ -107,7 +111,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					rs = template.queryForMap(sql, params);
 					variables.put("rs", rs);
 				} catch (Exception e) {
-					context.error("执行sql出错,异常信息:{}", e);
+					logger.error("执行sql出错,异常信息:{}", e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_SELECT_INT.equals(statementType)) {
@@ -117,7 +121,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					rs = rs == null ? 0 : rs;
 					variables.put("rs", rs);
 				} catch (Exception e) {
-					context.error("执行sql出错,异常信息:{}", e);
+					logger.error("执行sql出错,异常信息:{}", e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_UPDATE.equals(statementType) || STATEMENT_INSERT.equals(statementType) || STATEMENT_DELETE.equals(statementType)) {
@@ -138,7 +142,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					}
 					variables.put("rs", updateCount);
 				} catch (Exception e) {
-					context.error("执行sql出错,异常信息:{}", e);
+					logger.error("执行sql出错,异常信息:{}", e);
 					variables.put("rs", -1);
 					ExceptionUtils.wrapAndThrow(e);
 				}

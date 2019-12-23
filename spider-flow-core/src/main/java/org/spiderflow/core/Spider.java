@@ -2,12 +2,15 @@ package org.spiderflow.core;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.ExpressionEngine;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.RunnableNode;
 import org.spiderflow.context.RunnableTreeNode;
 import org.spiderflow.context.SpiderContext;
+import org.spiderflow.context.SpiderContextHolder;
 import org.spiderflow.core.executor.shape.LoopExecutor;
 import org.spiderflow.core.executor.shape.LoopJoinExecutor;
 import org.spiderflow.core.model.SpiderFlow;
@@ -28,9 +31,8 @@ import java.util.stream.Collectors;
 
 /**
  * 爬虫的核心类
- * 
- * @author jmxd
  *
+ * @author jmxd
  */
 @Component
 public class Spider {
@@ -48,10 +50,10 @@ public class Spider {
 
 	@Autowired(required = false)
 	private List<SpiderListener> listeners;
-	
+
 	@Value("${spider.thread.max:64}")
 	private Integer totalThreads;
-	
+
 	@Value("${spider.thread.default:8}")
 	private Integer defaultThreads;
 
@@ -59,10 +61,12 @@ public class Spider {
 	private Integer deadCycle;
 
 	private static Map<String, ShapeExecutor> executorMap = new HashMap<>();
-	
+
 	private static SpiderFlowThreadPoolExecutor executor;
 
 	private static final String ATOMIC_DEAD_CYCLE = "__atomic_dead_cycle";
+
+	private static Logger logger = LoggerFactory.getLogger(Spider.class);
 
 	@PostConstruct
 	private void init() {
@@ -70,7 +74,7 @@ public class Spider {
 		executor = new SpiderFlowThreadPoolExecutor(totalThreads);
 	}
 
-	public List<SpiderOutput> run(SpiderFlow spiderFlow, SpiderContext context,Map<String, Object> variables) {
+	public List<SpiderOutput> run(SpiderFlow spiderFlow, SpiderContext context, Map<String, Object> variables) {
 		if (variables == null) {
 			variables = new HashMap<>();
 		}
@@ -84,14 +88,16 @@ public class Spider {
 	}
 
 	public void runWithTest(SpiderNode root, SpiderContext context) {
-		AtomicInteger executeCount =  new AtomicInteger(0);
+		SpiderContextHolder.set(context);
+		AtomicInteger executeCount = new AtomicInteger(0);
 		context.put(ATOMIC_DEAD_CYCLE, executeCount);
 		executeRoot(root, context, new HashMap<>());
-		if(executeCount.get() > deadCycle){
-			context.error("检测到可能出现死循环,测试终止");
-		}else{
-			context.info("测试完毕！");
+		if (executeCount.get() > deadCycle) {
+			logger.error("检测到可能出现死循环,测试终止");
+		} else {
+			logger.info("测试完毕！");
 		}
+		SpiderContextHolder.remove();
 	}
 
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
@@ -138,10 +144,10 @@ public class Spider {
 		if (!executeCondition(fromNode, node, context, variables)) {
 			return;
 		}
-		context.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
+		logger.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
 		ShapeExecutor executor = executorMap.get(shape);
-		if(executor == null){
-			context.error("执行失败,找不到对应的执行器:{}",shape);
+		if (executor == null) {
+			logger.error("执行失败,找不到对应的执行器:{}", shape);
 		}
 		int loopCount = 1;
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
@@ -149,21 +155,21 @@ public class Spider {
 			try {
 				Object result = engine.execute(loopCountStr, variables);
 				result = result == null ? 0 : result;
-				context.debug("获取循环次数{}={}", loopCountStr, result);
+				logger.debug("获取循环次数{}={}", loopCountStr, result);
 				loopCount = Integer.parseInt(result.toString());
-			} catch (Throwable e) {
+			} catch (Throwable t) {
 				loopCount = 0;
-				context.error("获取循环次数失败,异常信息：{}",e);
+				logger.error("获取循环次数失败,异常信息：{}", t);
 			}
 		}
 		if (loopCount > 0) {
 			String loopVariableName = node.getStringJsonValue(ShapeExecutor.LOOP_VARIABLE_NAME);
 			RunnableTreeNode treeNode = new RunnableTreeNode(node.getNodeId());
 			RunnableTreeNode parentNode = (RunnableTreeNode) variables.get(LoopExecutor.LOOP_NODE_KEY);
-			if(parentNode != null){
+			if (parentNode != null) {
 				parentNode.add(treeNode);
 			}
-			if(executor instanceof LoopExecutor){
+			if (executor instanceof LoopExecutor) {
 				variables.put(LoopExecutor.LOOP_NODE_KEY + node.getNodeId(), treeNode);
 				variables.put(LoopExecutor.LOOP_NODE_KEY, treeNode);
 				variables.put(LoopExecutor.BEFORE_LOOP_VARIABLE + node.getNodeId(), variables);
@@ -176,7 +182,7 @@ public class Spider {
 					treeNode.add(new RunnableTreeNode("loop-" + node.getNodeId(), runnableNode));
 					Map<String, Object> nVariables = new HashMap<>(variables);
 					// 存入下标变量
-					if(loopVariableName != null){
+					if (loopVariableName != null) {
 						nVariables.put(loopVariableName, i);
 					}
 					runnables.add(() -> {
@@ -185,7 +191,7 @@ public class Spider {
 							try {
 								//死循环检测，当执行节点次数大于阈值时，结束本次测试
 								AtomicInteger executeCount = context.get(ATOMIC_DEAD_CYCLE);
-								if(executeCount != null && executeCount.incrementAndGet() > deadCycle){
+								if (executeCount != null && executeCount.incrementAndGet() > deadCycle) {
 									context.setRunning(false);
 									return;
 								}
@@ -194,22 +200,22 @@ public class Spider {
 								nVariables.put("ex", null);
 							} catch (Throwable t) {
 								nVariables.put("ex", t);
-								context.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
+								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
 							} finally {
-								if(node.isSync()){
+								if (node.isSync()) {
 									context.lock();
 								}
 								//设置当前线程为已完成状态
 								runnableNode.setState(RunnableNode.State.DONE);
 								//判断是否允许执行后续节点
 								if (executor.allowExecuteNext(node, context, nVariables)) {
-									context.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
+									logger.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
 									// 递归执行下一级节点
 									executeNextNodes(node, context, nVariables);
 								} else {
-									context.debug("执行节点[{}:{}]完毕，忽略执行下一节点", node.getNodeName(), node.getNodeId());
+									logger.debug("执行节点[{}:{}]完毕，忽略执行下一节点", node.getNodeName(), node.getNodeId());
 								}
-								if(node.isSync()){
+								if (node.isSync()) {
 									context.unlock();
 								}
 							}
@@ -229,11 +235,11 @@ public class Spider {
 				try {
 					result = engine.execute(condition, variables);
 				} catch (Exception e) {
-					context.error("判断{}出错,异常信息：{}", condition, e);
+					logger.error("判断{}出错,异常信息：{}", condition, e);
 				}
 				if (result != null) {
 					boolean isContinue = "true".equals(result) || Objects.equals(result, true);
-					context.debug("判断{}={}", condition, isContinue);
+					logger.debug("判断{}={}", condition, isContinue);
 					return isContinue;
 				}
 				return false;

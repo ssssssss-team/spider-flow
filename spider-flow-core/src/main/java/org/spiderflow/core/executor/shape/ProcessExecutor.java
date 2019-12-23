@@ -2,6 +2,8 @@ package org.spiderflow.core.executor.shape;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.Spider;
 import org.spiderflow.core.model.SpiderFlow;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Component;
 public class ProcessExecutor implements ShapeExecutor{
 	
 	public static final String FLOW_ID = "flowId";
+
+	private static Logger logger = LoggerFactory.getLogger(ProcessExecutor.class);
 	
 	@Autowired
 	private SpiderFlowService spiderFlowService;
@@ -33,11 +37,11 @@ public class ProcessExecutor implements ShapeExecutor{
 		String flowId = node.getStringJsonValue("flowId");
 		SpiderFlow spiderFlow = spiderFlowService.getById(flowId);
 		if(spiderFlow != null){
-			context.debug("执行子流程:{}", spiderFlow.getName());
+			logger.info("执行子流程:{}", spiderFlow.getName());
 			SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
 			spider.executeNode(null,root,context,variables);
 		}else{
-			context.debug("执行子流程:{}", flowId);
+			logger.info("执行子流程:{}失败，找不到该子流程", flowId);
 		}
 	}
 

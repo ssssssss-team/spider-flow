@@ -8,7 +8,11 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.spiderflow.context.SpiderContext;
+import org.spiderflow.context.SpiderContextHolder;
 import org.spiderflow.core.Spider;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.model.Task;
@@ -44,8 +48,10 @@ public class SpiderJob extends QuartzJobBean {
 	@Value("${spider.job.log.path:./}")
 	private String spiderLogPath;
 
+	private static Logger logger = LoggerFactory.getLogger(SpiderJob.class);
+
 	@Override
-	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+	protected void executeInternal(JobExecutionContext context) {
 		if (!spiderJobEnable) {
 			return;
 		}
@@ -61,27 +67,29 @@ public class SpiderJob extends QuartzJobBean {
 	public void run(SpiderFlow spiderFlow, Date nextExecuteTime) {
 		Date now = new Date();
 		SpiderJobContext context = SpiderJobContext.create(this.spiderLogPath, spiderFlow.getId() + ".log");
+		SpiderContextHolder.set(context);
 		Task task = new Task();
 		task.setFlowId(spiderFlow.getId());
 		task.setBeginTime(new Date());
 		try {
 			taskService.save(task);
 			contextMap.put(task.getId(), context);
-			context.info("开始执行任务{}", spiderFlow.getName());
+			logger.info("开始执行任务{}", spiderFlow.getName());
 			spider.run(spiderFlow, context);
-			context.info("执行任务{}完毕，下次执行时间：{}", spiderFlow.getName(), nextExecuteTime == null ? null : DateFormatUtils.format(nextExecuteTime, "yyyy-MM-dd HH:mm:ss"));
+			logger.info("执行任务{}完毕，下次执行时间：{}", spiderFlow.getName(), nextExecuteTime == null ? null : DateFormatUtils.format(nextExecuteTime, "yyyy-MM-dd HH:mm:ss"));
 		} catch (Exception e) {
-			context.error("执行任务{}出错", spiderFlow.getName(), e);
+			logger.error("执行任务{}出错", spiderFlow.getName(), e);
 		} finally {
 			context.close();
 			task.setEndTime(new Date());
 			taskService.saveOrUpdate(task);
 			contextMap.remove(task.getId());
+			SpiderContextHolder.remove();
 		}
 		spiderFlowService.executeCountIncrement(spiderFlow.getId(), now, nextExecuteTime);
 	}
 
-	public static SpiderContext getSpiderContext(Integer taskId){
+	public static SpiderContext getSpiderContext(Integer taskId) {
 		return contextMap.get(taskId);
 	}
 }

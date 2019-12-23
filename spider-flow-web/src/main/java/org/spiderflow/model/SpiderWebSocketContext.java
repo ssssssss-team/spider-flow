@@ -44,7 +44,7 @@ public class SpiderWebSocketContext extends SpiderContext implements ObjectSeria
 		super.addOutput(output);
 		this.write(new WebSocketEvent<>("output", output));
 	}
-	@Override
+
 	public void log(SpiderLog log) {
 		write(new WebSocketEvent<>("log", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), log));
 	}

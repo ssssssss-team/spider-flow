@@ -1,13 +1,13 @@
 package org.spiderflow.core.executor.function.extension;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.annotation.Comment;
 import org.spiderflow.annotation.Example;
 import org.spiderflow.executor.FunctionExtension;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.List;
 
 
 @Component
@@ -38,6 +38,13 @@ public class ListFunctionExtension implements FunctionExtension{
 		}else{
 			return StringUtils.join(list.toArray(),separator);
 		}
+	}
+
+	@Comment("将list<String>排序")
+	@Example("${listVar.sort()}")
+	public static List<String> sort(List<String> list){
+		Collections.sort(list);
+		return list;
 	}
 
 	@Comment("将list打乱顺序")
