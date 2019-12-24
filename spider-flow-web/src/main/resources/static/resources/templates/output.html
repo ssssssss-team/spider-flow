@@ -21,6 +21,12 @@
     			<label class="layui-form-label">循环次数</label>
     			<div class="layui-input-block" codemirror="loopCount" placeholder="请输入循环次数" data-value="{{=d.data.object.loopCount}}"></div>
     		</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">输出设置</label>
+				<div class="layui-input-block">
+					<input type="checkbox" title="输出全部参数" value="output-all" lay-skin="primary" {{d.data.object['output-all'] == '0' ? '' : 'checked'}}/>
+				</div>
+			</div>
     		{{# layui.each(d.data.object['output-name'],function(index,output){ }}
 			<div id="output{{=index}}" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)">
 				<hr>

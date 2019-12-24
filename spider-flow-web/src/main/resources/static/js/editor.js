@@ -234,7 +234,7 @@ $(function(){
 			layui.layer.open({
 				type : 1,
 				title : '请输入Cookie',
-				content : `<textarea id="cookies" name="cookies" placeholder="请输入Cookies，逗号( : )分隔Cookie，等于号( = )分隔name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
+				content : `<textarea id="cookies" name="cookies" placeholder="请输入Cookies，分号( ; )分隔Cookie，等于号( = )分隔name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
 				area : '800px',
 				btn : ['关闭','设置'],
 				btn2 : function(){
@@ -291,6 +291,52 @@ $(function(){
 					}
 					if (appendFlag) {
 						$("#addHeaderBtn").before(appendDiv);
+						renderCodeMirror();
+						serializeForm();
+					}
+				}
+			})
+		}).on("click",".editor-form-node .parameter-batch",function () {
+			layui.layer.open({
+				type : 1,
+				title : '请输入参数',
+				content : `<textarea id="paramters" name="paramters" placeholder="请输入参数，一行一个，冒号( : )、等号（ = ）、空格（  ）或tab（ \t ）分割name和value" autocomplete="off" class="layui-textarea"  lay-verify="required" style="height:250px"></textarea>`,
+				area : '800px',
+				btn : ['关闭','设置'],
+				btn2 : function(){
+					var paramterStr = $("#paramters").val();
+					var paramterArr = paramterStr.split("\n");
+					var appendFlag = true;
+					var appendDiv = "";
+					var length = $(".draggable").length;
+					for (var i = 0; i < paramterArr.length; i++) {
+						var paramterItem = paramterArr[i];
+						var index = -1;
+						var indexArr = [];
+						indexArr.push(paramterItem.indexOf(":"));
+						indexArr.push(paramterItem.indexOf("="));
+						indexArr.push(paramterItem.indexOf(" "));
+						indexArr.push(paramterItem.indexOf("\t"));
+						for (var j = 0; j < indexArr.length; j++) {
+							if (indexArr[j] >= 0) {
+								if (index < 0) {
+									index = indexArr[j];
+								}
+								index = Math.min(index, indexArr[j]);
+							}
+						}
+						if (index < 0) {
+							layer.alert('参数数据格式错误');
+							appendFlag = false;
+							return;
+						} else {
+							var name = paramterItem.substring(0, index);
+							var value = paramterItem.substring(index + 1);
+							appendDiv += `<div id="paramterr` + (length + i) + `" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close parameter-remove"></i><label class="layui-form-label">参数名</label><div class="layui-input-block"><input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array" value="` + $.trim(name) + `"></div></div><div class="layui-form-item"><label class="layui-form-label">参数值</label><div class="layui-input-block array" codemirror="parameter-value" placeholder="请输入参数值" data-value="` + $.trim(value) + `"></div></div><hr></div>`;
+						}
+					}
+					if (appendFlag) {
+						$("#addParamterBtn").before(appendDiv);
 						renderCodeMirror();
 						serializeForm();
 					}
@@ -560,9 +606,13 @@ function bindToolbarClickAction(editor){
 		var filterText = '';
 		var testWindowIndex = layui.layer.open({
 			id : 'test-window',
+			type : 1,
 			content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="960" height="100"></canvas></div>',
 			area : ["980px","500px"],
 			shade : 0,
+			maxmin : true,
+			maxWidth : 700,
+			maxHeight : 400,
 			title : '测试窗口',
 			btn : ['关闭','显示/隐藏输出','显示/隐藏日志','停止'],
 			btn2 : function(){
