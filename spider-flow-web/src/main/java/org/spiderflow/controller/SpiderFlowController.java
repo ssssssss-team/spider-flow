@@ -156,8 +156,12 @@ public class SpiderFlowController {
 	}
 	
 	@RequestMapping("/log")
-	public JsonBean<List<Line>> log(String id, String keywords, Long index, Integer count, Boolean reversed,Boolean matchcase,Boolean regx){
-		try (RandomAccessFileReader reader = new RandomAccessFileReader(new RandomAccessFile(new File(spiderLogPath,id + ".log"),"r"), index == null ? -1 : index, reversed == null || reversed)){
+	public JsonBean<List<Line>> log(String id, String taskId, String keywords, Long index, Integer count, Boolean reversed, Boolean matchcase, Boolean regx) {
+		if (StringUtils.isBlank(taskId)) {
+			Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
+			taskId = maxId == null ? "" : maxId.toString();
+		}
+		try (RandomAccessFileReader reader = new RandomAccessFileReader(new RandomAccessFile(new File(spiderLogPath,id + taskId +".log"),"r"), index == null ? -1 : index, reversed == null || reversed)){
 			return new JsonBean<>(reader.readLine(count == null ? 10 : count,keywords,matchcase != null && matchcase,regx != null && regx));
 		} catch(FileNotFoundException e){
 			return new JsonBean<>(0,"日志文件不存在");

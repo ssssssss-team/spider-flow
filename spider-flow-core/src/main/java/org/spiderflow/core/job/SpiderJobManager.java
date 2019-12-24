@@ -15,6 +15,8 @@ import org.spiderflow.core.model.SpiderFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 /**
  * 爬虫定时执行管理
  * @author Administrator
@@ -51,7 +53,7 @@ public class SpiderJobManager {
 	 * @param spiderFlow 爬虫流程图
 	 * @return boolean true/false
 	 */
-	public boolean addJob(SpiderFlow spiderFlow){
+	public Date addJob(SpiderFlow spiderFlow){
 		try {
 			JobDetail job = JobBuilder.newJob(SpiderJob.class).withIdentity(getJobKey(spiderFlow.getId())).build();
 			job.getJobDataMap().put(JOB_PARAM_NAME, spiderFlow);
@@ -60,12 +62,10 @@ public class SpiderJobManager {
 			
 			CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(spiderFlow.getId())).withSchedule(cronScheduleBuilder).build();
 			
-			scheduler.scheduleJob(job,trigger);
-			
-			return true;
+			return scheduler.scheduleJob(job,trigger);
 		} catch (SchedulerException e) {
 			logger.error("创建定时任务出错",e);
-			return false;
+			return null;
 		}
 	}
 	
