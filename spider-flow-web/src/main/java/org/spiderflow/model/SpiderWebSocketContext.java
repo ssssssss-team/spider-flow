@@ -12,11 +12,8 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.spiderflow.context.SpiderContext;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.ObjectSerializer;
-import com.alibaba.fastjson.serializer.SerializeConfig;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.spiderflow.core.executor.shape.OutputExecutor;
+import org.spiderflow.core.serializer.FastJsonSerializer;
 
 /**
  * WebSocket通讯中爬虫的上下文域
@@ -47,12 +44,11 @@ public class SpiderWebSocketContext extends SpiderContext{
 		synchronized (session) {
 			if (session.isOpen()) {
 				try {
-					session.getBasicRemote().sendText(JSON.toJSONString(event, OutputExecutor.serializeConfig));
+					session.getBasicRemote().sendText(JSON.toJSONString(event, FastJsonSerializer.serializeConfig));
 				} catch (IOException e) {
 					//忽略异常
 				}
 			}
 		}
 	}
-
 }

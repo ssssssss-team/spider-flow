@@ -606,9 +606,13 @@ function bindToolbarClickAction(editor){
 		var filterText = '';
 		var testWindowIndex = layui.layer.open({
 			id : 'test-window',
+			type : 1,
 			content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="960" height="100"></canvas></div>',
 			area : ["980px","500px"],
 			shade : 0,
+			maxmin : true,
+			maxWidth : 700,
+			maxHeight : 400,
 			title : '测试窗口',
 			btn : ['关闭','显示/隐藏输出','显示/隐藏日志','停止'],
 			btn2 : function(){
