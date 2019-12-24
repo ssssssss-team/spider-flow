@@ -5,12 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.context.SpiderContextHolder;
 import org.spiderflow.core.Spider;

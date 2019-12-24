@@ -43,10 +43,14 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	@PostConstruct
 	private void initJobs(){
 		List<SpiderFlow> spiderFlows = sfMapper.selectList(new QueryWrapper<SpiderFlow>().eq("enabled", "1"));
-		if(spiderFlows != null){
+		if(spiderFlows != null && !spiderFlows.isEmpty()){
 			for (SpiderFlow sf : spiderFlows) {
 				if(StringUtils.isNotEmpty(sf.getCron())){
-					spiderJobManager.addJob(sf);
+					Date nextExecuteTimt = spiderJobManager.addJob(sf);
+					if (nextExecuteTimt != null) {
+						sf.setNextExecuteTime(nextExecuteTimt);
+						sfMapper.updateById(sf);
+					}
 				}
 			}
 		}
@@ -110,14 +114,19 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	
 	public void stop(String id){
 		sfMapper.resetSpiderStatus(id,"0");
+		sfMapper.resetNextExecuteTime(id);
 		spiderJobManager.remove(id);
 	}
 	
 	public void start(String id){
 		spiderJobManager.remove(id);
 		SpiderFlow spiderFlow = getById(id);
-		spiderJobManager.addJob(spiderFlow);
-		sfMapper.resetSpiderStatus(id,"1");
+		Date nextExecuteTime = spiderJobManager.addJob(spiderFlow);
+		if (nextExecuteTime != null) {
+			spiderFlow.setNextExecuteTime(nextExecuteTime);
+			sfMapper.updateById(spiderFlow);
+			sfMapper.resetSpiderStatus(id, "1");
+		}
 	}
 	
 	public void run(String id){

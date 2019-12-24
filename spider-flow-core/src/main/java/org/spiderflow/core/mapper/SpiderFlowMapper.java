@@ -54,6 +54,9 @@ public interface SpiderFlowMapper extends BaseMapper<SpiderFlow>{
 	
 	@Update("update sp_flow set enabled = #{enabled} where id = #{id}")
 	int resetSpiderStatus(@Param("id") String id, @Param("enabled") String enabled);
+
+	@Select("update sp_flow set next_execute_time = null where id = #{id}")
+	int resetNextExecuteTime(@Param("id") String id);
 	
 	@Select("select id,name from sp_flow")
 	List<SpiderFlow> selectFlows();
