@@ -62,14 +62,15 @@ public class SpiderJob extends QuartzJobBean {
 	}
 
 	public void run(SpiderFlow spiderFlow, Date nextExecuteTime) {
+		SpiderJobContext context = null;
 		Date now = new Date();
-		SpiderJobContext context = SpiderJobContext.create(this.spiderLogPath, spiderFlow.getId() + ".log");
-		SpiderContextHolder.set(context);
 		Task task = new Task();
 		task.setFlowId(spiderFlow.getId());
 		task.setBeginTime(new Date());
 		try {
 			taskService.save(task);
+			context = SpiderJobContext.create(this.spiderLogPath, spiderFlow.getId() + task.getId() + ".log");
+			SpiderContextHolder.set(context);
 			contextMap.put(task.getId(), context);
 			logger.info("开始执行任务{}", spiderFlow.getName());
 			spider.run(spiderFlow, context);
@@ -77,7 +78,9 @@ public class SpiderJob extends QuartzJobBean {
 		} catch (Exception e) {
 			logger.error("执行任务{}出错", spiderFlow.getName(), e);
 		} finally {
-			context.close();
+			if (context != null) {
+				context.close();
+			}
 			task.setEndTime(new Date());
 			taskService.saveOrUpdate(task);
 			contextMap.remove(task.getId());

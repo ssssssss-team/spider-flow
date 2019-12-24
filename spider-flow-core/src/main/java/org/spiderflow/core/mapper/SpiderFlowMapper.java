@@ -55,7 +55,7 @@ public interface SpiderFlowMapper extends BaseMapper<SpiderFlow>{
 	@Update("update sp_flow set enabled = #{enabled} where id = #{id}")
 	int resetSpiderStatus(@Param("id") String id, @Param("enabled") String enabled);
 
-	@Select("update sp_flow set next_execute_time = null where id = #{id}")
+	@Update("update sp_flow set next_execute_time = null where id = #{id}")
 	int resetNextExecuteTime(@Param("id") String id);
 	
 	@Select("select id,name from sp_flow")
@@ -63,4 +63,7 @@ public interface SpiderFlowMapper extends BaseMapper<SpiderFlow>{
 	
 	@Select("select id,name from sp_flow where id != #{id}")
 	List<SpiderFlow> selectOtherFlows(@Param("id") String id);
+
+	@Select("select max(a.id) from `sp_task` a left join sp_flow b on a.flow_id = b.id where b.id = #{id}")
+	int getFlowMaxTaskId(@Param("id")String id);
 }

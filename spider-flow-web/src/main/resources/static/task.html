@@ -90,14 +90,14 @@
 			layui.layer.close(index);
 		})
 	}).on('click','.btn-log',function(){
-		parent.openTab(decodeURIComponent(decodeURIComponent(getQueryString('name'))) + '-日志',$(this).data('id') + '-log','log.html?id=' + $(this).data('id'));
+		parent.openTab(decodeURIComponent(decodeURIComponent(getQueryString('name'))) + '-日志',$(this).data('id') + '-log','log.html?id=' + $(this).data('id') + "&taskId=" + $(this).data("task"));
 	})
 </script>
 <script type="text/html" id="buttons">
 	{{# if(!d.endTime){ }}
 		<a class="layui-btn layui-btn-sm btn-stop" data-id="{{d.id}}">停止</a>
 	{{# } }}
-	<a class="layui-btn layui-btn-sm btn-log" data-id="{{d.flowId}}">查看日志</a>
+	<a class="layui-btn layui-btn-sm btn-log" data-id="{{d.flowId}}" data-task="{{d.id}}">查看日志</a>
 	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除记录</a>
 </script>
 </body>

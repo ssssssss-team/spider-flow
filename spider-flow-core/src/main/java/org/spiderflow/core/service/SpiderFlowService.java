@@ -173,4 +173,8 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 		}
 		return list;
 	}
+
+	public Integer getFlowMaxTaskId(String flowId){
+		return sfMapper.getFlowMaxTaskId(flowId);
+	}
 }

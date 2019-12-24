@@ -170,10 +170,12 @@
 	<script type="text/javascript">
 		$(function(){
 		    var logId = getQueryString('id');
+            var taskId = getQueryString('taskId');
 			var viewer = new LogViewer({
 				url: 'spider/log',
 				maxLines : parseInt(($('.log-container').height() - 8) / 14),
 				logId : logId,
+                taskId: taskId,
 				element : $('.log-container'),
                 onSearchFinish : function(hasData){
 				    if(hasData){
