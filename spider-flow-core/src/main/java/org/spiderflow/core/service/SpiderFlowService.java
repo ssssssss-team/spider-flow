@@ -42,6 +42,9 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	//项目启动后自动查询需要执行的任务进行爬取
 	@PostConstruct
 	private void initJobs(){
+		//清空所有任务下次执行时间
+		sfMapper.resetNextExecuteTime();
+		//获取启用corn的任务
 		List<SpiderFlow> spiderFlows = sfMapper.selectList(new QueryWrapper<SpiderFlow>().eq("enabled", "1"));
 		if(spiderFlows != null && !spiderFlows.isEmpty()){
 			for (SpiderFlow sf : spiderFlows) {

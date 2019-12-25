@@ -24,7 +24,7 @@
 			<div class="layui-form-item">
 				<label class="layui-form-label">输出设置</label>
 				<div class="layui-input-block">
-					<input type="checkbox" title="输出全部参数" value="output-all" lay-skin="primary" {{d.data.object['output-all'] == '0' ? '' : 'checked'}}/>
+					<input type="checkbox" title="输出全部参数" value="output-all" lay-skin="primary" {{d.data.object['output-all'] == '1' ? 'checked' : ''}}/>
 				</div>
 			</div>
     		{{# layui.each(d.data.object['output-name'],function(index,output){ }}
