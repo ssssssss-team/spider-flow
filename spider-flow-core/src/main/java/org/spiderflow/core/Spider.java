@@ -148,6 +148,7 @@ public class Spider {
 		ShapeExecutor executor = executorMap.get(shape);
 		if (executor == null) {
 			logger.error("执行失败,找不到对应的执行器:{}", shape);
+			context.setRunning(false);
 		}
 		int loopCount = 1;
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
@@ -182,7 +183,7 @@ public class Spider {
 					treeNode.add(new RunnableTreeNode("loop-" + node.getNodeId(), runnableNode));
 					Map<String, Object> nVariables = new HashMap<>(variables);
 					// 存入下标变量
-					if (loopVariableName != null) {
+					if (!StringUtils.isBlank(loopVariableName)) {
 						nVariables.put(loopVariableName, i);
 					}
 					runnables.add(() -> {
@@ -193,14 +194,16 @@ public class Spider {
 								AtomicInteger executeCount = context.get(ATOMIC_DEAD_CYCLE);
 								if (executeCount != null && executeCount.incrementAndGet() > deadCycle) {
 									context.setRunning(false);
+									//设置当前线程为已完成状态
+									runnableNode.setState(RunnableNode.State.DONE);
 									return;
 								}
 								//执行节点具体逻辑
 								executor.execute(node, context, nVariables);
-								nVariables.put("ex", null);
 							} catch (Throwable t) {
 								nVariables.put("ex", t);
 								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
+								context.setRunning(false);
 							} finally {
 								if (node.isSync()) {
 									context.lock();
