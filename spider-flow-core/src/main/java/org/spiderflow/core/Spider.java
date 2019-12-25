@@ -155,7 +155,7 @@ public class Spider {
 			try {
 				Object result = engine.execute(loopCountStr, variables);
 				result = result == null ? 0 : result;
-				logger.debug("获取循环次数{}={}", loopCountStr, result);
+				logger.info("获取循环次数{}={}", loopCountStr, result);
 				loopCount = Integer.parseInt(result.toString());
 			} catch (Throwable t) {
 				loopCount = 0;
