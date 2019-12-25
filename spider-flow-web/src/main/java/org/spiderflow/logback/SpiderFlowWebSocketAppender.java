@@ -10,6 +10,7 @@ import org.spiderflow.model.SpiderWebSocketContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class SpiderFlowWebSocketAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
@@ -19,7 +20,8 @@ public class SpiderFlowWebSocketAppender extends UnsynchronizedAppenderBase<ILog
 		SpiderContext context = SpiderContextHolder.get();
 		if(context instanceof SpiderWebSocketContext){
 			SpiderWebSocketContext socketContext = (SpiderWebSocketContext) context;
-			List<Object> arguments = new ArrayList<>(Arrays.asList(event.getArgumentArray()));
+			Object[] argumentArray = event.getArgumentArray();
+			List<Object> arguments = argumentArray == null ? Collections.emptyList()  : new ArrayList<>(Arrays.asList(argumentArray));
 			ThrowableProxy throwableProxy = (ThrowableProxy) event.getThrowableProxy();
 			if(throwableProxy != null){
 				arguments.add(throwableProxy.getThrowable());

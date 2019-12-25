@@ -1,19 +1,12 @@
 package org.spiderflow.model;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Date;
-
-import javax.websocket.Session;
-
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.spiderflow.context.SpiderContext;
-
-import com.alibaba.fastjson.JSON;
-import org.spiderflow.core.executor.shape.OutputExecutor;
 import org.spiderflow.core.serializer.FastJsonSerializer;
+
+import javax.websocket.Session;
+import java.util.Date;
 
 /**
  * WebSocket通讯中爬虫的上下文域
@@ -40,15 +33,11 @@ public class SpiderWebSocketContext extends SpiderContext{
 		write(new WebSocketEvent<>("log", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), log));
 	}
 	
-	public <T> void write(WebSocketEvent<T> event){
-		synchronized (session) {
-			if (session.isOpen()) {
-				try {
-					session.getBasicRemote().sendText(JSON.toJSONString(event, FastJsonSerializer.serializeConfig));
-				} catch (IOException e) {
-					//忽略异常
-				}
-			}
+	public synchronized <T> void write(WebSocketEvent<T> event){
+		try {
+			session.getAsyncRemote().sendText(JSON.toJSONString(event, FastJsonSerializer.serializeConfig));
+		} catch (Throwable ignored) {
+
 		}
 	}
 }
