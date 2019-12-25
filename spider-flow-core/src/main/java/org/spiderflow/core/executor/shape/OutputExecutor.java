@@ -41,7 +41,7 @@ public class OutputExecutor implements ShapeExecutor{
 		SpiderOutput output = new SpiderOutput();
 		output.setNodeName(node.getNodeName());
 		output.setNodeId(node.getNodeId());
-		boolean outputAll = !"0".equals(node.getStringJsonValue(OUTPUT_ALL));
+		boolean outputAll = "1".equals(node.getStringJsonValue(OUTPUT_ALL));
 		if (outputAll) {
 			outputAll(output, variables);
 		}
