@@ -40,7 +40,9 @@ public class SpiderRestController {
 			return new JsonBean<>(0, "找不到此爬虫信息");
 		}
 		List<SpiderOutput> outputs = null;
-		SpiderJobContext context = SpiderJobContext.create(spiderLogPath, id + ".log");
+		Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
+		String taskId = maxId == null ? "" : maxId.toString();
+		SpiderJobContext context = SpiderJobContext.create(spiderLogPath, id + taskId + ".log");
 		try{
 			outputs = spider.run(flow,context, params);	
 		}catch(Exception e){
