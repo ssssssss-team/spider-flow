@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.ExpressionEngine;
@@ -71,7 +72,7 @@ public class OutputExecutor implements ShapeExecutor{
 			Object value = item.getValue();
 			if (value instanceof SpiderResponse) {
 				SpiderResponse resp = (SpiderResponse) value;
-				output.addOutput("resp.html", resp.getHtml());
+				output.addOutput(item.getKey() + ".html", resp.getHtml());
 				continue;
 			}
 			//去除不输出的信息
