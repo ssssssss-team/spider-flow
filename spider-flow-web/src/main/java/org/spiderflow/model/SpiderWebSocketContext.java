@@ -10,34 +10,40 @@ import java.util.Date;
 
 /**
  * WebSocket通讯中爬虫的上下文域
- * @author Administrator
  *
+ * @author Administrator
  */
-public class SpiderWebSocketContext extends SpiderContext{
+public class SpiderWebSocketContext extends SpiderContext {
 
-	private static final long serialVersionUID = -1205530535069540245L;
-	
-	private Session session;
-	
-	public SpiderWebSocketContext(Session session) {
-		this.session = session;
-	}
+    private static final long serialVersionUID = -1205530535069540245L;
 
-	@Override
-	public void addOutput(SpiderOutput output) {
-		super.addOutput(output);
-		this.write(new WebSocketEvent<>("output", output));
-	}
+    private Session session;
 
-	public void log(SpiderLog log) {
-		write(new WebSocketEvent<>("log", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), log));
-	}
-	
-	public synchronized <T> void write(WebSocketEvent<T> event){
-		try {
-			session.getAsyncRemote().sendText(JSON.toJSONString(event, FastJsonSerializer.serializeConfig));
-		} catch (Throwable ignored) {
+    public SpiderWebSocketContext(Session session) {
+        this.session = session;
+    }
 
-		}
-	}
+    @Override
+    public void addOutput(SpiderOutput output) {
+        super.addOutput(output);
+        this.write(new WebSocketEvent<>("output", output));
+    }
+
+    public void log(SpiderLog log) {
+        write(new WebSocketEvent<>("log", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), log));
+    }
+
+    public <T> void write(WebSocketEvent<T> event) {
+        try {
+            String message = JSON.toJSONString(event, FastJsonSerializer.serializeConfig);
+            if(session.isOpen()){
+                synchronized (session){
+                    session.getBasicRemote().sendText(message);
+                }
+            }else{
+                System.out.println("close:" + session.getId() + ":"+message);
+            }
+        } catch (Throwable ignored) {
+        }
+    }
 }

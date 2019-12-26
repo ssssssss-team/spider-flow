@@ -1,11 +1,8 @@
 package org.spiderflow.core.job;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.quartz.*;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
@@ -19,6 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 爬虫定时执行
@@ -68,8 +69,8 @@ public class SpiderJob extends QuartzJobBean {
 		task.setFlowId(spiderFlow.getId());
 		task.setBeginTime(new Date());
 		try {
-			taskService.save(task);
 			context = SpiderJobContext.create(this.spiderLogPath, spiderFlow.getId() + task.getId() + ".log");
+			taskService.save(task);
 			SpiderContextHolder.set(context);
 			contextMap.put(task.getId(), context);
 			logger.info("开始执行任务{}", spiderFlow.getName());

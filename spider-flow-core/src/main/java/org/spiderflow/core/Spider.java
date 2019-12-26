@@ -141,7 +141,7 @@ public class Spider {
 			return;
 		}
 		//判断条件，如果不成立则不执行
-		if (!executeCondition(fromNode, node, context, variables)) {
+		if (!executeCondition(fromNode, node, variables)) {
 			return;
 		}
 		logger.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
@@ -189,6 +189,7 @@ public class Spider {
 						runnableNode.setState(RunnableNode.State.RUNNING);
 						if (context.isRunning()) {
 							try {
+								SpiderContextHolder.set(context);
 								//死循环检测，当执行节点次数大于阈值时，结束本次测试
 								AtomicInteger executeCount = context.get(ATOMIC_DEAD_CYCLE);
 								if (executeCount != null && executeCount.incrementAndGet() > deadCycle) {
@@ -218,6 +219,7 @@ public class Spider {
 								if (node.isSync()) {
 									context.unlock();
 								}
+								SpiderContextHolder.remove();
 							}
 						}
 					});
@@ -227,7 +229,7 @@ public class Spider {
 		}
 	}
 
-	private boolean executeCondition(SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+	private boolean executeCondition(SpiderNode fromNode, SpiderNode node, Map<String, Object> variables) {
 		if (fromNode != null) {
 			String condition = node.getCondition(fromNode.getNodeId());
 			if (StringUtils.isNotBlank(condition)) { // 判断是否有条件
