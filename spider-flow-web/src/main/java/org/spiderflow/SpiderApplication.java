@@ -32,8 +32,7 @@ public class SpiderApplication implements ServletContextInitializer{
 	
 	@Bean
     public PaginationInterceptor paginationInterceptor() {
-        PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
-        return paginationInterceptor;
+        return new PaginationInterceptor();
     }
 	
 }
