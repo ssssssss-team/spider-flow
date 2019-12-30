@@ -1,8 +1,5 @@
 package org.spiderflow.core.executor.shape;
 
-import java.lang.reflect.Array;
-import java.util.*;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -16,9 +13,11 @@ import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * SQL执行器
@@ -72,7 +71,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 				}
 				sql = sqlObject.toString();
 			} catch (Exception e) {
-				logger.error("获取sql出错,异常信息:{}", e);
+				logger.error("获取sql出错,异常信息:{}", e.getMessage(), e);
 				ExceptionUtils.wrapAndThrow(e);
 			}
 			int size = parameters.size();
@@ -97,44 +96,47 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 			String statementType = node.getStringJsonValue(STATEMENT_TYPE);
 			logger.debug("执行sql：{}", sql);
 			if (STATEMENT_SELECT.equals(statementType)) {
-				List<Map<String, Object>> rs = null;
+				List<Map<String, Object>> rs;
 				try {
 					rs = template.queryForList(sql, params);
 					variables.put("rs", rs);
 				} catch (Exception e) {
-					logger.error("执行sql出错,异常信息:{}", e);
+					variables.put("rs", null);
+					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_SELECT_ONE.equals(statementType)) {
-				Map<String, Object> rs = null;
+				Map<String, Object> rs;
 				try {
 					rs = template.queryForMap(sql, params);
 					variables.put("rs", rs);
 				} catch (Exception e) {
-					logger.error("执行sql出错,异常信息:{}", e);
+					variables.put("rs", null);
+					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_SELECT_INT.equals(statementType)) {
-				Integer rs = null;
+				Integer rs;
 				try {
 					rs = template.queryForObject(sql, params, Integer.class);
 					rs = rs == null ? 0 : rs;
 					variables.put("rs", rs);
 				} catch (Exception e) {
-					logger.error("执行sql出错,异常信息:{}", e);
+					variables.put("rs", 0);
+					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
 					ExceptionUtils.wrapAndThrow(e);
 				}
 			} else if (STATEMENT_UPDATE.equals(statementType) || STATEMENT_INSERT.equals(statementType) || STATEMENT_DELETE.equals(statementType)) {
 				try {
 					int updateCount = 0;
 					if (hasList) {
-						/**
-						 * 批量操作时，将参数Object[]转化为List<Object[]>
-						 * 当参数不为数组或List时，自动转为Object[]
-						 * 当数组或List长度不足时，自动取最后一项补齐
+						/*
+						  批量操作时，将参数Object[]转化为List<Object[]>
+						  当参数不为数组或List时，自动转为Object[]
+						  当数组或List长度不足时，自动取最后一项补齐
 						 */
 						int[] rs = template.batchUpdate(sql, convertParameters(params, parameterSize));
-						if (rs != null) {
+						if (rs.length > 0) {
 							updateCount = Arrays.stream(rs).sum();
 						}
 					} else {
@@ -142,7 +144,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					}
 					variables.put("rs", updateCount);
 				} catch (Exception e) {
-					logger.error("执行sql出错,异常信息:{}", e);
+					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
 					variables.put("rs", -1);
 					ExceptionUtils.wrapAndThrow(e);
 				}
@@ -194,7 +196,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 		grammer.setComment("执行SQL结果");
 		grammer.setFunction("rs");
 		grammer.setReturns(Arrays.asList("List<Map<String,Object>>", "int"));
-		return Arrays.asList(grammer);
+		return Collections.singletonList(grammer);
 	}
 
 
