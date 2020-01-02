@@ -204,7 +204,6 @@ public class Spider {
 							} catch (Throwable t) {
 								nVariables.put("ex", t);
 								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
-								context.setRunning(false);
 							} finally {
 								if (node.isSync()) {
 									context.lock();
