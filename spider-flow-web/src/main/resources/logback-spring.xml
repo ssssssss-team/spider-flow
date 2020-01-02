@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root" defaultValue="DEBUG"/>
-    <springProperty scope="context" name="LOG_HOME" source="spider.job.log.path" defaultValue="${spider.job.log.path}"/>
+    <springProperty scope="context" name="LOG_HOME" source="spider.job.log.path" defaultValue="/data/spider/logs"/>
     <!-- 控制台输出 -->
     <appender name="Stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
