@@ -49,6 +49,67 @@
 			<div class="editor-container"></div>
 			<div class="resize-container"></div>
 			<div class="properties-container"></div>
-		</div>		
+		</div>
+		<script type="text/html" id="parameter-name-tmpl">
+			<input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array" value="{{=d['parameter-name']}}">
+		</script>
+		<script type="text/html" id="parameter-description-tmpl">
+			<input type="text" name="parameter-description" placeholder="请输入参数描述" autocomplete="off" class="layui-input array" value="{{=d['parameter-description']}}">
+		</script>
+		<script type="text/html" id="parameter-value-tmpl">
+			<div class="layui-input-block array" placeholder="请输入参数值" codemirror="parameter-value" data-value="{{=d['parameter-value']}}"></div>
+		</script>
+		<script type="text/html" id="parameter-type-tmpl">
+			<select name="parameter-form-type" class="array">
+				<option value="text" {{d['parameter-form-type'] == 'text' ? 'selected': '' }}">text</option>
+				<option value="file" {{d['parameter-form-type'] == 'file' ? 'selected': '' }}>file</option>
+			</select>
+		</script>
+		<script type="text/html" id="parameter-filename-tmpl">
+			<div class="layui-input-block array" placeholder="请输入文件名" codemirror="parameter-form-filename" data-value="{{=d['parameter-form-filename']}}"></div>
+		</script>
+
+		<script type="text/html" id="cookie-name-tmpl">
+			<input type="text" name="cookie-name" placeholder="请输入Cookie名" autocomplete="off" class="layui-input array" value="{{=d['cookie-name']}}">
+		</script>
+		<script type="text/html" id="cookie-description-tmpl">
+			<input type="text" name="cookie-description" placeholder="请输入Cookie描述" autocomplete="off" class="layui-input array" value="{{=d['cookie-description']}}">
+		</script>
+		<script type="text/html" id="cookie-value-tmpl">
+			<div class="layui-input-block array" placeholder="请输入Cookie值" codemirror="cookie-value" data-value="{{=d['cookie-value']}}"></div>
+		</script>
+
+		<script type="text/html" id="header-name-tmpl">
+			<input type="text" name="header-name" placeholder="请输入Header名" autocomplete="off" class="layui-input array" value="{{=d['header-name']}}">
+		</script>
+		<script type="text/html" id="header-description-tmpl">
+			<input type="text" name="header-description" placeholder="请输入Header描述" autocomplete="off" class="layui-input array" value="{{=d['header-description']}}">
+		</script>
+		<script type="text/html" id="header-value-tmpl">
+			<div class="layui-input-block array" placeholder="请输入Header值" codemirror="header-value" data-value="{{=d['header-value']}}"></div>
+		</script>
+
+		<script type="text/html" id="variable-name-tmpl">
+			<input type="text" name="variable-name" placeholder="请输入变量名" autocomplete="off" class="layui-input array" value="{{=d['variable-name']}}">
+		</script>
+		<script type="text/html" id="variable-description-tmpl">
+			<input type="text" name="variable-description" placeholder="请输入变量描述" autocomplete="off" class="layui-input array" value="{{=d['variable-description']}}">
+		</script>
+		<script type="text/html" id="variable-value-tmpl">
+			<div class="layui-input-block array" placeholder="请输入变量值" codemirror="variable-value" data-value="{{=d['variable-value']}}"></div>
+		</script>
+
+		<script type="text/html" id="output-name-tmpl">
+			<input type="text" name="output-name" placeholder="输出项" autocomplete="off" class="layui-input array" value="{{=d['output-name']}}">
+		</script>
+		<script type="text/html" id="output-value-tmpl">
+			<div class="layui-input-block array" codemirror="output-value" placeholder="输出值" data-value="{{=d['output-value']}}"></div>
+		</script>
+
+		<script type="text/html" id="common-operation">
+			<a class="layui-btn layui-btn-sm table-row-up">上移</a>
+			<a class="layui-btn layui-btn-sm table-row-down">下移</a>
+			<a class="layui-btn layui-btn-sm" lay-event="del">删除</a>
+		</script>
 	</body>
 </html>

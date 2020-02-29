@@ -8,6 +8,9 @@ html,body{
 	overflow: hidden;
 	font-family: Microsoft YaHei;
 }
+.text-center{
+	text-align: center;
+}
 .main-container{
 	width : 100%;
 	height : 100%;
@@ -17,12 +20,13 @@ html,body{
 	width : 46px;
 	left : 0px;
 	top : 30px;
-	bottom:0px;
+	bottom:300px;
 	max-height: 100%;
 	overflow: auto;
 	background: #F6F6F6;
 	z-index: 1;
 	border-radius: 2px;
+	overflow-x: hidden;
 }
 .main-container .sidebar-container::-webkit-scrollbar {
  	width: 3px;
@@ -50,31 +54,52 @@ html,body{
 	background:#ccc;
 }
 .main-container .resize-container{
-	cursor: w-resize;
+	cursor: n-resize;
 	position: absolute;
-	right : 400px;
-	width : 10px;
-	height : 100%;
+	bottom : 290px;
+	width : 100%;
+	height : 20px;
 	background: transparent;
 }
 .editor-container,.xml-container{
 	position: absolute;
 	left : 38px;
-	right : 400px;
+	width : 100%;
 	top : 30px;
-	bottom : 0px;
+	bottom : 300px;
 	background-image: linear-gradient(90deg, rgba(153, 153, 153, 0.3) 1px, rgba(0, 0, 0, 0) 1px),linear-gradient(rgba(153, 153, 153, 0.3) 1px, rgba(0, 0, 0, 0) 1px);
     background-size: 8px 8px;
     overflow: auto;
 }
 .properties-container{
 	position: absolute;
-	right : 0px;
-	top:30px;
+	width : 100%;
 	bottom : 0px;
-	width : 400px;
+	height : 300px;
 	box-shadow: -2px 1px 3px #eee;
 	overflow: auto;
+}
+.properties-container .layui-table-cell{
+	height:32px;
+	line-height: 32px;
+	overflow: visible !important;
+}
+.properties-container .layui-table-box,.properties-container .layui-table-body {
+	overflow: visible;
+}
+.properties-container .layui-table-cell{
+	padding : 0 5px;
+}
+.properties-container .layui-table .layui-input-block{
+	margin-left:0px;
+	min-height: 32px;
+	height: 32px;
+}
+.properties-container .layui-table,.properties-container .layui-table-view{
+	margin-top:0px;
+}
+.properties-container .layui-table .layui-input,.properties-container .layui-table .layui-select,.properties-container .layui-table .layui-textarea{
+	height:32px;
 }
 .properties-container .editor-form-node .layui-form-relative{
 	position: relative;
@@ -97,6 +122,10 @@ html,body{
 }
 .properties-container .editor-form-node .layui-form-relative .layui-icon-close.cmd-remove{
 	top : 5px;
+}
+
+.properties-container .layui-tab{
+	margin : 0px;
 }
 
 .toolbar-container ul li{

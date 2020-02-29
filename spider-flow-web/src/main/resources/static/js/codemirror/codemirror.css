@@ -15,7 +15,10 @@
 /* PADDING */
 
 .CodeMirror-lines {
-  padding: 4px 0; /* Vertical padding around content */
+  padding: 8px 0; /* Vertical padding around content */
+}
+.layui-table .CodeMirror-lines {
+  padding: 0px 0; /* Vertical padding around content */
 }
 .CodeMirror pre.CodeMirror-line,
 .CodeMirror pre.CodeMirror-line-like {

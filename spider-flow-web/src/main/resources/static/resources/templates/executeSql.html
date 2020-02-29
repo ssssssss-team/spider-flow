@@ -5,35 +5,43 @@
   <div class="layui-tab-content">
     <div class="layui-tab-item layui-show">
     	<form class="layui-form editor-form-node" lay-filter="executesql-form">
-    		<div class="layui-form-item">
-    			<label class="layui-form-label">节点名称</label>
-    			<div class="layui-input-block">
-    				<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
-    			</div>
-    		</div>
-    		<div class="layui-form-item">
-    			<label class="layui-form-label">数据源</label>
-    			<div class="layui-input-block">
-    				<select name="datasourceId">
-    					{{# layui.each(d.datasources,function(index,datasource){ }}
-    						<option value="{{=datasource.id}}" {{datasource.id == d.data.object.datasourceId ? 'selected': ''}}>{{datasource.name}}</option>
-    					{{# }) }}
-    				</select>
-    			</div>
-    		</div>
-    		<div class="layui-form-item">
-    			<label class="layui-form-label">语句类型</label>
-    			<div class="layui-input-block">
-    				<select name="statementType">
-    					<option value="select" {{d.data.object.statementType == 'select' ? 'selected':''}}>select</option>
-						<option value="selectOne" {{d.data.object.statementType == 'selectOne' ? 'selected':''}}>selectOne</option>
-						<option value="selectInt" {{d.data.object.statementType == 'selectInt' ? 'selected':''}}>selectInt</option>
-    					<option value="insert" {{d.data.object.statementType == 'insert' ? 'selected':''}}>insert</option>
-    					<option value="delete" {{d.data.object.statementType == 'delete' ? 'selected':''}}>delete</option>
-    					<option value="update" {{d.data.object.statementType == 'update' ? 'selected':''}}>update</option>
-    				</select>
-    			</div>
-    		</div>
+			<div class="layui-row">
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">节点名称</label>
+						<div class="layui-input-block">
+							<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">数据源</label>
+						<div class="layui-input-block">
+							<select name="datasourceId">
+								{{# layui.each(d.datasources,function(index,datasource){ }}
+								<option value="{{=datasource.id}}" {{datasource.id == d.data.object.datasourceId ? 'selected': ''}}>{{datasource.name}}</option>
+								{{# }) }}
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">语句类型</label>
+						<div class="layui-input-block">
+							<select name="statementType">
+								<option value="select" {{d.data.object.statementType == 'select' ? 'selected':''}}>select</option>
+								<option value="selectOne" {{d.data.object.statementType == 'selectOne' ? 'selected':''}}>selectOne</option>
+								<option value="selectInt" {{d.data.object.statementType == 'selectInt' ? 'selected':''}}>selectInt</option>
+								<option value="insert" {{d.data.object.statementType == 'insert' ? 'selected':''}}>insert</option>
+								<option value="delete" {{d.data.object.statementType == 'delete' ? 'selected':''}}>delete</option>
+								<option value="update" {{d.data.object.statementType == 'update' ? 'selected':''}}>update</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
     		<div class="layui-form-item">
     			<label class="layui-form-label">SQL语句</label>
     			<div class="layui-input-block" style="height:200px;" codemirror="sql" data-value="{{=d.data.object.sql}}"></div>
