@@ -44,7 +44,12 @@ function getCellData(cellId,keys){
 	return data;
 }
 function serializeForm(){
-	var cell = editor.getSelectedCell();
+	var cellId = $(".properties-container").attr('data-cellid');
+	var model = editor.getModel();
+	var cell = model.getCell(cellId);
+	if(!cell){
+		return;
+	}
 	var shape = cell.data.get('shape');
 	cell.data.reset({});
 	$.each($(".properties-container form").serializeArray(),function(index,item){
@@ -55,7 +60,16 @@ function serializeForm(){
 			array.push(value);
 			cell.data.set(name,array);
 		}else{
-			cell.data.set(name,value);	
+			if(name == 'value'){
+				model.beginUpdate();
+				try{
+					model.execute(new mxCellAttributeChange(cell,'value',value));
+					cell.setValue(value);
+				}finally{
+					model.endUpdate();
+				}
+			}
+			cell.data.set(name,value);
 		}
 	});
 	$(".properties-container form [codemirror]").each(function(){
@@ -136,6 +150,7 @@ $(function(){
 	  }
 	var templateCache = {};
 	function loadTemplate(cell,model,callback){
+		serializeForm();
 		var cells = model.cells;
 		var template = cell.data.get('shape') || 'root';
 		if(cell.isEdge()){
@@ -149,7 +164,7 @@ $(function(){
 				model : model,
 				cell : cell
 			},function(html){
-				$(".properties-container").html(html);
+				$(".properties-container").html(html).attr('data-cellid',cell.id);
 				layui.form.render();
 				renderCodeMirror();
 				callback&&callback();
@@ -215,20 +230,7 @@ $(function(){
 				area : '800px'
 			})
 		}).on("blur","input,textarea",function(){
-			var $input = $(this);
-			if($input.attr('name') == 'value'){
-				var cell = editor.getSelectedCell();
-				var model = editor.getModel();
-				model.beginUpdate();
-				try{
-					model.execute(new mxCellAttributeChange(cell,'value',$input.val()));
-					cell.setValue($input.val());
-				}finally{
-					model.endUpdate();
-				}
-			}else{
-				serializeForm();
-			}
+			serializeForm();
 		}).on("click",".table-row-add",function(){	//添加一行
 			serializeForm();
 			var tableId = $(this).attr('for');
