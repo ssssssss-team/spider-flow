@@ -261,6 +261,10 @@ $(function(){
 			$dom.remove();
 			serializeForm();
 		}).on("click",".editor-form-node .cookie-batch",function(){
+			var tableId = $(this).attr('for');
+			var $table = $('#' + tableId);
+			var cellId = $table.data('cell');
+			var data = getCellData(cellId,$table.data('keys').split(","));
 			layui.layer.open({
 				type : 1,
 				title : '请输入Cookie',
@@ -270,9 +274,8 @@ $(function(){
 				btn2 : function(){
 					var cookieStr = $("#cookies").val();
 					var cookieArr = cookieStr.split(";");
-					var appendFlag = true;
-					var appendDiv = "";
 					var length = $(".draggable").length;
+					serializeForm();
 					for (var i = 0; i < cookieArr.length; i++) {
 						var cookieItem = cookieArr[i];
 						var index = cookieItem.indexOf("=");
@@ -281,19 +284,24 @@ $(function(){
 							appendFlag = false;
 							return;
 						} else {
-							var name = cookieItem.substring(0, index);
-							var value = cookieItem.substring(index + 1);
-							appendDiv += `<div id="cookie` + (length + i) + `" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close cookie-remove"></i><label class="layui-form-label">Cookie名</label><div class="layui-input-block"><input type="text" name="cookie-name" placeholder="请输入Cookie名" autocomplete="off" class="layui-input array" value="` + $.trim(name) + `"></div></div><div class="layui-form-item"><label class="layui-form-label">Cookie值</label><div class="layui-input-block array" codemirror="cookie-value" placeholder="请输入Cookie值" data-value="` + $.trim(value) + `"></div></div><hr></div>`;
+							data.push({
+								'cookie-name' : cookieItem.substring(0, index),
+								'cookie-value' : cookieItem.substring(index + 1)
+							})
 						}
 					}
-					if (appendFlag) {
-						$("#addCookieBtn").before(appendDiv);
-						renderCodeMirror();
-						serializeForm();
-					}
+					layui.table.reload(tableId,{
+						data : data
+					});
+					renderCodeMirror();
+					serializeForm();
 				}
 			})
 		}).on("click",".editor-form-node .header-batch",function(){
+			var tableId = $(this).attr('for');
+			var $table = $('#' + tableId);
+			var cellId = $table.data('cell');
+			var data = getCellData(cellId,$table.data('keys').split(","));
 			layui.layer.open({
 				type : 1,
 				title : '请输入Header',
@@ -303,30 +311,32 @@ $(function(){
 				btn2 : function(){
 					var headerStr = $("#headers").val();
 					var headerArr = headerStr.split("\n");
-					var appendFlag = true;
-					var appendDiv = "";
 					var length = $(".draggable").length;
 					for (var i = 0; i < headerArr.length; i++) {
 						var headerItem = headerArr[i];
 						var index = headerItem.indexOf(":");
 						if (index < 0) {
 							layer.alert('header数据格式错误');
-							appendFlag = false;
 							return;
 						} else {
-							var name = headerItem.substring(0, index);
-							var value = headerItem.substring(index + 1);
-							appendDiv += `<div id="header` + (length + i) + `" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close header-remove"></i><label class="layui-form-label">header名</label><div class="layui-input-block"><input type="text" name="header-name" placeholder="header key" autocomplete="off" class="layui-input array" value="` + $.trim(name) + `"></div></div><div class="layui-form-item"><label class="layui-form-label">header值</label><div class="layui-input-block array" codemirror="header-value" placeholder="请输入header value" data-value="` + $.trim(value) + `"></div></div><hr></div>`;
+							data.push({
+								'header-name' : headerItem.substring(0, index),
+								'header-value' : headerItem.substring(index + 1)
+							})
 						}
 					}
-					if (appendFlag) {
-						$("#addHeaderBtn").before(appendDiv);
-						renderCodeMirror();
-						serializeForm();
-					}
+					layui.table.reload(tableId,{
+						data : data
+					});
+					renderCodeMirror();
+					serializeForm();
 				}
 			})
 		}).on("click",".editor-form-node .parameter-batch",function () {
+			var tableId = $(this).attr('for');
+			var $table = $('#' + tableId);
+			var cellId = $table.data('cell');
+			var data = getCellData(cellId,$table.data('keys').split(","));
 			layui.layer.open({
 				type : 1,
 				title : '请输入参数',
@@ -336,8 +346,6 @@ $(function(){
 				btn2 : function(){
 					var paramterStr = $("#paramters").val();
 					var paramterArr = paramterStr.split("\n");
-					var appendFlag = true;
-					var appendDiv = "";
 					var length = $(".draggable").length;
 					for (var i = 0; i < paramterArr.length; i++) {
 						var paramterItem = paramterArr[i];
@@ -357,19 +365,19 @@ $(function(){
 						}
 						if (index < 0) {
 							layer.alert('参数数据格式错误');
-							appendFlag = false;
 							return;
 						} else {
-							var name = paramterItem.substring(0, index);
-							var value = paramterItem.substring(index + 1);
-							appendDiv += `<div id="paramterr` + (length + i) + `" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close parameter-remove"></i><label class="layui-form-label">参数名</label><div class="layui-input-block"><input type="text" name="parameter-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array" value="` + $.trim(name) + `"></div></div><div class="layui-form-item"><label class="layui-form-label">参数值</label><div class="layui-input-block array" codemirror="parameter-value" placeholder="请输入参数值" data-value="` + $.trim(value) + `"></div></div><hr></div>`;
+							data.push({
+								'parameter-name' : paramterItem.substring(0, index),
+								'parameter-value' : paramterItem.substring(index + 1)
+							})
 						}
 					}
-					if (appendFlag) {
-						$("#addParamterBtn").before(appendDiv);
-						renderCodeMirror();
-						serializeForm();
-					}
+					layui.table.reload(tableId,{
+						data : data
+					});
+					renderCodeMirror();
+					serializeForm();
 				}
 			})
 		}).on("click",".editor-form-node .function-add",function(){

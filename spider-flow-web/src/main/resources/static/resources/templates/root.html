@@ -26,9 +26,12 @@
    		<form class="layui-form">
 			<table class="layui-table" id="global-parameter" data-cell="{{=d.cell.id}}" data-keys="parameter-name,parameter-value,parameter-description"></table>
 	   		<div class="layui-form-item">
-	   			<div class="layui-input-block">
+	   			<div class="layui-input-inline">
 	    			<button class="layui-btn table-row-add" type="button" for="global-parameter">添加一个参数</button>
 	    		</div>
+				<div class="layui-input-inline">
+					<button class="layui-btn parameter-batch" type="button" for="global-parameter">批量设置参数</button>
+				</div>
 	    	</div>
 	    </form>
     </div>
@@ -36,13 +39,11 @@
 	  <form class="layui-form">
 		  <table class="layui-table" id="global-cookie" data-cell="{{=d.cell.id}}" data-keys="cookie-name,cookie-value,cookie-description"></table>
 		  <div id="addCookieBtn" class="layui-form-item">
-			  <div class="layui-input-block">
+			  <div class="layui-input-inline">
 				  <button class="layui-btn table-row-add" type="button" for="global-cookie">添加一个Cookie</button>
 			  </div>
-		  </div>
-		  <div class="layui-form-item">
-			  <div class="layui-input-block">
-				  <button class="layui-btn cookie-batch" type="button">批量设置Cookie</button>
+			  <div class="layui-input-inline">
+				  <button class="layui-btn cookie-batch" type="button" for="global-cookie">批量设置Cookie</button>
 			  </div>
 		  </div>
 	  </form>
@@ -50,15 +51,11 @@
     <div class="layui-tab-item">
    		<form class="layui-form">
 			<table class="layui-table" id="global-header" data-cell="{{=d.cell.id}}" data-keys="header-name,header-value,header-description"></table>
-	   		<div id="addHeaderBtn" class="layui-form-item">
-	   			<div class="layui-input-block">
-	    			<button class="layui-btn table-row-add" type="button" for="global-header">添加一个Header</button>
-	    		</div>
-	    	</div>
-			<div class="layui-form-item">
-				<div class="layui-input-block">
-					<button class="layui-btn header-batch" type="button">批量设置Header</button>
-				</div>
+			<div class="layui-input-inline">
+				<button class="layui-btn table-row-add" type="button" for="global-header">添加一个Header</button>
+			</div>
+			<div class="layui-input-inline">
+				<button class="layui-btn header-batch" type="button" for="global-header">批量设置Header</button>
 			</div>
 	    </form>
     </div>
