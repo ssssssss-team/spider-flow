@@ -165,7 +165,6 @@ public class OutputExecutor implements ShapeExecutor{
 			i++;
 		}
 		sb.append("\r\n");
-		System.out.println(sb.toString());
 		try {
 			FileFunctionExecutor.write(csvName, sb.toString().getBytes(),true);
 		} catch (IOException e) {
