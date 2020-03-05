@@ -84,4 +84,11 @@ public class ElementsFunctionExtension implements FunctionExtension{
 	public static Elements selectors(Elements elements,String selector){
 		return elements.select(selector);
 	}
+
+	@Comment("获取上级节点")
+	@Example("${elementsVar.parents()}")
+	public static Elements parents(Elements elements){
+		return elements.parents();
+	}
+
 }

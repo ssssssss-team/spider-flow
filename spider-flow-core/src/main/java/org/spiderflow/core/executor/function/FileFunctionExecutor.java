@@ -92,12 +92,20 @@ public class FileFunctionExecutor implements FunctionExecutor{
 	}
 
 	@Comment("下载Url资源")
-	@Example("${file.write('e:/downloadPath',urls)}")
-	public static void write(String path, List<String> urls) throws IOException{
+	@Example("${file.download('e:/downloadPath',urls)}")
+	public static void download(String path, List<String> urls) throws IOException{
 		if(!CollectionUtils.isEmpty(urls)) {
 			for (String url : urls) {
 				FileUtils.downloadFile(path, url, true);
 			}
+		}
+	}
+
+	@Comment("下载Url资源")
+	@Example("${file.download('e:/downloadPath',urls)}")
+	public static void download(String path, String url) throws IOException {
+		if (url != null) {
+			FileUtils.downloadFile(path, url, true);
 		}
 	}
 	

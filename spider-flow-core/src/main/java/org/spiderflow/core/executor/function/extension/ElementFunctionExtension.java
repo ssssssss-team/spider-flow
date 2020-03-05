@@ -82,5 +82,21 @@ public class ElementFunctionExtension implements FunctionExtension{
 		return element.select(cssQuery);
 	}
 
+	@Comment("获取同级节点")
+	@Example("${elementVar.subling()}")
+	public static Elements subling(Element element){
+		return element.siblingElements();
+	}
 
+	@Comment("获取上级节点")
+	@Example("${elementVar.parent()}")
+	public static Element parent(Element element){
+		return element.parent();
+	}
+
+	@Comment("获取上级节点")
+	@Example("${elementVar.parents()}")
+	public static Elements parents(Element element){
+		return element.parents();
+	}
 }

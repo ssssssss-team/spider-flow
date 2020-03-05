@@ -203,6 +203,8 @@ $(function(){
 				title : '删除'
 			},function(index) {
 				obj.del();
+				serializeForm();
+				renderCodeMirror();
 				layui.layer.close(index);
 			});
 		})
@@ -249,6 +251,7 @@ $(function(){
 				current.insertBefore(prev); //插入到当前<tr>前一个元素前
 				serializeForm();
 			}
+			renderCodeMirror();
 		}).on("click",".table-row-down",function(){	//下移
 			var current = $(this).parent().parent().parent(); //获取当前<tr>
 			var next = current.next(); //获取当前<tr>后面一个元素
@@ -256,6 +259,7 @@ $(function(){
 				current.insertAfter(next);  //插入到当前<tr>后面一个元素后面
 				serializeForm();
 			}
+			renderCodeMirror();
 		}).on("click",".editor-form-node .function-remove,.editor-form-node .cmd-remove",function () {
 			var $dom = $(this).parents(".draggable");
 			$dom.remove();
@@ -285,8 +289,8 @@ $(function(){
 							return;
 						} else {
 							data.push({
-								'cookie-name' : cookieItem.substring(0, index),
-								'cookie-value' : cookieItem.substring(index + 1)
+								'cookie-name' : $.trim(cookieItem.substring(0, index)),
+								'cookie-value' : $.trim(cookieItem.substring(index + 1))
 							})
 						}
 					}
@@ -320,8 +324,8 @@ $(function(){
 							return;
 						} else {
 							data.push({
-								'header-name' : headerItem.substring(0, index),
-								'header-value' : headerItem.substring(index + 1)
+								'header-name' : $.trim(headerItem.substring(0, index)),
+								'header-value' : $.trim(headerItem.substring(index + 1))
 							})
 						}
 					}
@@ -368,8 +372,8 @@ $(function(){
 							return;
 						} else {
 							data.push({
-								'parameter-name' : paramterItem.substring(0, index),
-								'parameter-value' : paramterItem.substring(index + 1)
+								'parameter-name' : $.trim(paramterItem.substring(0, index)),
+								'parameter-value' : $.trim(paramterItem.substring(index + 1))
 							})
 						}
 					}
@@ -388,7 +392,7 @@ $(function(){
 			var index = $(".draggable").length;
 			$(this).parent().parent().before('<div id="' + index + '" class="draggable" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="layui-form-item layui-form-relative"><i class="layui-icon layui-icon-close cmd-remove"></i><label class="layui-form-label">执行命令</label><div class="layui-input-block array" codemirror="cmd" placeholder="执行命令"></div></div></div>');
 			renderCodeMirror();
-		})
+		});
 		layui.form.on('select(bodyType)',function(e){
 			var bodyType = $(e.elem).val();
 			$(".form-body-raw,.form-body-form-data").hide();
@@ -400,6 +404,17 @@ $(function(){
 			}
 			renderCodeMirror();
 			serializeForm();
+		});
+		layui.form.on('checkbox(targetCheck)', function (data) {
+			var targetDiv = $(data.elem).attr('target-div');
+			console.log(targetDiv);
+			if (targetDiv != null) {
+				if (data.elem.checked) {
+					$("." + targetDiv).show();
+				} else {
+					$("." + targetDiv).hide();
+				}
+			}
 		});
 		layui.element.on('tab',function(){
 			for(var i=0;i<cms.length;i++){

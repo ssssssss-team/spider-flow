@@ -213,6 +213,7 @@
 		function renderRequestParameter(data){
 			layui.table.render({
 				elem : '#request-parameter',
+				limit: 50,
 				cols : [[{
 					title : '参数名',
 					width : 150,
@@ -239,6 +240,7 @@
 		function renderRequestCookie(data){
 			layui.table.render({
 				elem : '#request-cookie',
+				limit: 50,
 				cols : [[{
 					title : 'Cookie名',
 					width : 150,
@@ -266,6 +268,7 @@
 		function renderRequestHeader(data){
 			layui.table.render({
 				elem : '#request-header',
+				limit: 50,
 				cols : [[{
 					title : 'Header名',
 					width : 150,
