@@ -37,6 +37,39 @@
 					</div>
 				</div>
 			</div>
+			<div class="layui-row layui-col-space20">
+				<div class="layui-col-md3">
+					<div class="layui-form-item">
+						<label class="layui-form-label">数据输出</label>
+						<div class="layui-input-block">
+							<input type="checkbox" target-div="databaseDiv" title="输出到数据库" value="output-database" lay-skin="primary" {{d.data.object['output-database'] == '1' ? 'checked' : ''}} lay-filter="targetCheck"/>
+							<input type="checkbox" class="oCheckbox" target-div="csvDiv" title="输出到CSV文件" value="output-csv" lay-skin="primary" {{d.data.object['output-csv'] == '1' ? 'checked' : ''}} lay-filter="targetCheck"/>
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md3 databaseDiv" {{d.data.object['output-database'] == '1' ? '' : 'style="display: none;"'}}>
+					<div class="layui-form-item">
+						<label class="layui-form-label">数据源</label>
+						<div class="layui-input-block">
+							<select name="datasourceId">
+								{{# layui.each(d.datasources,function(index,datasource){ }}
+								<option value="{{=datasource.id}}" {{datasource.id == d.data.object.datasourceId ? 'selected': ''}}>{{datasource.name}}</option>
+								{{# }) }}
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md2 databaseDiv" {{d.data.object['output-database'] == '1' ? '' : 'style="display: none;"'}}>
+					<div class="layui-form-item">
+						<input type="text" name="tableName" placeholder="请输入表名" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.tableName}}">
+					</div>
+				</div>
+				<div class="layui-col-md2 csvDiv" {{d.data.object['output-csv'] == '1' ? '' : 'style="display: none;"'}}>
+					<div class="layui-form-item">
+						<input type="text" name="csvName" placeholder="请输入文件名" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.csvName}}">
+					</div>
+				</div>
+			</div>
 			<table class="layui-table" id="spider-output" data-cell="{{=d.cell.id}}" data-keys="output-name,output-value"></table>
     		<hr>
     		<div class="layui-form-item">
@@ -52,6 +85,7 @@
 	function renderSpiderOutput(data){
 		layui.table.render({
 			elem : '#spider-output',
+			limit: 50,
 			cols : [[{
 				title : '输出项',
 				width : 150,
@@ -72,4 +106,19 @@
 		})
 	}
 	renderSpiderOutput(getCellData({{d.cell.id}},$("#spider-output").data('keys').split(",")));
+
+	$.ajax({
+		url : 'datasource/all',
+		success : function(datasources){
+			for(var i =0;i<datasources.length;i++){
+				var ds = datasources[i];
+				$('select[name=datasourceId]').append('<option value="'+ds.id+'">'+ds.name+'</option>');
+			}
+			layui.form.render();
+			var selectDataSourceId = '{{=d.data.object.datasourceId}}';
+			if(selectDataSourceId != ''){
+				$('.layui-form-select dd[lay-value='+selectDataSourceId+']').trigger('click');
+			}
+		}
+	});
 </script>
