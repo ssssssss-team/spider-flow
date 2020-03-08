@@ -63,7 +63,9 @@ public class SpiderContext extends HashMap<String, Object>{
 	}
 
 	public void addOutput(SpiderOutput output){
-		this.outputs.add(output);
+		synchronized (this.outputs){
+			this.outputs.add(output);
+		}
 	}
 
 	public SubThreadPoolExecutor getThreadPool() {
