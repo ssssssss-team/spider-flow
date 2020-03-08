@@ -40,8 +40,6 @@ public class SpiderWebSocketContext extends SpiderContext {
                 synchronized (session){
                     session.getBasicRemote().sendText(message);
                 }
-            }else{
-                System.out.println("close:" + session.getId() + ":"+message);
             }
         } catch (Throwable ignored) {
         }

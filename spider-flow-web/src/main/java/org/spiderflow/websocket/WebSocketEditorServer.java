@@ -50,7 +50,6 @@ public class WebSocketEditorServer {
 
     @OnClose
     public void onClose(Session session) {
-        System.out.println("close");
         context.setRunning(false);
     }
 
