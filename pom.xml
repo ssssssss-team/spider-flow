@@ -19,6 +19,11 @@
 	</properties>
 	<dependencyManagement>
 		<dependencies>
+            <dependency>
+                <groupId>org.spiderflow</groupId>
+                <artifactId>spider-flow-api</artifactId>
+                <version>${spider-flow.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.spiderflow</groupId>
 				<artifactId>spider-flow-core</artifactId>

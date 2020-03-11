@@ -21,10 +21,6 @@
 			<groupId>org.spiderflow</groupId>
 			<artifactId>spider-flow-core</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.spiderflow</groupId>
-			<artifactId>spider-flow-mailbox</artifactId>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
