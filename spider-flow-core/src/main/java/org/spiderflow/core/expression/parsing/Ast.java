@@ -1,18 +1,6 @@
 
 package org.spiderflow.core.expression.parsing;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.transform.Source;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.spiderflow.core.expression.ExpressionError;
@@ -22,7 +10,14 @@ import org.spiderflow.core.expression.ExpressionTemplateContext;
 import org.spiderflow.core.expression.interpreter.AstInterpreter;
 import org.spiderflow.core.expression.interpreter.JavaReflection;
 import org.spiderflow.core.expression.interpreter.Reflection;
+import org.spiderflow.core.script.ScriptManager;
 import org.spiderflow.expression.DynamicMethod;
+
+import javax.xml.transform.Source;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 
 /** Templates are parsed into an abstract syntax tree (AST) nodes by a Parser. This class contains all AST node types. */
@@ -1085,8 +1080,15 @@ public abstract class Ast {
 						ExpressionError.error(t.getMessage(), getSpan(), t);
 						return null; // never reached
 					}
+				} else if(ScriptManager.containsFunction(getFunction().getSpan().getText())){
+					try {
+						return ScriptManager.eval(context,getFunction().getSpan().getText(),argumentValues);
+					} catch (Throwable t) {
+						ExpressionError.error(t.getMessage(), getSpan(), t);
+						return null; // never reached
+					}
 				} else {
-					ExpressionError.error("Couldn't find function.", getSpan());
+					ExpressionError.error("Couldn't find function " + getFunction(), getSpan());
 					return null; // never reached
 				}
 			} finally {

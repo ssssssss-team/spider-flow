@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>DataSource</title>
+	<link rel="stylesheet" href="js/layui/css/layui.css" />
+	<link rel="stylesheet" href="css/layui-blue.css" />
+	<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+</head>
+<body style="padding:5px;">
+<div class="layui-form-item">
+	<label class="layui-form-label">函数名称</label>
+	<div class="layui-input-inline">
+		<input type="text" name="name" required  lay-verify="required" placeholder="请输入函数名称" autocomplete="off" class="layui-input">
+	</div>
+	<div class="layui-input-inline" style="margin-top:5px">
+		<a class="layui-btn layui-btn-sm layui-btn-normal btn-search"><i class="layui-icon">&#xe615;</i> 搜索</a>
+		<a class="layui-btn layui-btn-sm layui-btn-normal" href="function-edit.html"><i class="layui-icon">&#xe654;</i> 添加函数</a>
+	</div>
+</div>
+<hr>
+<table class="layui-table" id="table" lay-filter="table"></table>
+<script>
+	var $ = layui.$;
+	var $table = layui.table.render({
+		id : 'table',
+		elem : '#table',
+		url : 'function/list',
+		page : true,
+		parseData : function(resp){
+			return {
+				code : 0,
+				data : resp.records,
+				count : resp.total
+			}
+		},
+		cols : [[{
+			title : '序号',
+			width : 60,
+			type : 'numbers',
+			align : 'center'
+		},{
+			title : '函数名称',
+			field : 'name'
+		},{
+			title : '函数参数',
+			field : 'parameter',
+		},{
+			title : '操作',
+			width : 120,
+			align : 'center',
+			templet : '#buttons'
+		}]]
+	})
+	$("body").on('click','.btn-search',function(){
+		$table.reload({
+			where : {
+				name : $('input[name=name]').val()
+			},
+			page : {
+				curr : 1
+			}
+		})
+	}).on('click','.btn-remove',function(){
+		var id = $(this).data('id');
+		layui.layer.confirm('您确定要删除此函数吗？',{
+			title : '删除'
+		},function(index){
+			$table.reload();
+			$.ajax({
+				url : 'function/remove',
+				data : {
+					id : id
+				},
+				success : function(){
+					layui.layer.msg('删除成功',{time : 500},function(){
+						$table.reload();
+					})
+				},
+				error : function(){
+					layui.layer.msg('删除失败')
+				}
+			})
+			layui.layer.close(index);
+		})
+	}).on('click','.btn-edit',function(){
+		location.href = 'function-edit.html?id=' + $(this).data('id');
+	})
+</script>
+<script type="text/html" id="buttons">
+	<a class="layui-btn layui-btn-sm btn-edit" data-id="{{d.id}}">编辑</a>
+	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
+</script>
+</body>
+</html>

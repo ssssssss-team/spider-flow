@@ -29,6 +29,20 @@ public class ExpressionTemplateContext {
 	 * generating garbage. **/
 	private final List<Map<String, Object>> freeScopes = new ArrayList<Map<String, Object>>();
 
+	private final static ThreadLocal<ExpressionTemplateContext> CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
+
+	public static ExpressionTemplateContext get(){
+		return CONTEXT_THREAD_LOCAL.get();
+	}
+
+	public static void remove(){
+		CONTEXT_THREAD_LOCAL.remove();
+	}
+
+	public static void set(ExpressionTemplateContext context){
+		CONTEXT_THREAD_LOCAL.set(context);
+	}
+
 	public ExpressionTemplateContext () {
 		push();
 	}
