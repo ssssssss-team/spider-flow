@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
@@ -85,7 +86,13 @@ public class OutputExecutor implements ShapeExecutor{
 		if(databaseFlag){
 			String dsId = node.getStringJsonValue(DATASOURCE_ID);
 			String tableName = node.getStringJsonValue(TABLE_NAME);
-			outputDB(dsId, tableName, outputData);
+			if (StringUtils.isBlank(dsId)) {
+				logger.warn("数据源ID为空！");
+			} else if (StringUtils.isBlank(tableName)) {
+				logger.warn("表名为空！");
+			} else {
+				outputDB(dsId, tableName, outputData);
+			}
 		}
 		if (csvFlag) {
 			String csvName = node.getStringJsonValue(CSV_NAME);

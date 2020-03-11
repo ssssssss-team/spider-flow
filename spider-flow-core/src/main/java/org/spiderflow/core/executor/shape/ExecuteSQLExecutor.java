@@ -54,9 +54,9 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String dsId = node.getStringJsonValue(DATASOURCE_ID);
 		String sql = node.getStringJsonValue(SQL);
-		if (!StringUtils.isNotBlank(dsId)) {
+		if (StringUtils.isBlank(dsId)) {
 			logger.warn("数据源ID为空！");
-		} else if (!StringUtils.isNotBlank(sql)) {
+		} else if (StringUtils.isBlank(sql)) {
 			logger.warn("sql为空！");
 		} else {
 			JdbcTemplate template = new JdbcTemplate(DataSourceUtils.getDataSource(dsId));
