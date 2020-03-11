@@ -4,15 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.ExpressionEngine;
 import org.spiderflow.Grammerable;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.utils.DataSourceUtils;
+import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -47,9 +46,6 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 
 	private static final Logger logger = LoggerFactory.getLogger(ExecuteSQLExecutor.class);
 
-	@Autowired
-	private ExpressionEngine engine;
-
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String dsId = node.getStringJsonValue(DATASOURCE_ID);
@@ -64,7 +60,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 			List<String> parameters = ExtractUtils.getMatchers(sql, "#(.*?)#", true);
 			sql = sql.replaceAll("#(.*?)#", "?");
 			try {
-				Object sqlObject = engine.execute(sql, variables);
+				Object sqlObject = ExpressionUtils.execute(sql, variables);
 				if(sqlObject == null){
 					logger.warn("获取的sql为空！");
 					return;
@@ -80,7 +76,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 			int parameterSize = 0;
 			//当参数中存在List或者数组时，认为是批量操作
 			for (int i = 0; i < size; i++) {
-				Object parameter = engine.execute(parameters.get(i), variables);
+				Object parameter = ExpressionUtils.execute(parameters.get(i), variables);
 				if (parameter != null) {
 					if (parameter instanceof List) {
 						hasList = true;

@@ -9,17 +9,16 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.RunnableTreeNode;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.executor.function.FileFunctionExecutor;
 import org.spiderflow.core.serializer.FastJsonSerializer;
 import org.spiderflow.core.utils.DataSourceUtils;
+import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.io.SpiderResponse;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -49,9 +48,6 @@ public class OutputExecutor implements ShapeExecutor{
 
 	private static Logger logger = LoggerFactory.getLogger(OutputExecutor.class);
 	
-	@Autowired
-	private ExpressionEngine engine;
-
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		SpiderOutput output = new SpiderOutput();
@@ -73,7 +69,7 @@ public class OutputExecutor implements ShapeExecutor{
 			String outputValue = item.get(OUTPUT_VALUE);
 			String outputName = item.get(OUTPUT_NAME);
 			try {
-				value = engine.execute(outputValue, variables);
+				value = ExpressionUtils.execute(outputValue, variables);
 				logger.debug("输出{}={}", outputName,value);
 			} catch (Exception e) {
 				logger.error("输出{}出错，异常信息：{}", outputName,e);

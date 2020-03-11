@@ -10,17 +10,16 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.ExpressionEngine;
 import org.spiderflow.Grammerable;
 import org.spiderflow.context.CookieContext;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.core.io.HttpRequest;
 import org.spiderflow.core.io.HttpResponse;
+import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.io.SpiderResponse;
 import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -81,9 +80,6 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 
 	private static final Logger logger = LoggerFactory.getLogger(RequestExecutor.class);
 	
-	@Autowired
-	private ExpressionEngine engine;
-
 	@Override
 	public String supportShape() {
 		return "request";
@@ -101,7 +97,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		String sleepCondition = node.getStringJsonValue(SLEEP);
 		if(StringUtils.isNotBlank(sleepCondition)){
 			try {
-				Object value = engine.execute(sleepCondition, variables);
+				Object value = ExpressionUtils.execute(sleepCondition, variables);
 				if(value != null){
 					long sleepTime = NumberUtils.toLong(value.toString(), 0L);
 					synchronized (node.getNodeId().intern()) {
@@ -125,7 +121,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		//设置请求url
 		String url = null;
 		try {
-			url = engine.execute(node.getStringJsonValue(URL), variables).toString();
+			url = ExpressionUtils.execute(node.getStringJsonValue(URL), variables).toString();
 		} catch (Exception e) {
 			logger.error("设置请求url出错，异常信息：{}", e);
 			ExceptionUtils.wrapAndThrow(e);
@@ -174,7 +170,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		if(!cookies.isEmpty()){
 			cookies.entrySet().forEach(entry->{
 				try {
-					Object value = engine.execute(entry.getValue(), variables);
+					Object value = ExpressionUtils.execute(entry.getValue(), variables);
 					entry.setValue(Objects.toString(value));
 				} catch (Exception e) {
 					logger.error("设置Cookie出错:{}",e);
@@ -194,7 +190,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 			String contentType = node.getStringJsonValue(BODY_CONTENT_TYPE);
 			request.contentType(contentType);
 			try {
-				Object requestBody = engine.execute(node.getStringJsonValue(REQUEST_BODY), variables);
+				Object requestBody = ExpressionUtils.execute(node.getStringJsonValue(REQUEST_BODY), variables);
 				request.data(requestBody);
 				logger.info("设置请求Body:{}", requestBody);
 			} catch (Exception e) {
@@ -212,7 +208,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		String proxy = node.getStringJsonValue(PROXY);
 		if(proxy != null){
 			try {
-				Object value = engine.execute(proxy, variables);
+				Object value = ExpressionUtils.execute(proxy, variables);
 				if(value != null){
 					String[] proxyArr = value.toString().split(":");
 					if(proxyArr.length == 2){
@@ -262,7 +258,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 					String parameterFilename = nameValue.get(PARAMETER_FORM_FILENAME);
 					boolean hasFile = "file".equals(parameterType);
 					try {
-						value = engine.execute(parameterValue, variables);
+						value = ExpressionUtils.execute(parameterValue, variables);
 						if(hasFile){
 							InputStream stream = null;
 							if(value instanceof byte[]){
@@ -302,7 +298,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 				if (StringUtils.isNotBlank(cookieName)) {
 					String cookieValue = nameValue.get(COOKIE_VALUE);
 					try {
-						value = engine.execute(cookieValue, variables);
+						value = ExpressionUtils.execute(cookieValue, variables);
 						if (value != null) {
 							cookieMap.put(cookieName, cookieValue);
 							logger.info("设置请求Cookie：{}={}", cookieName, value);
@@ -324,7 +320,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 				if (StringUtils.isNotBlank(parameterName)) {
 					String parameterValue = nameValue.get(PARAMETER_VALUE);
 					try {
-						value = engine.execute(parameterValue, variables);
+						value = ExpressionUtils.execute(parameterValue, variables);
 						logger.info("设置请求参数：{}={}", parameterName, value);
 					} catch (Exception e) {
 						logger.error("设置请求参数：{}出错,异常信息：{}", parameterName, e);
@@ -343,7 +339,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 				if (StringUtils.isNotBlank(headerName)) {
 					String headerValue = nameValue.get(HEADER_VALUE);
 					try {
-						value = engine.execute(headerValue, variables);
+						value = ExpressionUtils.execute(headerValue, variables);
 						logger.info("设置请求Header：{}={}", headerName, value);
 					} catch (Exception e) {
 						logger.error("设置请求Header：{}出错,异常信息：{}", headerName, e);

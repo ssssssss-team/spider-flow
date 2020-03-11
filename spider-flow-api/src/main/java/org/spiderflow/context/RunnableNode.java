@@ -1,7 +1,5 @@
 package org.spiderflow.context;
 
-import java.util.function.Function;
-
 public class RunnableNode{
 
 	public enum State{

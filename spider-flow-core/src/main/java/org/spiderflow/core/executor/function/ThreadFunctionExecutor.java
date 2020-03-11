@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 /**
  * Created on 2019-12-06
  *
- * @author YZ255027 - Octopus
+ * @author Octopus
  */
 @Component
 @Comment("thread常用方法")

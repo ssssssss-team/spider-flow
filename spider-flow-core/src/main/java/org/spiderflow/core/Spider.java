@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.ExpressionEngine;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.RunnableNode;
@@ -14,6 +13,8 @@ import org.spiderflow.context.SpiderContextHolder;
 import org.spiderflow.core.executor.shape.LoopExecutor;
 import org.spiderflow.core.executor.shape.LoopJoinExecutor;
 import org.spiderflow.core.model.SpiderFlow;
+import org.spiderflow.core.utils.ExecutorsUtils;
+import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.core.utils.SpiderFlowUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.listener.SpiderListener;
@@ -27,7 +28,6 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * 爬虫的核心类
@@ -36,17 +36,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class Spider {
-
-	/**
-	 * 节点执行器列表 当前爬虫的全部流程
-	 */
-	@Autowired
-	private List<ShapeExecutor> executors;
-	/**
-	 * 选择器
-	 */
-	@Autowired
-	private ExpressionEngine engine;
 
 	@Autowired(required = false)
 	private List<SpiderListener> listeners;
@@ -60,9 +49,7 @@ public class Spider {
 	@Value("${spider.detect.dead-cycle:5000}")
 	private Integer deadCycle;
 
-	private static Map<String, ShapeExecutor> executorMap = new HashMap<>();
-
-	private static SpiderFlowThreadPoolExecutor executor;
+	private static SpiderFlowThreadPoolExecutor threadPoolExecutor;
 
 	private static final String ATOMIC_DEAD_CYCLE = "__atomic_dead_cycle";
 
@@ -70,8 +57,7 @@ public class Spider {
 
 	@PostConstruct
 	private void init() {
-		executorMap = executors.stream().collect(Collectors.toMap(ShapeExecutor::supportShape, v -> v));
-		executor = new SpiderFlowThreadPoolExecutor(totalThreads);
+		threadPoolExecutor = new SpiderFlowThreadPoolExecutor(totalThreads);
 	}
 
 	public List<SpiderOutput> run(SpiderFlow spiderFlow, SpiderContext context, Map<String, Object> variables) {
@@ -102,7 +88,7 @@ public class Spider {
 
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
-		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
+		SubThreadPoolExecutor pool = threadPoolExecutor.createSubThreadPoolExecutor(nThreads);
 		context.setRootNode(root);
 		context.setThreadPool(pool);
 		if (listeners != null) {
@@ -119,7 +105,7 @@ public class Spider {
 	}
 
 	public void execute(int nThreads, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
-		SubThreadPoolExecutor pool = executor.createSubThreadPoolExecutor(nThreads);
+		SubThreadPoolExecutor pool = threadPoolExecutor.createSubThreadPoolExecutor(nThreads);
 		context.setThreadPool(pool);
 		executeNode(fromNode, node, context, variables);
 		pool.awaitTermination();
@@ -145,7 +131,7 @@ public class Spider {
 			return;
 		}
 		logger.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
-		ShapeExecutor executor = executorMap.get(shape);
+		ShapeExecutor executor = ExecutorsUtils.get(shape);
 		if (executor == null) {
 			logger.error("执行失败,找不到对应的执行器:{}", shape);
 			context.setRunning(false);
@@ -154,7 +140,7 @@ public class Spider {
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
 		if (StringUtils.isNotBlank(loopCountStr)) {
 			try {
-				Object result = engine.execute(loopCountStr, variables);
+				Object result = ExpressionUtils.execute(loopCountStr, variables);
 				result = result == null ? 0 : result;
 				logger.info("获取循环次数{}={}", loopCountStr, result);
 				loopCount = Integer.parseInt(result.toString());
@@ -237,7 +223,7 @@ public class Spider {
 			if (StringUtils.isNotBlank(condition)) { // 判断是否有条件
 				Object result = null;
 				try {
-					result = engine.execute(condition, variables);
+					result = ExpressionUtils.execute(condition, variables);
 				} catch (Exception e) {
 					logger.error("判断{}出错,异常信息：{}", condition, e);
 				}

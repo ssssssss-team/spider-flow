@@ -7,11 +7,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.ExpressionEngine;
 import org.spiderflow.context.SpiderContext;
+import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.SpiderNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,9 +25,6 @@ public class FunctionExecutor implements ShapeExecutor{
 
 	private static final Logger logger = LoggerFactory.getLogger(FunctionExecutor.class);
 	
-	@Autowired
-	private ExpressionEngine engine;
-
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		List<Map<String, String>> functions = node.getListJsonValue(FUNCTION);
@@ -37,7 +33,7 @@ public class FunctionExecutor implements ShapeExecutor{
 			if(StringUtils.isNotBlank(function)){
 				try {
 					logger.debug("执行函数{}",function);
-					engine.execute(function, variables);
+					ExpressionUtils.execute(function, variables);
 				} catch (Exception e) {
 					logger.error("执行函数{}失败,异常信息:{}",function,e);
 					ExceptionUtils.wrapAndThrow(e);

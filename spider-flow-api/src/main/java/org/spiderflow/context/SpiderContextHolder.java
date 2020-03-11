@@ -18,5 +18,4 @@ public class SpiderContextHolder {
 		THREAD_LOCAL.remove();
 	}
 
-
 }

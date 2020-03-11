@@ -3,7 +3,6 @@ package org.spiderflow.core.expression;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ExpressionGlobalVariables {
