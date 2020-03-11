@@ -20,7 +20,6 @@
 		<dependency>
 			<groupId>org.spiderflow</groupId>
 			<artifactId>spider-flow-core</artifactId>
-			<version>${spider-flow.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

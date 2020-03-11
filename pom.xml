@@ -17,6 +17,50 @@
 		<spider-flow.version>0.3.2</spider-flow.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.spiderflow</groupId>
+				<artifactId>spider-flow-core</artifactId>
+				<version>${spider-flow.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.spiderflow</groupId>
+				<artifactId>spider-flow-selenium</artifactId>
+				<version>${spider-flow.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.spiderflow</groupId>
+				<artifactId>spider-flow-proxypool</artifactId>
+				<version>${spider-flow.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.spiderflow</groupId>
+				<artifactId>spider-flow-mongodb</artifactId>
+				<version>${spider-flow.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.spiderflow</groupId>
+				<artifactId>spider-flow-redis</artifactId>
+				<version>${spider-flow.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.spiderflow</groupId>
+				<artifactId>spider-flow-ocr</artifactId>
+				<version>${spider-flow.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.spiderflow</groupId>
+				<artifactId>spider-flow-oss</artifactId>
+				<version>${spider-flow.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.spiderflow</groupId>
+				<artifactId>spider-flow-mailbox</artifactId>
+				<version>${spider-flow.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<modules>
 		<module>spider-flow-api</module>
 		<module>spider-flow-core</module>
