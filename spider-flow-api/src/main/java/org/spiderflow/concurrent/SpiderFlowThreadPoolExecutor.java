@@ -61,6 +61,9 @@ public class SpiderFlowThreadPoolExecutor {
 				removeDoneFuture();
 			}
 			running = false;
+			synchronized (queue){
+				queue.notifyAll();
+			}
 		}
 		
 		private int index(){
@@ -71,7 +74,7 @@ public class SpiderFlowThreadPoolExecutor {
 			}
 			return -1;
 		}
-		
+
 		/**
 		 * 清除已完成的任务
 		 */
