@@ -1,10 +1,6 @@
 package org.spiderflow.concurrent;
 
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SpiderFlowThreadPoolExecutor {
@@ -45,6 +41,12 @@ public class SpiderFlowThreadPoolExecutor {
 		
 		private AtomicInteger executing = new AtomicInteger(0);
 
+		private volatile boolean running = true;
+
+		private volatile boolean submitting = false;
+
+		private LinkedBlockingQueue<SpiderFuture<?>> queue = new LinkedBlockingQueue<>();
+
 		public SubThreadPoolExecutor(int threads) {
 			super();
 			this.threads = threads;
@@ -58,6 +60,7 @@ public class SpiderFlowThreadPoolExecutor {
 			while(executing.get() > 0){
 				removeDoneFuture();
 			}
+			running = false;
 		}
 		
 		private int index(){
@@ -89,28 +92,52 @@ public class SpiderFlowThreadPoolExecutor {
 				removeDoneFuture();
 			}
 		}
-		
-		public void submit(Runnable runnable){
-			//正在执行的线程数+1
-			executing.incrementAndGet();
-			Runnable task = ()->{
-				try{
+
+		public <T> Future<T> submitAsync(Runnable runnable,T value){
+			SpiderFuture<T> future = new SpiderFuture<>(()-> {
+				try {
 					//执行任务
 					runnable.run();
-				} finally{
+				} finally {
 					//正在执行的线程数-1
 					executing.decrementAndGet();
 				}
-			};
-			//如果没有空闲线程且在线程池中提交，则直接运行
-			if(index() == -1 && Thread.currentThread().getThreadGroup() == SPIDER_FLOW_THREAD_GROUP){
-				task.run();
-				return;
+			}, value,this);
+			synchronized (queue){
+				queue.add(future);
+				if(!submitting){
+					submitting = true;
+					CompletableFuture.runAsync(this::submit);
+				}
+				queue.notifyAll();
 			}
-			//等待有空闲线程时在提交
-			await();
-			futures[index()] = executor.submit(task);
+
+			return future;
+		}
+		
+		private void submit(){
+			while(running){
+				try {
+					synchronized (queue){
+						if(queue.isEmpty()){
+							queue.wait();
+						}
+					}
+					while(!queue.isEmpty()){
+						SpiderFuture<?> future = queue.poll();
+						//如果没有空闲线程且在线程池中提交，则直接运行
+						if(index() == -1 && Thread.currentThread().getThreadGroup() == SPIDER_FLOW_THREAD_GROUP){
+							future.run();
+						}else{
+							//等待有空闲线程时在提交
+							await();
+							executor.submit(future);
+							futures[index()] = future;
+						}
+					}
+				} catch (InterruptedException ignored) {
+				}
+			}
 		}
 	}
-
 }

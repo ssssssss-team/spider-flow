@@ -4,10 +4,9 @@ import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecu
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -37,10 +36,12 @@ public class SpiderContext extends HashMap<String, Object>{
 
 	private SpiderNode rootNode;
 	
-	private boolean running = true;
+	private volatile boolean running = true;
+
+	private LinkedBlockingQueue<Future<?>> futureQueue = new LinkedBlockingQueue<>();
 
 	private CookieContext cookieContext = new CookieContext();
-	
+
 	public List<SpiderOutput> getOutputs() {
 		return outputs;
 	}
@@ -53,7 +54,11 @@ public class SpiderContext extends HashMap<String, Object>{
 		T value = this.get(key);
 		return value == null ? defaultValue : value;
 	}
-	
+
+	public LinkedBlockingQueue<Future<?>> getFutureQueue() {
+		return futureQueue;
+	}
+
 	public boolean isRunning() {
 		return running;
 	}

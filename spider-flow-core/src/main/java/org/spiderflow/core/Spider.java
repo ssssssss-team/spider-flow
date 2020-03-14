@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -94,21 +94,36 @@ public class Spider {
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
-		try {
-			executeNode(null, root, context, variables);
-			pool.awaitTermination();
-		} finally {
-			if (listeners != null) {
-				listeners.forEach(listener -> listener.afterEnd(context));
+		Future<?> f = pool.submitAsync(() -> {
+			try {
+				Spider.this.executeNode(null, root, context, variables);
+				Queue<Future<?>> queue = context.getFutureQueue();
+				while (!queue.isEmpty()) {
+					try {
+						Future<?> future = queue.poll();
+						if (future.isDone()) {
+							if (context.isRunning()) {
+								SpiderTask task = (SpiderTask) future.get();
+								//执行下一级
+								Spider.this.executeNextNodes(task.node, context, task.variables);
+							}
+						} else {
+							queue.add(future);
+						}
+						Thread.sleep(1);
+					} catch (InterruptedException | ExecutionException ignored) {
+					}
+				}
+				pool.awaitTermination();
+			} finally {
+				if (listeners != null) {
+					listeners.forEach(listener -> listener.afterEnd(context));
+				}
 			}
-		}
-	}
-
-	public void execute(int nThreads, SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
-		SubThreadPoolExecutor pool = threadPoolExecutor.createSubThreadPoolExecutor(nThreads);
-		context.setThreadPool(pool);
-		executeNode(fromNode, node, context, variables);
-		pool.awaitTermination();
+		}, null);
+		try {
+			f.get();
+		} catch (InterruptedException | ExecutionException ignored) {}
 	}
 
 	private void executeNextNodes(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
@@ -162,7 +177,7 @@ public class Spider {
 				variables.put(LoopExecutor.BEFORE_LOOP_VARIABLE + node.getNodeId(), variables);
 				variables.put(LoopJoinExecutor.VARIABLE_CONTEXT + node.getNodeId(), new LinkedBlockingQueue<>());
 			}
-			List<Runnable> runnables = new ArrayList<>();
+			List<SpiderTask> tasks = new ArrayList<>();
 			for (int i = 0; i < loopCount; i++) {
 				if (context.isRunning()) {
 					RunnableNode runnableNode = new RunnableNode();
@@ -172,7 +187,7 @@ public class Spider {
 					if (!StringUtils.isBlank(loopVariableName)) {
 						nVariables.put(loopVariableName, i);
 					}
-					runnables.add(() -> {
+					tasks.add(new SpiderTask(() -> {
 						runnableNode.setState(RunnableNode.State.RUNNING);
 						if (context.isRunning()) {
 							try {
@@ -200,7 +215,8 @@ public class Spider {
 								if (executor.allowExecuteNext(node, context, nVariables)) {
 									logger.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
 									// 递归执行下一级节点
-									executeNextNodes(node, context, nVariables);
+									// v0.4.0 移除递归，改为队列
+									// executeNextNodes(node, context, nVariables);
 								} else {
 									logger.debug("执行节点[{}:{}]完毕，忽略执行下一节点", node.getNodeName(), node.getNodeId());
 								}
@@ -210,10 +226,19 @@ public class Spider {
 								SpiderContextHolder.remove();
 							}
 						}
-					});
+					}, node, nVariables));
 				}
 			}
-			runnables.forEach(executor.isThread() ? context.getThreadPool()::submit : Runnable::run);
+			LinkedBlockingQueue<Future<?>> futureQueue = context.getFutureQueue();
+			for (SpiderTask task : tasks) {
+				if(executor.isThread()){
+					futureQueue.add(context.getThreadPool().submitAsync(task.runnable, task));
+				}else{
+					FutureTask<SpiderTask> futureTask = new FutureTask<>(task.runnable, task);
+					futureTask.run();
+					futureQueue.add(futureTask);
+				}
+			}
 		}
 	}
 
@@ -236,5 +261,20 @@ public class Spider {
 			}
 		}
 		return true;
+	}
+
+	class SpiderTask{
+
+		Runnable runnable;
+
+		SpiderNode node;
+
+		Map<String,Object> variables;
+
+		public SpiderTask(Runnable runnable, SpiderNode node, Map<String, Object> variables) {
+			this.runnable = runnable;
+			this.node = node;
+			this.variables = variables;
+		}
 	}
 }
