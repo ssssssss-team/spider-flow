@@ -25,7 +25,7 @@ public class UrlFunctionExecutor implements FunctionExecutor{
 	}
 	
 	@Comment("获取url参数")
-	@Example("${url.parameter('http://www.baidu.com/s?wd=spider-flow')}")
+	@Example("${url.parameter('http://www.baidu.com/s?wd=spider-flow','wd')}")
 	public static String parameter(String url,String key){
 		return parameterMap(url).get(key);
 	}
