@@ -21,30 +21,6 @@
 			<groupId>org.spiderflow</groupId>
 			<artifactId>spider-flow-core</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.spiderflow</groupId>
-			<artifactId>spider-flow-redis</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.spiderflow</groupId>
-			<artifactId>spider-flow-mongodb</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.spiderflow</groupId>
-			<artifactId>spider-flow-oss</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.spiderflow</groupId>
-			<artifactId>spider-flow-ocr</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.spiderflow</groupId>
-			<artifactId>spider-flow-mailbox</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.spiderflow</groupId>
-			<artifactId>spider-flow-selenium</artifactId>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
