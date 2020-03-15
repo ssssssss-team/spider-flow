@@ -26,16 +26,19 @@ spider-flow
 - [x] 支持css选择器、正则提取
 - [x] 支持JSON/XML格式
 - [x] 支持Xpath/JsonPath提取
-- [x] 支持多数据源、SQL select/insert/update/delete
+- [x] 支持多数据源、SQL select/selectInt/selectOne/insert/update/delete
 - [x] 支持爬取JS动态渲染的页面
 - [x] 支持代理
 - [x] 支持二进制格式
 - [x] 支持保存/读取文件(csv、xls、jpg等)
+- [x] 支持自定报错至数据库/文件
 - [x] 常用字符串、日期、文件、加解密等函数
 - [x] 支持流程嵌套
 - [x] 支持插件扩展(自定义执行器，自定义函数）
-- [x] 任务监控
+- [x] 任务监控,任务日志
 - [x] 支持HTTP接口
+- [x] 支持Cookie自动管理
+- [x] 支持自定义函数
 
 #### 插件列表
 - [x] [Selenium插件](https://gitee.com/jmxd/spider-flow-selenium)
