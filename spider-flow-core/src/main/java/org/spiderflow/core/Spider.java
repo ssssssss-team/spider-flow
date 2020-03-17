@@ -95,15 +95,15 @@ public class Spider {
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
 		//获取当前流程执行线程数
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
-		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）
-		SubThreadPoolExecutor pool = threadPoolExecutor.createSubThreadPoolExecutor(nThreads);
+		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）,+1是因为会占用一个线程用来调度执行下一级
+		SubThreadPoolExecutor pool = threadPoolExecutor.createSubThreadPoolExecutor(Math.max(nThreads,1) + 1);
 		context.setRootNode(root);
 		context.setThreadPool(pool);
 		//触发监听器
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
-		//
+		//启动一个线程开始执行任务,并监听其结束并执行下一级
 		Future<?> f = pool.submitAsync(TtlRunnable.get(() -> {
 			try {
 				//执行具体节点
