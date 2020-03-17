@@ -1,17 +1,14 @@
 package org.spiderflow.core;
 
+import com.alibaba.ttl.TtlRunnable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
-import org.spiderflow.context.RunnableNode;
-import org.spiderflow.context.RunnableTreeNode;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.context.SpiderContextHolder;
-import org.spiderflow.core.executor.shape.LoopExecutor;
-import org.spiderflow.core.executor.shape.LoopJoinExecutor;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.utils.ExecutorsUtils;
 import org.spiderflow.core.utils.ExpressionUtils;
@@ -74,58 +71,86 @@ public class Spider {
 	}
 
 	public void runWithTest(SpiderNode root, SpiderContext context) {
+		//将上下文存到ThreadLocal里，以便后续使用
 		SpiderContextHolder.set(context);
+		//死循环检测的计数器（死循环检测只在测试时有效）
 		AtomicInteger executeCount = new AtomicInteger(0);
+		//存入到上下文中，以供后续检测
 		context.put(ATOMIC_DEAD_CYCLE, executeCount);
+		//执行根节点
 		executeRoot(root, context, new HashMap<>());
+		//当爬虫任务执行完毕时,判断是否超过预期
 		if (executeCount.get() > deadCycle) {
 			logger.error("检测到可能出现死循环,测试终止");
 		} else {
 			logger.info("测试完毕！");
 		}
+		//将上下文从ThreadLocal移除，防止内存泄漏
 		SpiderContextHolder.remove();
 	}
 
+	/**
+	 * 执行根节点
+	 */
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
+		//获取当前流程执行线程数
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
+		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）
 		SubThreadPoolExecutor pool = threadPoolExecutor.createSubThreadPoolExecutor(nThreads);
 		context.setRootNode(root);
 		context.setThreadPool(pool);
+		//触发监听器
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
-		Future<?> f = pool.submitAsync(() -> {
+		//
+		Future<?> f = pool.submitAsync(TtlRunnable.get(() -> {
 			try {
+				//执行具体节点
 				Spider.this.executeNode(null, root, context, variables);
 				Queue<Future<?>> queue = context.getFutureQueue();
+				//循环从队列中获取Future,直到队列为空结束,当任务完成时，则执行下一级，如未完成，把Future加到队列末尾
 				while (!queue.isEmpty()) {
 					try {
 						Future<?> future = queue.poll();
-						if (future.isDone()) {
-							if (context.isRunning()) {
+						if (future.isDone()) {	//判断任务是否完成
+							if (context.isRunning()) {	//检测是否运行中(当在页面中点击"停止"时,此值为false,其余为true)
 								SpiderTask task = (SpiderTask) future.get();
-								//执行下一级
-								Spider.this.executeNextNodes(task.node, context, task.variables);
+								task.node.decrement();	//任务执行完毕,计数器减一(该计数器是给Join节点使用)
+								if (task.executor.allowExecuteNext(task.node, context, task.variables)) {	//判断是否允许执行下一级
+									logger.debug("执行节点[{}:{}]完毕", task.node.getNodeName(), task.node.getNodeId());
+									//执行下一级
+									Spider.this.executeNextNodes(task.node, context, task.variables);
+								} else {
+									logger.debug("执行节点[{}:{}]完毕，忽略执行下一节点", task.node.getNodeName(), task.node.getNodeId());
+								}
 							}
 						} else {
+							//将Future加到队列末尾
 							queue.add(future);
 						}
+						//睡眠1ms,让出cpu
 						Thread.sleep(1);
 					} catch (InterruptedException | ExecutionException ignored) {
 					}
 				}
+				//等待线程池结束
 				pool.awaitTermination();
 			} finally {
+				//触发监听器
 				if (listeners != null) {
 					listeners.forEach(listener -> listener.afterEnd(context));
 				}
 			}
-		}, null);
+		}), null);
 		try {
-			f.get();
+			f.get();	//阻塞等待所有任务执行完毕
 		} catch (InterruptedException | ExecutionException ignored) {}
 	}
 
+	/**
+	 * 执行下一级节点
+	 */
 	private void executeNextNodes(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		List<SpiderNode> nextNodes = node.getNextNodes();
 		if (nextNodes != null) {
@@ -135,22 +160,27 @@ public class Spider {
 		}
 	}
 
+	/**
+	 * 执行节点
+	 */
 	public void executeNode(SpiderNode fromNode, SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String shape = node.getStringJsonValue("shape");
 		if (StringUtils.isBlank(shape)) {
 			executeNextNodes(node, context, variables);
 			return;
 		}
-		//判断条件，如果不成立则不执行
+		//判断箭头上的条件，如果不成立则不执行
 		if (!executeCondition(fromNode, node, variables)) {
 			return;
 		}
 		logger.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
+		//找到对应的执行器
 		ShapeExecutor executor = ExecutorsUtils.get(shape);
 		if (executor == null) {
 			logger.error("执行失败,找不到对应的执行器:{}", shape);
 			context.setRunning(false);
 		}
+		//循环次数默认为1,如果节点有循环属性且填了循环次数,则取出循环次数
 		int loopCount = 1;
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
 		if (StringUtils.isNotBlank(loopCountStr)) {
@@ -165,39 +195,24 @@ public class Spider {
 			}
 		}
 		if (loopCount > 0) {
+			//获取循环下标的变量名称
 			String loopVariableName = node.getStringJsonValue(ShapeExecutor.LOOP_VARIABLE_NAME);
-			RunnableTreeNode treeNode = new RunnableTreeNode(node.getNodeId());
-			RunnableTreeNode parentNode = (RunnableTreeNode) variables.get(LoopExecutor.LOOP_NODE_KEY);
-			if (parentNode != null) {
-				parentNode.add(treeNode);
-			}
-			if (executor instanceof LoopExecutor) {
-				variables.put(LoopExecutor.LOOP_NODE_KEY + node.getNodeId(), treeNode);
-				variables.put(LoopExecutor.LOOP_NODE_KEY, treeNode);
-				variables.put(LoopExecutor.BEFORE_LOOP_VARIABLE + node.getNodeId(), variables);
-				variables.put(LoopJoinExecutor.VARIABLE_CONTEXT + node.getNodeId(), new LinkedBlockingQueue<>());
-			}
 			List<SpiderTask> tasks = new ArrayList<>();
 			for (int i = 0; i < loopCount; i++) {
+				node.increment();	//节点执行次数+1(后续Join节点使用)
 				if (context.isRunning()) {
-					RunnableNode runnableNode = new RunnableNode();
-					treeNode.add(new RunnableTreeNode("loop-" + node.getNodeId(), runnableNode));
 					Map<String, Object> nVariables = new HashMap<>(variables);
 					// 存入下标变量
 					if (!StringUtils.isBlank(loopVariableName)) {
 						nVariables.put(loopVariableName, i);
 					}
 					tasks.add(new SpiderTask(() -> {
-						runnableNode.setState(RunnableNode.State.RUNNING);
 						if (context.isRunning()) {
 							try {
-								SpiderContextHolder.set(context);
 								//死循环检测，当执行节点次数大于阈值时，结束本次测试
 								AtomicInteger executeCount = context.get(ATOMIC_DEAD_CYCLE);
 								if (executeCount != null && executeCount.incrementAndGet() > deadCycle) {
 									context.setRunning(false);
-									//设置当前线程为已完成状态
-									runnableNode.setState(RunnableNode.State.DONE);
 									return;
 								}
 								//执行节点具体逻辑
@@ -205,33 +220,15 @@ public class Spider {
 							} catch (Throwable t) {
 								nVariables.put("ex", t);
 								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
-							} finally {
-								if (node.isSync()) {
-									context.lock();
-								}
-								//设置当前线程为已完成状态
-								runnableNode.setState(RunnableNode.State.DONE);
-								//判断是否允许执行后续节点
-								if (executor.allowExecuteNext(node, context, nVariables)) {
-									logger.debug("执行节点[{}:{}]完毕", node.getNodeName(), node.getNodeId());
-									// 递归执行下一级节点
-									// v0.4.0 移除递归，改为队列
-									// executeNextNodes(node, context, nVariables);
-								} else {
-									logger.debug("执行节点[{}:{}]完毕，忽略执行下一节点", node.getNodeName(), node.getNodeId());
-								}
-								if (node.isSync()) {
-									context.unlock();
-								}
-								SpiderContextHolder.remove();
 							}
 						}
-					}, node, nVariables));
+					}, node, nVariables, executor));
 				}
 			}
 			LinkedBlockingQueue<Future<?>> futureQueue = context.getFutureQueue();
 			for (SpiderTask task : tasks) {
-				if(executor.isThread()){
+				if(executor.isThread()){	//【判断节点是否是异步运行
+					//提交任务至线程池中,并将Future添加到队列末尾
 					futureQueue.add(context.getThreadPool().submitAsync(task.runnable, task));
 				}else{
 					FutureTask<SpiderTask> futureTask = new FutureTask<>(task.runnable, task);
@@ -242,6 +239,9 @@ public class Spider {
 		}
 	}
 
+	/**
+	 *	判断箭头上的表达式是否成立
+	 */
 	private boolean executeCondition(SpiderNode fromNode, SpiderNode node, Map<String, Object> variables) {
 		if (fromNode != null) {
 			String condition = node.getCondition(fromNode.getNodeId());
@@ -271,10 +271,13 @@ public class Spider {
 
 		Map<String,Object> variables;
 
-		public SpiderTask(Runnable runnable, SpiderNode node, Map<String, Object> variables) {
+		ShapeExecutor executor;
+
+		public SpiderTask(Runnable runnable, SpiderNode node, Map<String, Object> variables,ShapeExecutor executor) {
 			this.runnable = runnable;
 			this.node = node;
 			this.variables = variables;
+			this.executor = executor;
 		}
 	}
 }

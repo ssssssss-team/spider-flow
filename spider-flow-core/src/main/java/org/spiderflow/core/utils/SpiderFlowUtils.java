@@ -10,7 +10,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.spiderflow.core.executor.shape.LoopJoinExecutor;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.util.CollectionUtils;
 
@@ -48,10 +47,6 @@ public class SpiderFlowUtils {
 			} else if (jsonProperty != null && node.getStringJsonValue("shape") != null) {
 				if ("start".equals(node.getStringJsonValue("shape"))) {
 					root = node;
-				} else if ("loopJoin".equals(node.getStringJsonValue("shape"))) {
-					String joinNodeId = node.getStringJsonValue(LoopJoinExecutor.JOIN_NODE_ID);
-					node.setSync(true);
-					nodeMap.get(joinNodeId).setSync(true);
 				}
 			}
 			if("0".equals(nodeId)){
@@ -86,8 +81,5 @@ public class SpiderFlowUtils {
 		}
 		return null;
 	}
-	
-	public static SpiderNode loadXMLFromBytes(byte[] bytes){
-		return loadXMLFromString(new String(bytes));
-	}
+
 }

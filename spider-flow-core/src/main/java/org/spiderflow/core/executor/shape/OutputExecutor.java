@@ -1,16 +1,13 @@
 package org.spiderflow.core.executor.shape;
 
-import java.io.IOException;
-import java.util.*;
-
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.context.RunnableTreeNode;
 import org.spiderflow.context.SpiderContext;
+import org.spiderflow.context.SpiderContextHolder;
 import org.spiderflow.core.executor.function.FileFunctionExecutor;
 import org.spiderflow.core.serializer.FastJsonSerializer;
 import org.spiderflow.core.utils.DataSourceUtils;
@@ -21,6 +18,12 @@ import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 输出执行器
@@ -111,13 +114,14 @@ public class OutputExecutor implements ShapeExecutor{
 				continue;
 			}
 			//去除不输出的信息
-			if ("ex".equals(item.getKey()) || value instanceof RunnableTreeNode) {
+			if ("ex".equals(item.getKey())) {
 				continue;
 			}
 			//去除不能序列化的参数
 			try {
 				JSON.toJSONString(value, FastJsonSerializer.serializeConfig);
 			} catch (Exception e) {
+				e.printStackTrace();
 				continue;
 			}
 			//输出信息
@@ -144,7 +148,7 @@ public class OutputExecutor implements ShapeExecutor{
 		}
 		try {
 			//执行sql
-			int update = template.update(sql.toString(), params);
+			template.update(sql.toString(), params);
 		} catch (Exception e) {
 			logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
 			ExceptionUtils.wrapAndThrow(e);

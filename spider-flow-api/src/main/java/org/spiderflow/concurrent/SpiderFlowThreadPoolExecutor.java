@@ -1,51 +1,88 @@
 package org.spiderflow.concurrent;
 
+import com.alibaba.ttl.TtlRunnable;
+
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SpiderFlowThreadPoolExecutor {
-	
+
+	/**
+	 * 最大线程数
+	 */
 	private int maxThreads;
-	
+
+	/**
+	 * 真正线程池
+	 */
 	private ThreadPoolExecutor executor;
-	
+
+	/**
+	 * 线程number计数器
+	 */
 	private final AtomicInteger poolNumber = new AtomicInteger(1);
-	
+
+	/**
+	 * ThreadGroup
+	 */
 	private static final ThreadGroup SPIDER_FLOW_THREAD_GROUP = new ThreadGroup("spider-flow-group");
-	
+
+	/**
+	 * 线程名称前缀
+	 */
 	private static final String THREAD_POOL_NAME_PREFIX = "spider-flow-";
-	
+
 	public SpiderFlowThreadPoolExecutor(int maxThreads) {
 		super();
 		this.maxThreads = maxThreads;
-		this.executor = new ThreadPoolExecutor(maxThreads, maxThreads, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),new ThreadFactory() {
-			
-			@Override
-			public Thread newThread(Runnable runnable) {
-				return new Thread(SPIDER_FLOW_THREAD_GROUP, runnable, THREAD_POOL_NAME_PREFIX + poolNumber.getAndIncrement());
-			}
+		//创建线程池实例
+		this.executor = new ThreadPoolExecutor(maxThreads, maxThreads, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), runnable -> {
+			//重写线程名称
+			return new Thread(SPIDER_FLOW_THREAD_GROUP, runnable, THREAD_POOL_NAME_PREFIX + poolNumber.getAndIncrement());
 		});
 	}
-	
-	
+
+
+	/**
+	 * 创建子线程池
+	 * @param threads	线程池大小
+	 * @return
+	 */
 	public SubThreadPoolExecutor createSubThreadPoolExecutor(int threads){
 		return new SubThreadPoolExecutor(Math.min(maxThreads, threads));
 	}
-	
-	
+
+	/**
+	 * 子线程池
+	 */
 	public class SubThreadPoolExecutor{
-		
+
+		/**
+		 * 线程池大小
+		 */
 		private int threads;
-		
+
+		/**
+		 * 正在执行中的任务
+		 */
 		private Future<?>[] futures;
-		
+
+		/**
+		 * 执行中的数量
+		 */
 		private AtomicInteger executing = new AtomicInteger(0);
 
+		/**
+		 * 是否运行中
+		 */
 		private volatile boolean running = true;
 
+		/**
+		 * 是否提交任务中
+		 */
 		private volatile boolean submitting = false;
 
-		private LinkedBlockingQueue<SpiderFuture<?>> queue = new LinkedBlockingQueue<>();
+		private LinkedBlockingQueue<SpiderFutureTask<?>> queue = new LinkedBlockingQueue<>();
 
 		public SubThreadPoolExecutor(int threads) {
 			super();
@@ -61,6 +98,7 @@ public class SpiderFlowThreadPoolExecutor {
 				removeDoneFuture();
 			}
 			running = false;
+			//当停止时,唤醒提交任务线程使其结束
 			synchronized (queue){
 				queue.notifyAll();
 			}
@@ -89,15 +127,21 @@ public class SpiderFlowThreadPoolExecutor {
 				} 
 			}
 		}
-		
+
+		/**
+		 * 等待有空闲线程
+		 */
 		private void await(){
 			while(index() == -1){
 				removeDoneFuture();
 			}
 		}
 
+		/**
+		 * 异步提交任务
+		 */
 		public <T> Future<T> submitAsync(Runnable runnable,T value){
-			SpiderFuture<T> future = new SpiderFuture<>(()-> {
+			SpiderFutureTask<T> future = new SpiderFutureTask<>(()-> {
 				try {
 					//执行任务
 					runnable.run();
@@ -108,34 +152,38 @@ public class SpiderFlowThreadPoolExecutor {
 			}, value,this);
 			synchronized (queue){
 				queue.add(future);
+				//如果是第一次调用submitSync方法，则启动提交任务线程
 				if(!submitting){
 					submitting = true;
 					CompletableFuture.runAsync(this::submit);
 				}
+				//通知继续从队列中取任务提交到线程池中
 				queue.notifyAll();
 			}
 
 			return future;
 		}
-		
+
 		private void submit(){
 			while(running){
 				try {
 					synchronized (queue){
+						//如果队列是空的，则等待提交
 						if(queue.isEmpty()){
-							queue.wait();
+							queue.wait();	//等待唤醒
 						}
 					}
+					//当该线程被唤醒时，把队列中所有任务都提交到线程池中
 					while(!queue.isEmpty()){
-						SpiderFuture<?> future = queue.poll();
+						SpiderFutureTask<?> futureTask = queue.poll();
 						//如果没有空闲线程且在线程池中提交，则直接运行
 						if(index() == -1 && Thread.currentThread().getThreadGroup() == SPIDER_FLOW_THREAD_GROUP){
-							future.run();
+							futureTask.run();
 						}else{
 							//等待有空闲线程时在提交
 							await();
-							executor.submit(future);
-							futures[index()] = future;
+							//提交任务至线程池中
+							futures[index()] = executor.submit(futureTask);
 						}
 					}
 				} catch (InterruptedException ignored) {

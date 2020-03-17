@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -24,6 +25,11 @@ public class SpiderNode {
 	 * 节点列表中的下一个节点
 	 */
 	private List<SpiderNode> nextNodes = new ArrayList<>();
+
+	/**
+	 * 节点列表中的上一个节点
+	 */
+	private List<SpiderNode> prevNodes = new ArrayList<>();
 	/**
 	 * 节点流转条件
 	 */
@@ -37,8 +43,11 @@ public class SpiderNode {
 	 */
 	private String nodeId;
 
-	private boolean sync = false;
-	
+	/**
+	 * 计数器,用来计算当前节点执行中的个数
+	 */
+	private AtomicInteger counter = new AtomicInteger();
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -96,9 +105,10 @@ public class SpiderNode {
 	}
 
 	public void addNextNode(SpiderNode nextNode){
+		nextNode.prevNodes.add(this);
 		this.nextNodes.add(nextNode);
 	}
-	
+
 	public List<SpiderNode> getNextNodes() {
 		return nextNodes;
 	}
@@ -111,12 +121,24 @@ public class SpiderNode {
 		this.condition.put(fromNodeId, condition);
 	}
 
-	public boolean isSync() {
-		return sync;
+	public void increment(){
+		counter.incrementAndGet();
 	}
 
-	public void setSync(boolean sync) {
-		this.sync = sync;
+	public void decrement(){
+		counter.decrementAndGet();
+	}
+
+	public boolean isDone(){
+		if(this.counter.get() == 0){
+			for (SpiderNode prevNode : prevNodes) {
+				if(!prevNode.isDone()){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	@Override

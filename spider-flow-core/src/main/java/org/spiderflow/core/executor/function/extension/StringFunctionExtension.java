@@ -70,7 +70,7 @@ public class StringFunctionExtension implements FunctionExtension{
 	}
 	
 	@Comment("根据xpath在String变量中查找")
-	@Example("${resp.xpaths('//a/@href')}")
+	@Example("${strVar.xpaths('//a/@href')}")
 	public static List<String> xpaths(String source,String xpath){
 		return ExtractUtils.getValuesByXPath(Jsoup.parse(source), xpath);
 	}

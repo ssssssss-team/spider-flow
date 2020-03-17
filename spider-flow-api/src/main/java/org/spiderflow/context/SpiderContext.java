@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 爬虫上下文集合
+ * 爬虫上下文
  * @author jmxd
  *
  */
@@ -30,16 +30,23 @@ public class SpiderContext extends HashMap<String, Object>{
 	private SubThreadPoolExecutor threadPool;
 
 	/**
-	 * 处理流程同步锁
+	 * 根节点
 	 */
-	private ReentrantLock lock = new ReentrantLock();
-
 	private SpiderNode rootNode;
-	
+
+	/**
+	 * 爬虫是否运行中
+	 */
 	private volatile boolean running = true;
 
+	/**
+	 * Future队列
+	 */
 	private LinkedBlockingQueue<Future<?>> futureQueue = new LinkedBlockingQueue<>();
 
+	/**
+	 * Cookie上下文
+	 */
 	private CookieContext cookieContext = new CookieContext();
 
 	public List<SpiderOutput> getOutputs() {
@@ -95,14 +102,6 @@ public class SpiderContext extends HashMap<String, Object>{
 	
 	public CookieContext getCookieContext() {
 		return cookieContext;
-	}
-
-	public void lock(){
-		lock.lock();
-	}
-
-	public void unlock(){
-		lock.unlock();
 	}
 
 }
