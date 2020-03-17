@@ -105,18 +105,19 @@ public class OutputExecutor implements ShapeExecutor{
 	@Override
 	public boolean allowExecuteNext(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
 		String key = context.getId() + "-" + node.getNodeId();
-		boolean isDone = node.isDone();
-		if(isDone){
+		if(node.isDone()){
 			CSVPrinter printer = cachePrinter.remove(key);
-			try {
-				printer.flush();
-				printer.close();
-			} catch (IOException e) {
-				logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
-				ExceptionUtils.wrapAndThrow(e);
+			if(printer != null){
+				try {
+					printer.flush();
+					printer.close();
+				} catch (IOException e) {
+					logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
+					ExceptionUtils.wrapAndThrow(e);
+				}
 			}
 		}
-		return isDone;
+		return true;
 	}
 
 	/**
@@ -182,30 +183,20 @@ public class OutputExecutor implements ShapeExecutor{
 		CSVPrinter printer = cachePrinter.get(key);
 		List<String> records = new ArrayList<>(data.size());
 		String[] headers = data.keySet().toArray(new String[data.size()]);
-		if (printer == null) {
-			CSVFormat format = CSVFormat.DEFAULT.withHeader(headers);
-			try {
-				OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(csvName), "GBK");
+		try {
+			if (printer == null) {
+				CSVFormat format = CSVFormat.DEFAULT.withHeader(headers);
+				OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(csvName), "UTF-8");
 				printer = new CSVPrinter(osw, format);
 				cachePrinter.put(key, printer);
-				for (int i = 0; i < headers.length; i++) {
-					records.add(data.get(headers[i]).toString());
-				}
-				printer.printRecord(records);
-			} catch (IOException e) {
-				logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
-				ExceptionUtils.wrapAndThrow(e);
 			}
-		} else {
 			for (int i = 0; i < headers.length; i++) {
 				records.add(data.get(headers[i]).toString());
 			}
-			try {
-				printer.printRecord(records);
-			} catch (IOException e) {
-				logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
-				ExceptionUtils.wrapAndThrow(e);
-			}
+			printer.printRecord(records);
+		} catch (IOException e) {
+			logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
+			ExceptionUtils.wrapAndThrow(e);
 		}
 	}
 
