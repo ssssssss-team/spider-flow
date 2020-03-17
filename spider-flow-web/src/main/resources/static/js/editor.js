@@ -89,6 +89,15 @@ function serializeForm(){
 	});
 	cell.data.set('shape',shape);
 }
+function resizeSlideBar(){
+	var $dom = $(".sidebar-container");
+	var height = $dom.height();
+	var len = $dom.find("img").length;
+	var totalHeight = len * 46;
+	var w = Math.ceil(totalHeight / height);
+	$dom.width(w * 50);
+	$(".editor-container,.xml-container").css("left",w * 50 + "px");
+}
 $(function(){
 	$.ajax({
 		url : 'spider/other',
@@ -133,10 +142,8 @@ $(function(){
 	      var moveLen = e.clientY;
 	      if(moveLen<250) moveLen = 250;
 	      if(moveLen>maxT-150) moveLen = maxT-150;
-	      /*if(box.clientHeight - moveLen < 400 || box.clientHeight - moveLen > 800){
-	      	return;
-	      }*/
 	      resize.style.top = moveLen + 'px';
+	      resizeSlideBar();
 	      $(".editor-container,.sidebar-container,.xml-container").css('bottom',($('body').height() - moveLen) + 'px');
 	      $(".properties-container").height(box.clientHeight - moveLen - 5);
 	    }
@@ -147,7 +154,8 @@ $(function(){
 	    }
 	    resize.setCapture && resize.setCapture();
 	    return false;
-	  }
+	}
+	resizeSlideBar();
 	var templateCache = {};
 	function loadTemplate(cell,model,callback){
 		serializeForm();
@@ -167,6 +175,7 @@ $(function(){
 				$(".properties-container").html(html).attr('data-cellid',cell.id);
 				layui.form.render();
 				renderCodeMirror();
+				resizeSlideBar();
 				callback&&callback();
 			})
 		}
@@ -192,9 +201,6 @@ $(function(){
 		bindToolbarClickAction(editor);
 		//加载图形
 		loadShapes(editor,$('.sidebar-container')[0]);
-		if($('.sidebar-container')[0].scrollWidth>$('.sidebar-container')[0].clientWidth){
-			$('.sidebar-container').width($('.sidebar-container').width() + 3);
-		}
 		layui.form.on('checkbox',function(e){
 			serializeForm();
 		});
@@ -570,6 +576,7 @@ $(function(){
 					image.src = shape.image;
 					image.title = shape.title;
 					editor.addShape(shape.name,shape.title || 'Label',image,false);
+					resizeSlideBar();
 				}
 			}
 		})
