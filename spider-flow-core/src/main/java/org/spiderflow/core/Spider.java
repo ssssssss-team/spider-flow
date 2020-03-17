@@ -206,7 +206,7 @@ public class Spider {
 					if (!StringUtils.isBlank(loopVariableName)) {
 						nVariables.put(loopVariableName, i);
 					}
-					tasks.add(new SpiderTask(() -> {
+					tasks.add(new SpiderTask(TtlRunnable.get(() -> {
 						if (context.isRunning()) {
 							try {
 								//死循环检测，当执行节点次数大于阈值时，结束本次测试
@@ -222,7 +222,7 @@ public class Spider {
 								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
 							}
 						}
-					}, node, nVariables, executor));
+					}), node, nVariables, executor));
 				}
 			}
 			LinkedBlockingQueue<Future<?>> futureQueue = context.getFutureQueue();
