@@ -21,6 +21,9 @@ import org.spiderflow.model.Plugin;
 import org.spiderflow.model.Shape;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -149,7 +152,21 @@ public class SpiderFlowController {
 	public String xml(String id){
 		return spiderFlowService.getById(id).getXml();
 	}
-	
+
+	@RequestMapping("/log/download")
+	public ResponseEntity<FileSystemResource> download(String id, String taskId)  {
+		if (StringUtils.isBlank(taskId)) {
+			Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
+			taskId = maxId == null ? "" : maxId.toString();
+		}
+		String finalTaskId = taskId;
+		File file = new File(spiderLogPath, id + finalTaskId + ".log");
+		return ResponseEntity.ok()
+				.header("Content-Disposition","attachment; filename=spider.log")
+				.contentType(MediaType.parseMediaType("application/octet-stream"))
+				.body(new FileSystemResource(file));
+	}
+
 	@RequestMapping("/log")
 	public JsonBean<List<Line>> log(String id, String taskId, String keywords, Long index, Integer count, Boolean reversed, Boolean matchcase, Boolean regx) {
 		if (StringUtils.isBlank(taskId)) {

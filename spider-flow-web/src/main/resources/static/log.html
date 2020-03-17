@@ -94,6 +94,18 @@
                 background-position: center center;
                 background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAoklEQVQ4T63SwQnCQBCF4fdIN9qEZxEMgqnAGqzDDgSPCZgYgwcvVmGKEeLIGFZwHEWW7HX34x+WISIPIx2GhVV1Ggm7HYgb78kqTaetneyjqAjscgHG+pjAFZJkFr9Bi0LFwy9okYBZX5TcKz+hhxbzWaF3+0Oz9DB/oTCqh1nWxwsEE32k44WS/UWLWdbNVqEA62/IlDcgz8MuwD9rGF18AERoXOuD03ayAAAAAElFTkSuQmCC");
                 float : left;
+                cursor: pointer;
+            }
+            .btn.btn-download{
+                width : 48px;
+                backgrond:none;
+                font-size:12px;
+                line-height: 24px;
+                color : #ddd;
+                background-image: none;
+                padding : 0 5px;
+                margin-left : 5px;
+                background-color: #4c5052;
             }
             .btn.btn-prev{
                 background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAoklEQVQ4T63SwQnCQBCF4fdIN9qEZxEMgqnAGqzDDgSPCZgYgwcvVmGKEeLIGFZwHEWW7HX34x+WISIPIx2GhVV1Ggm7HYgb78kqTaetneyjqAjscgHG+pjAFZJkFr9Bi0LFwy9okYBZX5TcKz+hhxbzWaF3+0Oz9DB/oTCqh1nWxwsEE32k44WS/UWLWdbNVqEA62/IlDcgz8MuwD9rGF18AERoXOuD03ayAAAAAElFTkSuQmCC");
@@ -153,6 +165,7 @@
 	</head>
 	<div class="log-container"></div>
     <div class="toolbox-container">
+        <span class="btn btn-download" title="下载日志">下载日志</span>
         <input type="text" id="keywords" placeholder="请输入关键词搜索定位日志" class="input-text"/>
         <input type="checkbox" id="reversed" checked class="input-checkbox"/>
         <label for="reversed">反向搜索</label>
@@ -229,6 +242,8 @@
             }).on('click','.btn-page-end',function(){
                 viewer.setOptions('reversed',true);
                 viewer.init();
+            }).on('click','.btn-download',function(){
+                window.open('spider/log/download?id=' + logId + "&taskId=" + taskId);
             });
 		});
 	</script>
