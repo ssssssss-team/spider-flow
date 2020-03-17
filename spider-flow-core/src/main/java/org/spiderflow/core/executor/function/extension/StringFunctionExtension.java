@@ -1,12 +1,9 @@
 package org.spiderflow.core.executor.function.extension;
 
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 import org.spiderflow.annotation.Comment;
 import org.spiderflow.annotation.Example;
@@ -16,7 +13,9 @@ import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.FunctionExtension;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class StringFunctionExtension implements FunctionExtension{
@@ -66,19 +65,19 @@ public class StringFunctionExtension implements FunctionExtension{
 	@Example("${strVar.xpath('//title/text()')}")
 	@Return({Element.class,String.class})
 	public static String xpath(String source,String xpath){
-		return ExtractUtils.getValueByXPath(Jsoup.parse(source), xpath);
+		return ExtractUtils.getValueByXPath(element(source), xpath);
 	}
 	
 	@Comment("根据xpath在String变量中查找")
 	@Example("${strVar.xpaths('//a/@href')}")
 	public static List<String> xpaths(String source,String xpath){
-		return ExtractUtils.getValuesByXPath(Jsoup.parse(source), xpath);
+		return ExtractUtils.getValuesByXPath(element(source), xpath);
 	}
 	
 	@Comment("将String变量转为Element对象")
 	@Example("${strVar.element()}")
 	public static Element element(String source){
-		return Jsoup.parse(source);
+		return Parser.xmlParser().parseInput(source,"");
 	}
 	
 	@Comment("根据css选择器提取")
