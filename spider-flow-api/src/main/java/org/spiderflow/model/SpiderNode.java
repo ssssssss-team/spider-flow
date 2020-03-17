@@ -1,9 +1,6 @@
 package org.spiderflow.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.text.StringEscapeUtils;
@@ -130,9 +127,12 @@ public class SpiderNode {
 	}
 
 	public boolean isDone(){
+		return isDone(new HashSet<>());
+	}
+	public boolean isDone(Set<String> visited){
 		if(this.counter.get() == 0){
 			for (SpiderNode prevNode : prevNodes) {
-				if(!prevNode.isDone()){
+				if(visited.add(nodeId)&&!prevNode.isDone(visited)){
 					return false;
 				}
 			}
