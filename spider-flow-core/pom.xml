@@ -40,5 +40,10 @@
 			<groupId>org.spiderflow</groupId>
 			<artifactId>spider-flow-api</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.8</version>
+		</dependency>
 	</dependencies>
 </project>

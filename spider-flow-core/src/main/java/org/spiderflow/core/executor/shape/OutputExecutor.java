@@ -1,14 +1,14 @@
 package org.spiderflow.core.executor.shape;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.context.SpiderContext;
-import org.spiderflow.context.SpiderContextHolder;
-import org.spiderflow.core.executor.function.FileFunctionExecutor;
 import org.spiderflow.core.serializer.FastJsonSerializer;
 import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.core.utils.ExpressionUtils;
@@ -19,11 +19,8 @@ import org.spiderflow.model.SpiderOutput;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 /**
  * 输出执行器
@@ -50,6 +47,11 @@ public class OutputExecutor implements ShapeExecutor{
 	public static final String CSV_NAME = "csvName";
 
 	private static Logger logger = LoggerFactory.getLogger(OutputExecutor.class);
+
+	/**
+	 * 输出CSVPrinter节点变量
+	 */
+	private Map<String, CSVPrinter> cachePrinter = new HashMap<>();
 	
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
@@ -95,9 +97,26 @@ public class OutputExecutor implements ShapeExecutor{
 		}
 		if (csvFlag) {
 			String csvName = node.getStringJsonValue(CSV_NAME);
-			outputCSV(csvName, outputData);
+			outputCSV(node, context, csvName, outputData);
 		}
 		context.addOutput(output);
+	}
+
+	@Override
+	public boolean allowExecuteNext(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+		String key = context.getId() + "-" + node.getNodeId();
+		boolean isDone = node.isDone();
+		if(isDone){
+			CSVPrinter printer = cachePrinter.remove(key);
+			try {
+				printer.flush();
+				printer.close();
+			} catch (IOException e) {
+				logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
+				ExceptionUtils.wrapAndThrow(e);
+			}
+		}
+		return isDone;
 	}
 
 	/**
@@ -155,28 +174,38 @@ public class OutputExecutor implements ShapeExecutor{
 		}
 	}
 
-	private void outputCSV(String csvName, Map<String, Object> data) {
+	private void outputCSV(SpiderNode node, SpiderContext context, String csvName, Map<String, Object> data) {
 		if (data == null || data.isEmpty()) {
 			return;
 		}
-		Set<Map.Entry<String, Object>> entries = data.entrySet();
-		StringBuffer sb = new StringBuffer();
-		int i = 1 ;
-		for (Map.Entry<String,Object> item : entries) {
-			if (item.getValue() != null) {
-				sb.append(item.getValue().toString());
+		String key = context.getId() + "-" + node.getNodeId();
+		CSVPrinter printer = cachePrinter.get(key);
+		List<String> records = new ArrayList<>(data.size());
+		String[] headers = data.keySet().toArray(new String[data.size()]);
+		if (printer == null) {
+			CSVFormat format = CSVFormat.DEFAULT.withHeader(headers);
+			try {
+				OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(csvName), "GBK");
+				printer = new CSVPrinter(osw, format);
+				cachePrinter.put(key, printer);
+				for (int i = 0; i < headers.length; i++) {
+					records.add(data.get(headers[i]).toString());
+				}
+				printer.printRecord(records);
+			} catch (IOException e) {
+				logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
+				ExceptionUtils.wrapAndThrow(e);
 			}
-			if (i < data.size()) {
-				sb.append(",");
+		} else {
+			for (int i = 0; i < headers.length; i++) {
+				records.add(data.get(headers[i]).toString());
 			}
-			i++;
-		}
-		sb.append("\r\n");
-		try {
-			FileFunctionExecutor.write(csvName, sb.toString().getBytes(),true);
-		} catch (IOException e) {
-			logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
-			ExceptionUtils.wrapAndThrow(e);
+			try {
+				printer.printRecord(records);
+			} catch (IOException e) {
+				logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
+				ExceptionUtils.wrapAndThrow(e);
+			}
 		}
 	}
 
