@@ -1,7 +1,8 @@
 package org.spiderflow.concurrent;
 
-import com.alibaba.ttl.TtlRunnable;
+import org.apache.commons.lang3.RandomUtils;
 
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -82,7 +83,7 @@ public class SpiderFlowThreadPoolExecutor {
 		 */
 		private volatile boolean submitting = false;
 
-		private LinkedBlockingQueue<SpiderFutureTask<?>> queue = new LinkedBlockingQueue<>();
+		private List<SpiderFutureTask<?>> futureTaskList = new CopyOnWriteArrayList<>();
 
 		public SubThreadPoolExecutor(int threads) {
 			super();
@@ -99,8 +100,8 @@ public class SpiderFlowThreadPoolExecutor {
 			}
 			running = false;
 			//当停止时,唤醒提交任务线程使其结束
-			synchronized (queue){
-				queue.notifyAll();
+			synchronized (futureTaskList){
+				futureTaskList.notifyAll();
 			}
 		}
 		
@@ -150,32 +151,32 @@ public class SpiderFlowThreadPoolExecutor {
 					executing.decrementAndGet();
 				}
 			}, value,this);
-			synchronized (queue){
-				queue.add(future);
+			synchronized (futureTaskList){
+				futureTaskList.add(future);
 				//如果是第一次调用submitSync方法，则启动提交任务线程
 				if(!submitting){
 					submitting = true;
 					CompletableFuture.runAsync(this::submit);
 				}
-				//通知继续从队列中取任务提交到线程池中
-				queue.notifyAll();
+				//通知继续从集合中取任务提交到线程池中
+				futureTaskList.notifyAll();
 			}
-
 			return future;
 		}
 
 		private void submit(){
 			while(running){
 				try {
-					synchronized (queue){
-						//如果队列是空的，则等待提交
-						if(queue.isEmpty()){
-							queue.wait();	//等待唤醒
+					synchronized (futureTaskList){
+						//如果集合是空的，则等待提交
+						if(futureTaskList.isEmpty()){
+							futureTaskList.wait();	//等待唤醒
 						}
 					}
-					//当该线程被唤醒时，把队列中所有任务都提交到线程池中
-					while(!queue.isEmpty()){
-						SpiderFutureTask<?> futureTask = queue.poll();
+					//当该线程被唤醒时，把集合中所有任务都提交到线程池中
+					while(!futureTaskList.isEmpty()){
+						//随机从集合中获取任务提交到线程池中
+						SpiderFutureTask<?> futureTask = futureTaskList.remove(RandomUtils.nextInt(0, futureTaskList.size()));
 						//如果没有空闲线程且在线程池中提交，则直接运行
 						if(index() == -1 && Thread.currentThread().getThreadGroup() == SPIDER_FLOW_THREAD_GROUP){
 							futureTask.run();
