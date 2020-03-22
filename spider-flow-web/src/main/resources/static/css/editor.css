@@ -82,6 +82,11 @@ html,body{
 	box-shadow: -2px 1px 3px #eee;
 	overflow: auto;
 }
+.properties-container .layui-form-selectup dl{
+	top:auto;
+	bottom:auto;
+
+}
 .properties-container .layui-table-cell{
 	height:32px;
 	line-height: 32px;
