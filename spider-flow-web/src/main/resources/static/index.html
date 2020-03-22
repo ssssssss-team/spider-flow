@@ -6,12 +6,14 @@
 		<link rel="stylesheet" href="js/layui/css/layui.css" />
 		<link rel="stylesheet" href="css/layui-blue.css" />
 		<link rel="stylesheet" href="css/index.css" />
+		<script>SPIDER_FLOW_VERSION = '0.4.1'</script>
 		<script type="text/javascript" src="js/layui/layui.all.js" ></script>
 		<script type="text/javascript" src="js/index.js" ></script>
+		<script type="text/javascript" src="https://www.spiderflow.org/update-detection.js"></script>
 	</head>
 	<body class="layui-layout layui-layout-admin">
 		<div class="layui-header">
-			<div class="layui-logo">SpiderFlow平台v0.4.1</div>
+			<div class="layui-logo">SpiderFlow平台</div>
 			<ul class="layui-nav layui-layout-left"></ul>
 		</div>
 		<div class="layui-side">
@@ -36,5 +38,9 @@
 		    	</div>
 		    </div>
 		</div>
+		<script>
+			var title = $(".layui-logo");
+			title.append('v' + SPIDER_FLOW_VERSION);
+		</script>
 	</body>
 </html>
