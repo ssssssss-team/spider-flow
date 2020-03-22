@@ -190,6 +190,21 @@ SpiderEditor.prototype.getSelectedCell = function(){
 SpiderEditor.prototype.getXML = function(){
 	return mxUtils.getPrettyXml(new mxCodec(mxUtils.createXmlDocument()).encode(this.graph.getModel()));
 }
+SpiderEditor.prototype.selectCell = function(cell){
+	this.graph.setSelectionCell(cell);
+}
+SpiderEditor.prototype.valid = function(){
+	var cells = editor.graph.getModel().cells;
+	for(var key in cells){
+		var cell = cells[key];
+		if(cell&&cell.edge){
+			if(cell.source == null || cell.target == null){
+				return cell;
+			}
+		}
+	}
+	return null;
+}
 SpiderEditor.prototype.setXML = function(xml){
 	var doc = mxUtils.parseXml(xml);
 	var root = doc.documentElement;

@@ -61,12 +61,14 @@ function serializeForm(){
 			cell.data.set(name,array);
 		}else{
 			if(name == 'value'){
-				model.beginUpdate();
-				try{
-					model.execute(new mxCellAttributeChange(cell,'value',value));
-					cell.setValue(value);
-				}finally{
-					model.endUpdate();
+				if(cell.getValue() != value){
+					model.beginUpdate();
+					try{
+						cell.setValue(value);
+						model.execute(new mxValueChange(model,cell,value));
+					}finally{
+						model.endUpdate();
+					}
 				}
 			}
 			cell.data.set(name,value);
@@ -97,6 +99,23 @@ function resizeSlideBar(){
 	var w = Math.ceil(totalHeight / height);
 	$dom.width(w * 50);
 	$(".editor-container,.xml-container").css("left",w * 50 + "px");
+}
+
+function validXML(callback){
+	var cell = editor.valid();
+	if(cell){
+		layui.layer.confirm("检测到有箭头未连接到节点上，是否处理？",{
+			title : '异常处理',
+			btn : ['处理','忽略'],
+		},function(index){
+			layui.layer.close(index);
+			editor.selectCell(cell);
+		},function(){
+			callback&&callback();
+		})
+	}else{
+		callback&&callback();
+	}
 }
 $(function(){
 	$.ajax({
@@ -617,254 +636,256 @@ function bindToolbarClickAction(editor){
 //		editor.setXML($(".xml-container textarea").val());
 //		editor.onSelectedCell();
 	}).on('click','.btn-test',function(){
-		var LogViewer;
-		var tableMap = {};
-		var socket;
-		var first = true;
-		var filterText = '';
-		var testWindowIndex = layui.layer.open({
-			id : 'test-window',
-			type : 1,
-			content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="960" height="100"></canvas></div>',
-			area : ["980px","500px"],
-			shade : 0,
-			maxmin : true,
-			maxWidth : 700,
-			maxHeight : 400,
-			title : '测试窗口',
-			btn : ['关闭','显示/隐藏输出','显示/隐藏日志','停止'],
-			btn2 : function(){
-				var $output = $(".test-window-container .output-container");
-				var $log = $(".test-window-container .log-container");
-				if($output.is(":hidden")){
-					$output.show();
-					$output.find("canvas").each(function(){
-						if($log.is(":hidden")){
-							this.height = 320;
-						}else{
-							this.height = 200;
+		validXML(function(){
+			var LogViewer;
+			var tableMap = {};
+			var socket;
+			var first = true;
+			var filterText = '';
+			var testWindowIndex = layui.layer.open({
+				id : 'test-window',
+				type : 1,
+				content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="960" height="100"></canvas></div>',
+				area : ["980px","500px"],
+				shade : 0,
+				maxmin : true,
+				maxWidth : 700,
+				maxHeight : 400,
+				title : '测试窗口',
+				btn : ['关闭','显示/隐藏输出','显示/隐藏日志','停止'],
+				btn2 : function(){
+					var $output = $(".test-window-container .output-container");
+					var $log = $(".test-window-container .log-container");
+					if($output.is(":hidden")){
+						$output.show();
+						$output.find("canvas").each(function(){
+							if($log.is(":hidden")){
+								this.height = 320;
+							}else{
+								this.height = 200;
+							}
+						})
+						$log.attr('height',100)
+						LogViewer.resize();
+						for(var tableId in tableMap){
+							tableMap[tableId].instance.resize();
 						}
-					})
-					$log.attr('height',100)
-					LogViewer.resize();
-					for(var tableId in tableMap){
-						tableMap[tableId].instance.resize();
+					}else{
+						$output.hide();
+						$log.attr('height',400);
+						LogViewer.resize();
+						for(var tableId in tableMap){
+							tableMap[tableId].instance.resize();
+						}
 					}
-				}else{
-					$output.hide();
-					$log.attr('height',400);
-					LogViewer.resize();
-					for(var tableId in tableMap){
-						tableMap[tableId].instance.resize();
+					return false;
+				},
+				btn3 : function(){
+					var $output = $(".test-window-container .output-container");
+					var $log = $(".test-window-container .log-container");
+					if($log.is(":hidden")){
+						$log.show();
+						$log.attr('height',$output.is(":hidden") ? 400 : 100)
+						$output.find("canvas").each(function(){
+							this.height = 200;
+						});
+						LogViewer.resize();
+						for(var tableId in tableMap){
+							tableMap[tableId].instance.resize();
+						}
+					}else{
+						$log.hide();
+						$output.find("canvas").each(function(){
+							this.height = 320;
+						});
+						LogViewer.resize();
+						for(var tableId in tableMap){
+							tableMap[tableId].instance.resize();
+						}
 					}
-				}
-				return false;
-			},
-			btn3 : function(){
-				var $output = $(".test-window-container .output-container");
-				var $log = $(".test-window-container .log-container");
-				if($log.is(":hidden")){
-					$log.show();
-					$log.attr('height',$output.is(":hidden") ? 400 : 100)
-					$output.find("canvas").each(function(){
-						this.height = 200;
-					});
-					LogViewer.resize();
-					for(var tableId in tableMap){
-						tableMap[tableId].instance.resize();
-					}
-				}else{
-					$log.hide();
-					$output.find("canvas").each(function(){
-						this.height = 320;
-					});
-					LogViewer.resize();
-					for(var tableId in tableMap){
-						tableMap[tableId].instance.resize();
-					}
-				}
-				return false;
-			},
-			btn4 : function(){
-				var $btn = $("#layui-layer" + testWindowIndex).find('.layui-layer-btn3');
-				if($btn.html() == '停止'){
-					socket.send(JSON.stringify({
-						eventType : 'stop'
-					}));
-				}else{
-					socket.send(JSON.stringify({
-						eventType : 'test',
-						message : editor.getXML()
-					}));
-					$btn.html('停止');
-				}
-				return false;
-			},
-			end : function(){
-				if(socket){
-					socket.close();
-				}
-				if(LogViewer){
-					LogViewer.destory();
-				}
-				for(var tableId in tableMap){
-					tableMap[tableId].instance.destory();
-				}
-			},
-			success : function(layero,index){
-				var logElement = $(".test-window-container .log-container")[0];
-				var colors = {
-					'array' : '#2a00ff',
-					'object' : '#2a00ff',
-					'boolean' : '#600100',
-					'number' : '#000E59'
-				}
-				LogViewer = new CanvasViewer({
-					element : logElement,
-					onClick : function(e){
-						onCanvasViewerClick(e,'日志');
-					}
-				});
-				$(layero).find(".layui-layer-btn")
-					.append('<div class="layui-inline"><input type="text" class="layui-input" placeholder="输入关键字过滤日志"/></div>')
-					.on("keyup","input",function(){
-						LogViewer.filter(this.value);
-					});
-				socket = createWebSocket({
-					onopen : function(){
+					return false;
+				},
+				btn4 : function(){
+					var $btn = $("#layui-layer" + testWindowIndex).find('.layui-layer-btn3');
+					if($btn.html() == '停止'){
+						socket.send(JSON.stringify({
+							eventType : 'stop'
+						}));
+					}else{
 						socket.send(JSON.stringify({
 							eventType : 'test',
 							message : editor.getXML()
 						}));
-					},
-					onmessage : function(e){
-						var event = JSON.parse(e.data);
-						var eventType = event.eventType;
-						var message = event.message;
-						if(eventType == 'finish'){
-							$("#layui-layer" + testWindowIndex).find('.layui-layer-btn3').html('重新开始');
-						}else if(eventType == 'output'){
-							var tableId = 'output-' + message.nodeId;
-							var $table = $('#' + tableId);
-							if($table.length == 0){
-								tableMap[tableId] = {
-									index : 0
-								};
-								var $tab = $(".test-window-container .output-container .layui-tab")
-								var outputTitle = '输出-'+tableId;
-								var cell = editor.getModel().cells[message.nodeId];
-								if(cell){
-									outputTitle = cell.value;
-								}
-								if(first){
-									$tab.find(".layui-tab-title").append('<li  class="layui-this">' + outputTitle + '</li>');
-									$tab.find(".layui-tab-content").append('<div class="layui-tab-item layui-show" data-output="'+tableId+'"></div>');
-									first = false;
-								}else{
-									$tab.find(".layui-tab-title").append('<li>' + outputTitle + '</li>');
-									$tab.find(".layui-tab-content").append('<div class="layui-tab-item" data-output="'+tableId+'"></div>');
-								}
-								$table = $('<canvas width="960" height="200"/>').appendTo($(".test-window-container .output-container .layui-tab-item[data-output="+tableId+"]"));
-								$table.attr('id',tableId);
-								tableMap[tableId].instance = new CanvasViewer({
-									element : document.getElementById(tableId),
-									grid : true,
-									header : true,
-									style : {
-										font : 'bold 13px Consolas'
-									},
-									onClick : function(e){
-										onCanvasViewerClick(e,'表格');
+						$btn.html('停止');
+					}
+					return false;
+				},
+				end : function(){
+					if(socket){
+						socket.close();
+					}
+					if(LogViewer){
+						LogViewer.destory();
+					}
+					for(var tableId in tableMap){
+						tableMap[tableId].instance.destory();
+					}
+				},
+				success : function(layero,index){
+					var logElement = $(".test-window-container .log-container")[0];
+					var colors = {
+						'array' : '#2a00ff',
+						'object' : '#2a00ff',
+						'boolean' : '#600100',
+						'number' : '#000E59'
+					}
+					LogViewer = new CanvasViewer({
+						element : logElement,
+						onClick : function(e){
+							onCanvasViewerClick(e,'日志');
+						}
+					});
+					$(layero).find(".layui-layer-btn")
+						.append('<div class="layui-inline"><input type="text" class="layui-input" placeholder="输入关键字过滤日志"/></div>')
+						.on("keyup","input",function(){
+							LogViewer.filter(this.value);
+						});
+					socket = createWebSocket({
+						onopen : function(){
+							socket.send(JSON.stringify({
+								eventType : 'test',
+								message : editor.getXML()
+							}));
+						},
+						onmessage : function(e){
+							var event = JSON.parse(e.data);
+							var eventType = event.eventType;
+							var message = event.message;
+							if(eventType == 'finish'){
+								$("#layui-layer" + testWindowIndex).find('.layui-layer-btn3').html('重新开始');
+							}else if(eventType == 'output'){
+								var tableId = 'output-' + message.nodeId;
+								var $table = $('#' + tableId);
+								if($table.length == 0){
+									tableMap[tableId] = {
+										index : 0
+									};
+									var $tab = $(".test-window-container .output-container .layui-tab")
+									var outputTitle = '输出-'+tableId;
+									var cell = editor.getModel().cells[message.nodeId];
+									if(cell){
+										outputTitle = cell.value;
 									}
-								})
-								var cols = [];
+									if(first){
+										$tab.find(".layui-tab-title").append('<li  class="layui-this">' + outputTitle + '</li>');
+										$tab.find(".layui-tab-content").append('<div class="layui-tab-item layui-show" data-output="'+tableId+'"></div>');
+										first = false;
+									}else{
+										$tab.find(".layui-tab-title").append('<li>' + outputTitle + '</li>');
+										$tab.find(".layui-tab-content").append('<div class="layui-tab-item" data-output="'+tableId+'"></div>');
+									}
+									$table = $('<canvas width="960" height="200"/>').appendTo($(".test-window-container .output-container .layui-tab-item[data-output="+tableId+"]"));
+									$table.attr('id',tableId);
+									tableMap[tableId].instance = new CanvasViewer({
+										element : document.getElementById(tableId),
+										grid : true,
+										header : true,
+										style : {
+											font : 'bold 13px Consolas'
+										},
+										onClick : function(e){
+											onCanvasViewerClick(e,'表格');
+										}
+									})
+									var cols = [];
+									var texts = [new CanvasText({
+										text : '序号',
+										maxWidth : 100
+									})];
+									for(var i =0,len = message.outputNames.length;i<len;i++){
+										texts.push(new CanvasText({
+											text : message.outputNames[i],
+											maxWidth : 200,
+											click : true
+										}));
+									}
+									tableMap[tableId].instance.append(texts);
+								}
 								var texts = [new CanvasText({
-									text : '序号',
-									maxWidth : 100
+									text : ++tableMap[tableId].index,
+									maxWidth : 200,
+									click : true
 								})];
 								for(var i =0,len = message.outputNames.length;i<len;i++){
-									texts.push(new CanvasText({
-										text : message.outputNames[i],
-										maxWidth : 200,
-										click : true
-									}));
-								}
-								tableMap[tableId].instance.append(texts);
-							}
-							var texts = [new CanvasText({
-								text : ++tableMap[tableId].index,
-								maxWidth : 200,
-								click : true
-							})];
-							for(var i =0,len = message.outputNames.length;i<len;i++){
-								var displayText = message.values[i];
-								var variableType = 'string';
-								if(Array.isArray(displayText)){
-									variableType = 'array';
-									displayText = JSON.stringify(displayText);
-								}else{
-									variableType = typeof displayText;
-									if(variableType == 'object'){
-										displayText = JSON.stringify(displayText);
-									}
-								}
-								texts.push(new CanvasText({
-									text : displayText,
-									maxWidth : 200,
-									color : colors[variableType] || 'black',
-									click : true
-								}));
-							}
-							tableMap[tableId].instance.append(texts);
-							tableMap[tableId].instance.scrollTo(-1);
-						}else if(eventType == 'log'){
-							var texts = [];
-							var defaultColor = message.level == 'error' ? 'red' : '';
-							texts.push(new CanvasText({
-								text : message.level,
-								color : defaultColor
-							}));
-							texts.push(new CanvasText({
-								text : event.timestamp,
-								color : defaultColor
-							}));
-							var temp = message.message.split("{}");
-							message.variables = message.variables || [];
-							for(var i=0,len=temp.length;i<len;i++){
-								if(temp[i]!=''){
-									texts.push(new CanvasText({
-										text : temp[i],
-										color : defaultColor
-									}))
-								}
-								var object = message.variables[i];
-								if(object != undefined){
-									var variableType = '';
-									var displayText = object;
-									if(Array.isArray(object)){
+									var displayText = message.values[i];
+									var variableType = 'string';
+									if(Array.isArray(displayText)){
 										variableType = 'array';
 										displayText = JSON.stringify(displayText);
 									}else{
-										variableType = typeof object;
+										variableType = typeof displayText;
 										if(variableType == 'object'){
-											displayText = JSON.stringify(displayText);	
+											displayText = JSON.stringify(displayText);
 										}
 									}
 									texts.push(new CanvasText({
 										text : displayText,
-										maxWidth : 330,
-										color : colors[variableType] || '#025900',
+										maxWidth : 200,
+										color : colors[variableType] || 'black',
 										click : true
-									}))
+									}));
 								}
+								tableMap[tableId].instance.append(texts);
+								tableMap[tableId].instance.scrollTo(-1);
+							}else if(eventType == 'log'){
+								var texts = [];
+								var defaultColor = message.level == 'error' ? 'red' : '';
+								texts.push(new CanvasText({
+									text : message.level,
+									color : defaultColor
+								}));
+								texts.push(new CanvasText({
+									text : event.timestamp,
+									color : defaultColor
+								}));
+								var temp = message.message.split("{}");
+								message.variables = message.variables || [];
+								for(var i=0,len=temp.length;i<len;i++){
+									if(temp[i]!=''){
+										texts.push(new CanvasText({
+											text : temp[i],
+											color : defaultColor
+										}))
+									}
+									var object = message.variables[i];
+									if(object != undefined){
+										var variableType = '';
+										var displayText = object;
+										if(Array.isArray(object)){
+											variableType = 'array';
+											displayText = JSON.stringify(displayText);
+										}else{
+											variableType = typeof object;
+											if(variableType == 'object'){
+												displayText = JSON.stringify(displayText);
+											}
+										}
+										texts.push(new CanvasText({
+											text : displayText,
+											maxWidth : 330,
+											color : colors[variableType] || '#025900',
+											click : true
+										}))
+									}
+								}
+								LogViewer.append(texts);
+								LogViewer.scrollTo(-1);
 							}
-							LogViewer.append(texts);
-							LogViewer.scrollTo(-1);
 						}
-					}
-				});
-			}
-		})
+					});
+				}
+			})
+		});
 	}).on('click',".btn-return",function(){
 		location.href="spiderList.html"
 	}).on('click','.btn-save',function(){
@@ -926,23 +947,25 @@ function createWebSocket(options){
 
 var flowId;
 function Save(){
-	$.ajax({
-		url : 'spider/save',
-		type : 'post',
-		data : {
-			id : getQueryString('id') || flowId,
-			xml : editor.getXML(),
-			name : editor.graph.getModel().getRoot().data.get('spiderName') || '未定义名称',
-		},
-		success : function(id) {
-			flowId = id;
-			layui.layer.msg('保存成功', {
-				time : 800
-			}, function() {
-				// location.href = "spiderList.html";
-			})
-		}
-	})
+	validXML(function(){
+		$.ajax({
+			url : 'spider/save',
+			type : 'post',
+			data : {
+				id : getQueryString('id') || flowId,
+				xml : editor.getXML(),
+				name : editor.graph.getModel().getRoot().data.get('spiderName') || '未定义名称',
+			},
+			success : function(id) {
+				flowId = id;
+				layui.layer.msg('保存成功', {
+					time : 800
+				}, function() {
+					// location.href = "spiderList.html";
+				})
+			}
+		})
+	});
 }
 
 function allowDrop(ev){
