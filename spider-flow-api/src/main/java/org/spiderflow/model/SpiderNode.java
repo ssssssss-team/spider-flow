@@ -31,6 +31,16 @@ public class SpiderNode {
 	 * 节点流转条件
 	 */
 	private Map<String,String> condition = new HashMap<>();
+
+	/**
+	 * 异常流转
+	 */
+	private Map<String,String> exception = new HashMap<>();
+
+	/**
+	 * 传递变量
+	 */
+	private Map<String,String> transmitVariable = new HashMap<>();
 	/**
 	 * 节点名称
 	 */
@@ -104,6 +114,23 @@ public class SpiderNode {
 	public void addNextNode(SpiderNode nextNode){
 		nextNode.prevNodes.add(this);
 		this.nextNodes.add(nextNode);
+	}
+
+	public String getExceptionFlow(String fromNodeId) {
+		return exception.get(fromNodeId);
+	}
+
+	public boolean isTransmitVariable(String fromNodeId) {
+		String value = transmitVariable.get(fromNodeId);
+		return value == null || "1".equalsIgnoreCase(value);
+	}
+
+	public void setTransmitVariable(String fromNodeId,String value){
+		this.transmitVariable.put(fromNodeId,value);
+	}
+
+	public void setExceptionFlow(String fromNodeId,String value){
+		this.exception.put(fromNodeId,value);
 	}
 
 	public List<SpiderNode> getNextNodes() {
