@@ -63,6 +63,9 @@ public class SpiderFlowUtils {
 				SpiderNode targetNode = nodeMap.get(edge.getValue());
 				//设置流转条件
 				targetNode.setCondition(sourceNode.getNodeId(),edgeNode.getStringJsonValue("condition"));
+				//设置流转特性
+				targetNode.setExceptionFlow(sourceNode.getNodeId(),edgeNode.getStringJsonValue("exception-flow"));
+				targetNode.setTransmitVariable(sourceNode.getNodeId(),edgeNode.getStringJsonValue("transmit-variable"));
 				sourceNode.addNextNode(targetNode);
 			}
 		}

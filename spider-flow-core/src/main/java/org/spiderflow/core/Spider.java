@@ -201,7 +201,11 @@ public class Spider {
 			for (int i = 0; i < loopCount; i++) {
 				node.increment();	//节点执行次数+1(后续Join节点使用)
 				if (context.isRunning()) {
-					Map<String, Object> nVariables = new HashMap<>(variables);
+					Map<String, Object> nVariables = new HashMap<>();
+					// 判断是否需要传递变量
+					if(fromNode == null || node.isTransmitVariable(fromNode.getNodeId())){
+						nVariables.putAll(variables);
+					}
 					// 存入下标变量
 					if (!StringUtils.isBlank(loopVariableName)) {
 						nVariables.put(loopVariableName, i);
@@ -246,6 +250,13 @@ public class Spider {
 	 */
 	private boolean executeCondition(SpiderNode fromNode, SpiderNode node, Map<String, Object> variables) {
 		if (fromNode != null) {
+			boolean hasException = variables.get("ex") != null;
+			String exceptionFlow = node.getExceptionFlow(fromNode.getNodeId());
+			//当出现异常流转 : 1
+			//未出现异常流转 : 2
+			if(("1".equalsIgnoreCase(exceptionFlow) && !hasException) || ("2".equalsIgnoreCase(exceptionFlow) && hasException)){
+				return false;
+			}
 			String condition = node.getCondition(fromNode.getNodeId());
 			if (StringUtils.isNotBlank(condition)) { // 判断是否有条件
 				Object result = null;
