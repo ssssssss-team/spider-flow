@@ -217,6 +217,8 @@ public class Spider {
 								}
 								//执行节点具体逻辑
 								executor.execute(node, context, nVariables);
+								//当未发生异常时，移除ex变量
+								nVariables.remove("ex");
 							} catch (Throwable t) {
 								nVariables.put("ex", t);
 								logger.error("执行节点[{}:{}]出错,异常信息：{}", node.getNodeName(), node.getNodeId(), t);
