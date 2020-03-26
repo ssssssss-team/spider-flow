@@ -1,5 +1,6 @@
 package org.spiderflow.core.script;
 
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.expression.ExpressionTemplate;
@@ -9,6 +10,7 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -107,9 +109,31 @@ public class ScriptManager {
         }
         try{
             lock.readLock().lock();
-            return ((Invocable) scriptEngine).invokeFunction(functionName,args);
+            return convertObject(((Invocable) scriptEngine).invokeFunction(functionName, args));
         } finally{
             lock.readLock().unlock();
         }
+    }
+
+    private static Object convertObject(Object object){
+        if(object instanceof ScriptObjectMirror){
+            ScriptObjectMirror mirror = (ScriptObjectMirror) object;
+            if(mirror.isArray()){
+                int size = mirror.size();
+                Object[] array = new Object[size];
+                for (int i = 0; i < size; i++) {
+                    array[i] = convertObject(mirror.getSlot(i));
+                }
+                return array;
+            }else{
+                String className = mirror.getClassName();
+                if("Date".equalsIgnoreCase(className)){
+                    return new Date(mirror.to(Long.class));
+                }
+                //其它类型待处理
+            }
+            
+        }
+        return object;
     }
 }
