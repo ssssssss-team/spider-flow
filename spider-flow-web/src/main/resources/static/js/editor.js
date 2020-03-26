@@ -1,9 +1,9 @@
 var $ = layui.$;
 var editor;
 var flows;
-var cms = [];
+var codeMirrorInstances = {};
 function renderCodeMirror(){
-	cms = [];
+	codeMirrorInstances = {};
 	$('[codemirror]').each(function(){
 		var $dom = $(this);
 		if($dom.attr("rendered") == 'true'){
@@ -18,13 +18,16 @@ function renderCodeMirror(){
 			scrollbarStyle : 'null',	//隐藏滚动条
 		});
 		initHint(cm);
+		codeMirrorInstances[$(this).attr('codemirror')] = cm;
 		cm.on('change',function(){
-			//cm.closeHint();
-			//cm.showHint();
 			$dom.attr('data-value',cm.getValue());
+			if($dom.attr('codemirror') == 'condition'){
+				var $select = $('select[name="exception-flow"]');
+				$select.siblings("div.layui-form-select").find('dl dd[lay-value=' + $select.val() + ']').click();
+			}
 			serializeForm();
 		});
-		cms.push(cm);
+		codeMirrorInstances[$(this).attr('codemirror')] = cm;
 	});
 }
 function getCellData(cellId,keys){
@@ -71,6 +74,15 @@ function serializeForm(){
 					}
 				}
 			}
+			if(name == 'lineWidth'){
+				editor.graph.setCellStyles('strokeWidth',value,[cell]);
+			}
+			if(name == 'line-style'){
+				editor.graph.setCellStyles('sharp',undefined,[cell]);
+				editor.graph.setCellStyles('rounded',undefined,[cell]);
+				editor.graph.setCellStyles('curved',undefined,[cell]);
+				editor.graph.setCellStyles(value,1,[cell]);
+			}
 			cell.data.set(name,value);
 		}
 	});
@@ -87,6 +99,13 @@ function serializeForm(){
 		}
 	});
 	$(".properties-container form input[type=checkbox]").each(function(){
+		if(this.value == 'transmit-variable'){
+			if($(this).is(":checked")){
+				editor.graph.setCellStyles('dashed',undefined,[cell]);
+			}else{
+				editor.graph.setCellStyles('dashed',1,[cell]);
+			}
+		}
 		cell.data.set(this.value,$(this).is(":checked") ? '1': '0');
 	});
 	cell.data.set('shape',shape);
@@ -442,8 +461,8 @@ $(function(){
 			}
 		});
 		layui.element.on('tab',function(){
-			for(var i=0;i<cms.length;i++){
-				cms[i].refresh();
+			for(var key in codeMirrorInstances){
+				codeMirrorInstances[key].refresh();
 			}
 		})
 		layui.form.on('select',serializeForm);

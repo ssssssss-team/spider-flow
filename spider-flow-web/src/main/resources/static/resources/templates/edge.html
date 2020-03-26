@@ -18,7 +18,7 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">流转特性</label>
 						<div class="layui-input-block">
-							<select name="exception-flow">
+							<select name="exception-flow" lay-filter="exceptionFlow">
 								<option value="0">直接流转</option>
 								<option value="1" {{d.data.object['exception-flow'] == '1' ? 'selected' : ''}}>当出现异常流转</option>
 								<option value="2" {{d.data.object['exception-flow'] == '2' ? 'selected' : ''}}>未出现异常流转</option>
@@ -39,7 +39,65 @@
     			<label class="layui-form-label">流转条件</label>
     			<div class="layui-input-block" placeholder="请输入流转条件" codemirror="condition" data-value="{{=d.data.object.condition}}"></div>
     		</div>
+			<div class="layui-row">
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">线粗细</label>
+						<div class="layui-input-block">
+							<input type="number" min="1" max="10" name="lineWidth"  value="{{=d.data.object.lineWidth || 2}}" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">线样式</label>
+						<div class="layui-input-block">
+							<select name="line-style">
+								<option value="sharp">Sharp</option>
+								<option value="rounded" {{d.data.object['line-style'] == 'rounded' ? 'selected' : ''}}>Rounded</option>
+								<option value="curved" {{d.data.object['line-style'] == 'curved' ? 'selected' : ''}}>Curved</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">线颜色</label>
+						<div class="layui-input-block">
+							<div id="line-color"></div>
+							<input type="hidden" name="lineColor" value="{{=d.data.object.lineColor || 'black'}}"/>
+						</div>
+					</div>
+				</div>
+			</div>
     	</form>
     </div>
   </div>
 </div>
+<script>
+	layui.colorpicker.render({
+		elem : '#line-color',
+		color : $('input[name=lineColor]').val(),
+		done : function(color){
+			$('input[name=lineColor]').val(color);
+			editor.graph.setCellStyles('strokeColor',color,[editor.getModel().getCell({{d.cell.id}})]);
+		}
+	});
+	layui.form.on('select(exceptionFlow)',function(data){
+		var color = $('input[name=lineColor]').val();
+		if(data.value == '1'){
+			color = 'red';
+		}else if(data.value == '2'){
+			color = '#00ff00';
+		}else if($('[codemirror=condition]').attr('data-value') != ''){
+			color = 'blue';
+		}else{
+			color = 'black';
+		}
+		editor.graph.setCellStyles('strokeColor',color,[editor.getModel().getCell({{d.cell.id}})]);
+		$('input[name=lineColor]').val(color);
+	});
+	$("input[name=lineWidth]").on('change',function(){
+		serializeForm();
+	})
+</script>
