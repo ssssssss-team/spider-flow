@@ -27,6 +27,12 @@ public class SpiderNode {
 	 * 节点列表中的上一个节点
 	 */
 	private List<SpiderNode> prevNodes = new ArrayList<>();
+
+	/**
+	 * 父级节点ID
+	 */
+	private Set<String> parentNodes;
+
 	/**
 	 * 节点流转条件
 	 */
@@ -151,6 +157,23 @@ public class SpiderNode {
 
 	public void decrement(){
 		counter.decrementAndGet();
+	}
+
+	public boolean hasLeftNode(String nodeId){
+		if(parentNodes == null){
+			Set<String> parents = new HashSet<>();
+			generateParents(parents);
+			this.parentNodes = parents;
+		}
+		return this.parentNodes.contains(nodeId);
+	}
+
+	private void generateParents(Set<String> parents){
+		for (SpiderNode prevNode : prevNodes) {
+			if(parents.add(prevNode.nodeId)){
+				prevNode.generateParents(parents);
+			}
+		}
 	}
 
 	public boolean isDone(){

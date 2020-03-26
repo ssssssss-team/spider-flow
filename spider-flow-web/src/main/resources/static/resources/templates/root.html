@@ -15,6 +15,17 @@
 				</div>
 			</div>
 			<div class="layui-col-md4">
+				<label class="layui-form-label">提交策略</label>
+				<div class="layui-input-block">
+					<select name="submit-strategy">
+						<option value="random" {{d.data.object['submit-strategy'] == 'random' ? 'selected':''}}>随机</option>
+						<option value="linked" {{d.data.object['submit-strategy'] == 'linked' ? 'selected':''}}>顺序</option>
+						<option value="child"  {{d.data.object['submit-strategy'] == 'child'  ? 'selected':''}}>子优先</option>
+						<option value="parent" {{d.data.object['submit-strategy'] == 'parent' ? 'selected':''}}>父优先</option>
+					</select>
+				</div>
+			</div>
+			<div class="layui-col-md4">
 				<label class="layui-form-label">最大线程数</label>
 				<div class="layui-input-block">
 					<input type="number" min="1" name="threadCount" placeholder="请输入线程数" autocomplete="off" class="layui-input" value="{{=d.data.object.threadCount}}">

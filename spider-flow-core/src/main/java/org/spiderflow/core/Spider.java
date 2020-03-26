@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor;
+import org.spiderflow.concurrent.*;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.context.SpiderContextHolder;
@@ -95,8 +95,20 @@ public class Spider {
 	private void executeRoot(SpiderNode root, SpiderContext context, Map<String, Object> variables) {
 		//获取当前流程执行线程数
 		int nThreads = NumberUtils.toInt(root.getStringJsonValue(ShapeExecutor.THREAD_COUNT), defaultThreads);
+		String strategy = root.getStringJsonValue("submit-strategy");
+		ThreadSubmitStrategy submitStrategy;
+		//选择提交策略，这里一定要使用new,不能与其他实例共享
+		if("linked".equalsIgnoreCase(strategy)){
+			submitStrategy = new LinkedThreadSubmitStrategy();
+		}else if("child".equalsIgnoreCase(strategy)){
+			submitStrategy = new ChildPriorThreadSubmitStrategy();
+		}else if("parent".equalsIgnoreCase(strategy)){
+			submitStrategy = new ParentPriorThreadSubmitStrategy();
+		}else{
+			submitStrategy = new RandomThreadSubmitStrategy();
+		}
 		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）,+1是因为会占用一个线程用来调度执行下一级
-		SubThreadPoolExecutor pool = threadPoolExecutor.createSubThreadPoolExecutor(Math.max(nThreads,1) + 1);
+		SubThreadPoolExecutor pool = threadPoolExecutor.createSubThreadPoolExecutor(Math.max(nThreads,1) + 1,submitStrategy);
 		context.setRootNode(root);
 		context.setThreadPool(pool);
 		//触发监听器
@@ -142,7 +154,7 @@ public class Spider {
 					listeners.forEach(listener -> listener.afterEnd(context));
 				}
 			}
-		}), null);
+		}), null, root);
 		try {
 			f.get();	//阻塞等待所有任务执行完毕
 		} catch (InterruptedException | ExecutionException ignored) {}
@@ -235,7 +247,7 @@ public class Spider {
 			for (SpiderTask task : tasks) {
 				if(executor.isThread()){	//【判断节点是否是异步运行
 					//提交任务至线程池中,并将Future添加到队列末尾
-					futureQueue.add(context.getThreadPool().submitAsync(task.runnable, task));
+					futureQueue.add(context.getThreadPool().submitAsync(task.runnable, task, node));
 				}else{
 					FutureTask<SpiderTask> futureTask = new FutureTask<>(task.runnable, task);
 					futureTask.run();

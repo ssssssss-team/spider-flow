@@ -1,8 +1,7 @@
 package org.spiderflow.concurrent;
 
-import org.apache.commons.lang3.RandomUtils;
+import org.spiderflow.model.SpiderNode;
 
-import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,8 +48,8 @@ public class SpiderFlowThreadPoolExecutor {
 	 * @param threads	线程池大小
 	 * @return
 	 */
-	public SubThreadPoolExecutor createSubThreadPoolExecutor(int threads){
-		return new SubThreadPoolExecutor(Math.min(maxThreads, threads));
+	public SubThreadPoolExecutor createSubThreadPoolExecutor(int threads,ThreadSubmitStrategy submitStrategy){
+		return new SubThreadPoolExecutor(Math.min(maxThreads, threads),submitStrategy);
 	}
 
 	/**
@@ -83,12 +82,13 @@ public class SpiderFlowThreadPoolExecutor {
 		 */
 		private volatile boolean submitting = false;
 
-		private List<SpiderFutureTask<?>> futureTaskList = new CopyOnWriteArrayList<>();
+		private ThreadSubmitStrategy submitStrategy;
 
-		public SubThreadPoolExecutor(int threads) {
+		public SubThreadPoolExecutor(int threads,ThreadSubmitStrategy submitStrategy) {
 			super();
 			this.threads = threads;
 			this.futures = new Future[threads];
+			this.submitStrategy = submitStrategy;
 		}
 		
 		/**
@@ -100,8 +100,8 @@ public class SpiderFlowThreadPoolExecutor {
 			}
 			running = false;
 			//当停止时,唤醒提交任务线程使其结束
-			synchronized (futureTaskList){
-				futureTaskList.notifyAll();
+			synchronized (submitStrategy){
+				submitStrategy.notifyAll();
 			}
 		}
 		
@@ -141,7 +141,7 @@ public class SpiderFlowThreadPoolExecutor {
 		/**
 		 * 异步提交任务
 		 */
-		public <T> Future<T> submitAsync(Runnable runnable,T value){
+		public <T> Future<T> submitAsync(Runnable runnable, T value, SpiderNode node){
 			SpiderFutureTask<T> future = new SpiderFutureTask<>(()-> {
 				try {
 					//执行任务
@@ -150,16 +150,18 @@ public class SpiderFlowThreadPoolExecutor {
 					//正在执行的线程数-1
 					executing.decrementAndGet();
 				}
-			}, value,this);
-			synchronized (futureTaskList){
-				futureTaskList.add(future);
-				//如果是第一次调用submitSync方法，则启动提交任务线程
-				if(!submitting){
-					submitting = true;
-					CompletableFuture.runAsync(this::submit);
-				}
+			}, value,node,this);
+
+			submitStrategy.add(future);
+			//如果是第一次调用submitSync方法，则启动提交任务线程
+			if(!submitting){
+				submitting = true;
+				CompletableFuture.runAsync(this::submit);
+			}
+			synchronized (submitStrategy){
 				//通知继续从集合中取任务提交到线程池中
-				futureTaskList.notifyAll();
+				submitStrategy.notifyAll();
+
 			}
 			return future;
 		}
@@ -167,16 +169,16 @@ public class SpiderFlowThreadPoolExecutor {
 		private void submit(){
 			while(running){
 				try {
-					synchronized (futureTaskList){
+					synchronized (submitStrategy){
 						//如果集合是空的，则等待提交
-						if(futureTaskList.isEmpty()){
-							futureTaskList.wait();	//等待唤醒
+						if(submitStrategy.isEmpty()){
+							submitStrategy.wait();	//等待唤醒
 						}
 					}
 					//当该线程被唤醒时，把集合中所有任务都提交到线程池中
-					while(!futureTaskList.isEmpty()){
-						//随机从集合中获取任务提交到线程池中
-						SpiderFutureTask<?> futureTask = futureTaskList.remove(RandomUtils.nextInt(0, futureTaskList.size()));
+					while(!submitStrategy.isEmpty()){
+						//从提交策略中获取任务提交到线程池中
+						SpiderFutureTask<?> futureTask = submitStrategy.get();
 						//如果没有空闲线程且在线程池中提交，则直接运行
 						if(index() == -1 && Thread.currentThread().getThreadGroup() == SPIDER_FLOW_THREAD_GROUP){
 							futureTask.run();
