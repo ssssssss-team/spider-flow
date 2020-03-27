@@ -266,3 +266,94 @@ html,body{
 .layui-layer-tips{
 	word-break: break-all;
 }
+
+
+
+/*样式调整*/
+.properties-container .editor-form-node input, .properties-container .editor-form-node textarea{
+	font-size : 12px;
+}
+.layui-input, .layui-select, .layui-textarea{
+	height : 24px;
+}
+.layui-form-label{
+	padding : 0 5px;
+	line-height: 24px;
+}
+.layui-input-block{
+	min-height: 24px;
+	line-height: 24px;
+}
+.layui-input-block{
+	margin-left : 100px;
+}
+
+.layui-tab-title li{
+	font-size:12px;
+	line-height:24px;
+}
+.layui-tab-title{
+	height :24px;
+}
+.layui-tab-title .layui-this:after{
+	height : 25px;
+}
+.layui-form-select dl{
+	top : 26px;
+}
+.layui-form-select dl dd, .layui-form-select dl dt{
+	line-height: 24px;
+}
+.layui-table td, .layui-table th{
+	font-size : 12px;
+	padding : 0;
+}
+.properties-container .layui-table-cell{
+	height : 24px;
+	line-height: 24px;
+}
+.properties-container .layui-table .layui-input, .properties-container .layui-table .layui-select, .properties-container .layui-table .layui-textarea{
+	height : 24px;
+}
+.properties-container .layui-table .layui-input-block{
+	height : 24px;
+	min-height: 24px;
+}
+.layui-table-view .layui-table td, .layui-table-view .layui-table th{
+	padding : 2px 0;
+}
+.layui-form-item{
+	margin-bottom : 5px;
+}
+.CodeMirror{
+	padding-top : 0px !important;
+	font-size : 12px;
+}
+.CodeMirror-lines{
+	padding : 0px !important;
+}
+.CodeMirror-cursor{
+	height : 16px !important;
+	margin-top: 3px;
+}
+.layui-form-item .layui-form-checkbox[lay-skin=primary]{
+	margin-top : -2px;
+}
+.layui-colorpicker{
+	width : 16px;
+	height : 16px;
+	padding : 4px;
+}
+.layui-icon-down:before{
+	position: absolute;
+	top : 2px;
+	left : 6.5px;
+}
+.properties-container button.layui-btn{
+	height: 24px;
+	line-height: 24px;
+	padding: 0px 5px;
+}
+.properties-container .layui-form-item .layui-input-inline{
+	width : auto;
+}
