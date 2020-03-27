@@ -1,16 +1,5 @@
 package org.spiderflow.core.executor.shape;
 
-import java.lang.reflect.Array;
-import java.math.BigDecimal;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -23,11 +12,16 @@ import org.spiderflow.core.utils.ExtractUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
+import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Array;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.*;
 
 /**
  * SQL执行器
@@ -157,45 +151,21 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					variables.put("rs", -1);
 					ExceptionUtils.wrapAndThrow(e);
 				}
-			}
-			else if(STATEMENT_INSERT_PK.equals(statementType)) {
-				KeyHolder keyHolder = new GeneratedKeyHolder();
-				final String sql2 = sql;
-		        PreparedStatementCreator preparedStatementCreator = con -> {
-		            PreparedStatement ps = con.prepareStatement(sql2, Statement.RETURN_GENERATED_KEYS);
-		            for(int i=0;i<params.length;i++) {
-		            	switch (params[i].getClass().getName()) {
-		            		case "java.lang.String":
-		            			ps.setString(i+1, params[i]==null?"":params[i].toString());
-		            			break;
-		            		case "java.lang.Integer":
-		            			ps.setInt(i+1, params[i]==null?0:((Integer)params[i]).intValue());
-		            			break;
-		            		case "java.lang.Long":
-		            			ps.setLong(i+1, params[i]==null?0L:((Long)params[i]).longValue());
-		            			break;
-		            		case "java.lang.Float":
-		            			ps.setFloat(i+1, params[i]==null?0:((Float)params[i]).floatValue());
-		            			break;
-		            		case "java.lang.Double":
-		            			ps.setDouble(i+1, params[i]==null?0.0:((Double)params[i]).doubleValue());
-		            			break;
-		            		case "java.lang.Boolean":
-		            			ps.setBoolean(i+1, params[i]==null?false:((Boolean)params[i]).booleanValue());
-		            			break;
-		            		case "java.math.BigDecimal":
-		            			ps.setBigDecimal(i+1, params[i]==null?null:(new BigDecimal(params[i].toString())));
-		            			break;
-		            		case "java.util.Date":
-		            			Date date = (Date)params[i];
-		            			ps.setDate(i+1, params[i]==null?new java.sql.Date(new Date().getTime()):new java.sql.Date(date.getTime()));
-		            			break;
-		            	}
-		            }
-		            return ps;
-		        };
-		        template.update(preparedStatementCreator, keyHolder);
-				variables.put("rs", keyHolder.getKey().intValue());
+			} else if(STATEMENT_INSERT_PK.equals(statementType)) {
+				try {
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					final String insertSQL = sql;
+					template.update(con -> {
+						PreparedStatement ps = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+						new ArgumentPreparedStatementSetter(params).setValues(ps);
+						return ps;
+					}, keyHolder);
+					variables.put("rs", keyHolder.getKey().intValue());
+				} catch (Exception e) {
+					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);
+					variables.put("rs", -1);
+					ExceptionUtils.wrapAndThrow(e);
+				}
 			}
 		}
 	}
