@@ -17,6 +17,13 @@
 	max-width: 195px;
 	max-height: 360px;
 }
+.layui-layout-right .layui-nav-item a{
+	padding : 0 10px;
+}
+.layui-layout-right .layui-nav-item a img{
+	background : #fff;
+	border-radius : 4px;
+}
 a{
 	cursor:pointer;
 }

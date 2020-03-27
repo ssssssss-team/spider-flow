@@ -144,7 +144,6 @@ public class Spider {
 								task.node.decrement();	//任务执行完毕,计数器减一(该计数器是给Join节点使用)
 								if (task.executor.allowExecuteNext(task.node, context, task.variables)) {	//判断是否允许执行下一级
 									logger.debug("执行节点[{}:{}]完毕", task.node.getNodeName(), task.node.getNodeId());
-									System.out.println("执行下一级：" + task.node.getNodeName());
 									//执行下一级
 									Spider.this.executeNextNodes(task.node, context, task.variables);
 								} else {
