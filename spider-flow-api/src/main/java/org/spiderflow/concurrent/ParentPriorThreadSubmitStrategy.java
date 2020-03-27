@@ -1,17 +1,27 @@
 package org.spiderflow.concurrent;
 
+import org.spiderflow.model.SpiderNode;
+
+import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class ParentPriorThreadSubmitStrategy implements ThreadSubmitStrategy{
+public class ParentPriorThreadSubmitStrategy implements ThreadSubmitStrategy {
 
     private Object mutex = this;
 
-    private PriorityQueue<SpiderFutureTask<?>> priorityQueue = new PriorityQueue<>((o1, o2) -> {
-        if(o1.getNode().hasLeftNode(o2.getNode().getNodeId())){
+    private Comparator<SpiderNode> comparator = (o1, o2) -> {
+        if (o1.hasLeftNode(o2.getNodeId())) {
             return 1;
         }
         return -1;
-    });
+    };
+
+    private PriorityQueue<SpiderFutureTask<?>> priorityQueue = new PriorityQueue<>((o1, o2) -> comparator.compare(o1.getNode(), o2.getNode()));
+
+    @Override
+    public Comparator<SpiderNode> comparator() {
+        return comparator;
+    }
 
     @Override
     public void add(SpiderFutureTask<?> task) {

@@ -23,7 +23,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -115,31 +118,39 @@ public class Spider {
 		if (listeners != null) {
 			listeners.forEach(listener -> listener.beforeStart(context));
 		}
+		Comparator<SpiderNode> comparator = submitStrategy.comparator();
 		//启动一个线程开始执行任务,并监听其结束并执行下一级
 		Future<?> f = pool.submitAsync(TtlRunnable.get(() -> {
 			try {
 				//执行具体节点
 				Spider.this.executeNode(null, root, context, variables);
 				Queue<Future<?>> queue = context.getFutureQueue();
-				//循环从队列中获取Future,直到队列为空结束,当任务完成时，则执行下一级，如未完成，把Future加到队列末尾
+				//循环从队列中获取Future,直到队列为空结束,当任务完成时，则执行下一级
 				while (!queue.isEmpty()) {
 					try {
-						Future<?> future = queue.poll();
-						if (future.isDone()) {	//判断任务是否完成
+						//TODO 这里应该是取出最先执行完毕的任务
+						Optional<Future<?>> max = queue.stream().filter(Future::isDone).max((o1, o2) -> {
+							try {
+								return comparator.compare(((SpiderTask) o1.get()).node, ((SpiderTask) o2.get()).node);
+							} catch (InterruptedException | ExecutionException e) {
+							}
+							return 0;
+
+						});
+						if (max.isPresent()) {	//判断任务是否完成
+							queue.remove(max.get());
 							if (context.isRunning()) {	//检测是否运行中(当在页面中点击"停止"时,此值为false,其余为true)
-								SpiderTask task = (SpiderTask) future.get();
+								SpiderTask task = (SpiderTask) max.get().get();
 								task.node.decrement();	//任务执行完毕,计数器减一(该计数器是给Join节点使用)
 								if (task.executor.allowExecuteNext(task.node, context, task.variables)) {	//判断是否允许执行下一级
 									logger.debug("执行节点[{}:{}]完毕", task.node.getNodeName(), task.node.getNodeId());
+									System.out.println("执行下一级：" + task.node.getNodeName());
 									//执行下一级
 									Spider.this.executeNextNodes(task.node, context, task.variables);
 								} else {
 									logger.debug("执行节点[{}:{}]完毕，忽略执行下一节点", task.node.getNodeName(), task.node.getNodeId());
 								}
 							}
-						} else {
-							//将Future加到队列末尾
-							queue.add(future);
 						}
 						//睡眠1ms,让出cpu
 						Thread.sleep(1);
