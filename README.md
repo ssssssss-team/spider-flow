@@ -10,7 +10,7 @@
     <a target="_blank" href="https://shang.qq.com/wpa/qunwpa?idkey=10faa4cf9743e0aa379a72f2ad12a9e576c81462742143c8f3391b52e8c3ed8d"><img src="https://img.shields.io/badge/Join-QQGroup-blue"></a>
 </p>
 
-[介绍](#介绍) [特性](#特性) | [插件](#插件) | [Demo站点](http://demo.spiderflow.org) | [文档](https://www.spiderflow.org) | [更新日志](https://www.spiderflow.org/changelog.html) | [截图](#截图) | [免责声明](#免责声明)
+[介绍](#介绍) | [特性](#特性) | [插件](#插件) | <a target="_blank" href="http://demo.spiderflow.org">DEMO站点</a> | <a target="_blank" href="https://www.spiderflow.org">文档</a> | <a target="_blank" href="https://www.spiderflow.org/changelog.html">更新日志</a> | [截图](#截图) | [免责声明](#免责声明)
 
 ## 介绍
 平台以流程图的方式定义爬虫,是一个高度灵活可配置的爬虫平台
