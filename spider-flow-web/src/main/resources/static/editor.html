@@ -72,7 +72,22 @@
 				<option value="file" {{d['parameter-form-type'] == 'file' ? 'selected': '' }}>file</option>
 			</select>
 		</script>
-		<script type="text/html" id="parameter-filename-tmpl">
+		<script type="text/html" id="parameter-from-name-tmpl">
+			<input type="text" name="parameter-form-name" placeholder="请输入参数名" autocomplete="off" class="layui-input array" value="{{=d['parameter-form-name']}}">
+		</script>
+		<script type="text/html" id="parameter-from-description-tmpl">
+			<input type="text" name="parameter-form-description" placeholder="请输入参数描述" autocomplete="off" class="layui-input array" value="{{=d['parameter-form-description']}}">
+		</script>
+		<script type="text/html" id="parameter-from-value-tmpl">
+			<div class="layui-input-block array" placeholder="请输入参数值" codemirror="parameter-form-value" data-value="{{=d['parameter-form-value']}}"></div>
+		</script>
+		<script type="text/html" id="parameter-from-type-tmpl">
+			<select name="parameter-form-type" class="array">
+				<option value="text" {{d['parameter-form-type'] == 'text' ? 'selected': '' }}">text</option>
+				<option value="file" {{d['parameter-form-type'] == 'file' ? 'selected': '' }}>file</option>
+			</select>
+		</script>
+		<script type="text/html" id="parameter-from-filename-tmpl">
 			<div class="layui-input-block array" placeholder="请输入文件名" codemirror="parameter-form-filename" data-value="{{=d['parameter-form-filename']}}"></div>
 		</script>
 

@@ -174,30 +174,6 @@
     		</div>
     		<div class="form-body-form-data" {{d.data.object['body-type'] != 'form-data' ? 'style="display:none;"':''}}>
 	  			<table class="layui-table" id="body-parameter" data-cell="{{=d.cell.id}}" data-keys="parameter-form-name,parameter-form-value,parameter-form-type,parameter-form-filename,parameter-form-description"></table>
-    			{{# layui.each(d.data.object['parameter-form-name'],function(index){ }}
-    				<div class="layui-form-item layui-form-relative">
-						<i class="layui-icon layui-icon-close parameter-form-remove"></i>
-						<label class="layui-form-label">参数名</label>
-						<div class="layui-input-block">
-							<input type="text" name="parameter-form-name" placeholder="请输入参数名" value="{{=d.data.object['parameter-form-name'][index]}}" autocomplete="off" class="layui-input array">
-						</div>
-					</div>
-					<div class="layui-form-item">
-						<label class="layui-form-label">参数类型</label>
-						<div class="layui-input-block">
-
-						</div>
-					</div>
-					<div class="layui-form-item" {{d.data.object['parameter-form-type'][index] == 'file' ? '': 'style="display:none;"' }}>
-						<label class="layui-form-label">文件名</label>
-
-					</div>
-						<div class="layui-form-item">
-						<label class="layui-form-label">参数值</label>
-						<div class="layui-input-block array" placeholder="请输入参数值" codemirror="parameter-form-value" data-value="{{=d.data.object['parameter-form-value'][index]}}"></div>
-					</div>
-					<hr>
-    			{{# }) }}
 	    		<div class="layui-form-item">
 		   			<div class="layui-input-inline">
 		    			<button class="layui-btn table-row-add" type="button" for="body-parameter">添加一个参数</button>
@@ -299,22 +275,22 @@
 				cols : [[{
 					title : '参数名',
 					width : 150,
-					templet : '#parameter-name-tmpl'
+					templet : '#parameter-from-name-tmpl'
 				},{
 					title : '参数类型',
 					width : 85,
-					templet : '#parameter-type-tmpl'
+					templet : '#parameter-from-type-tmpl'
 				},{
 					title : '文件名',
 					width : 195,
-					templet : '#parameter-filename-tmpl'
+					templet : '#parameter-from-filename-tmpl'
 				},{
 					title : '参数值',
-					templet : '#parameter-value-tmpl'
+					templet : '#parameter-from-value-tmpl'
 				},{
 					title : '参数描述',
 					width : 250,
-					templet : '#parameter-description-tmpl'
+					templet : '#parameter-from-description-tmpl'
 				},{
 					title : '操作',
 					width : 120,
