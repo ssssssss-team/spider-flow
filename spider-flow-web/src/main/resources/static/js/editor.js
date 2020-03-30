@@ -690,7 +690,7 @@ function bindToolbarClickAction(editor){
 	}).on('click','.btn-debug',function(){
 		runSpider(true);
 	}).on('click',".btn-return",function(){
-		location.href="spiderList.html"
+		parent.openTab('爬虫列表','welcome','spiderList.html')
 	}).on('click','.btn-save',function(){
 		Save();
 	})

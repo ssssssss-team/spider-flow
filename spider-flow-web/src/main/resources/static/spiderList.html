@@ -45,7 +45,7 @@
 			title : '爬虫名称',
 			field : 'name',
 			templet : function(row){
-				return '<a class="layui-btn layui-btn-sm" href="editor.html?id='+row.id+'">'+row.name+'</a>';
+				return '<a class="layui-btn layui-btn-sm btn-details" data-name="'+row.name+'" data-id="'+row.id+'">'+row.name+'</a>';
 			}
 		},{
 			title : 'cron表达式',
@@ -180,6 +180,8 @@
 			maxmin: true,
 			content: 'editCron.html?id=' + id + '&cron=' + value
 		});
+	}).on('click','.btn-details',function () {
+		parent.openTab($(this).data('name') +'-编辑',$(this).data('id') + '-edit','editor.html?id='+$(this).data('id'));
 	})
 </script>
 <script type="text/html" id="execute-count">
