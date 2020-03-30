@@ -141,13 +141,23 @@ html,body{
 	padding : 0 10px;
 	cursor: pointer;
 	margin-top:5px;
+	/*margin-right: 5px;*/
 	color:#333;
 }
+.toolbar-container ul span{
+	float: left;
+	line-height: 30px;
+	font-size: large;
+	margin:0 5px 0 5px;
+	color: #ccc;
+}
 .toolbar-container ul li:hover{
-	color : #40a9ff;
+	color : #ff4d02;
+	background-color: rgb(204,204,204);
+
 }
 .toolbar-container ul li:not(:first-child){
-	border-left: 1px solid #ccc;
+	/*border-left: 1px solid #ccc;*/
 }
 
 .test-window-container .output-container{
