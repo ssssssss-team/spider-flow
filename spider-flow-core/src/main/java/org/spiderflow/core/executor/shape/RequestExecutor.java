@@ -107,6 +107,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 							sleepTime = lastExecuteTime + sleepTime - System.currentTimeMillis();
 						}
 						if (sleepTime > 0) {
+							context.pause(node.getNodeId(),"common",SLEEP,sleepTime);
 							logger.debug("设置延迟时间:{}ms", sleepTime);
 							Thread.sleep(sleepTime);
 						}
@@ -126,6 +127,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 			logger.error("设置请求url出错，异常信息：{}", e);
 			ExceptionUtils.wrapAndThrow(e);
 		}
+		context.pause(node.getNodeId(),"common",URL,url);
 		logger.info("设置请求url:{}", url);
 		request.url(url);
 		//设置请求超时时间
@@ -150,11 +152,11 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		}
 		SpiderNode root = context.getRootNode();
 		//设置请求header
-		setRequestHeader(request, root.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
-		setRequestHeader(request, node.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
+		setRequestHeader(root, request, root.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
+		setRequestHeader(node, request, node.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
 
 		//设置全局Cookie
-		Map<String, String> cookies = getRequestCookie(request, root.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
+		Map<String, String> cookies = getRequestCookie(root, root.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
 		if(!cookies.isEmpty()){
 			logger.info("设置全局Cookie：{}", cookies);
 			request.cookies(cookies);
@@ -162,23 +164,15 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		//设置自动管理的Cookie
 		boolean cookieAutoSet = !"0".equals(node.getStringJsonValue(COOKIE_AUTO_SET));
 		if(cookieAutoSet && !cookieContext.isEmpty()){
+			context.pause(node.getNodeId(),COOKIE_AUTO_SET,COOKIE_AUTO_SET,cookieContext);
 			request.cookies(cookieContext);
 			logger.info("自动设置Cookie：{}", cookieContext);
 		}
 		//设置本节点Cookie
-		cookies = getRequestCookie(request, node.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
+		cookies = getRequestCookie(node, node.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
 		if(!cookies.isEmpty()){
-			cookies.entrySet().forEach(entry->{
-				try {
-					Object value = ExpressionUtils.execute(entry.getValue(), variables);
-					entry.setValue(Objects.toString(value));
-				} catch (Exception e) {
-					logger.error("设置Cookie出错:{}",e);
-				}
-
-			});
-			logger.debug("设置Cookie：{}", cookies);
 			request.cookies(cookies);
+			logger.debug("设置Cookie：{}", cookies);
 		}
 		if(cookieAutoSet){
 			cookieContext.putAll(cookies);
@@ -191,6 +185,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 			request.contentType(contentType);
 			try {
 				Object requestBody = ExpressionUtils.execute(node.getStringJsonValue(REQUEST_BODY), variables);
+				context.pause(node.getNodeId(),"request-body",REQUEST_BODY,requestBody);
 				request.data(requestBody);
 				logger.info("设置请求Body:{}", requestBody);
 			} catch (Exception e) {
@@ -198,17 +193,18 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 			}
 		}else if("form-data".equals(bodyType)){
 			List<Map<String, String>> formParameters = node.getListJsonValue(PARAMETER_FORM_NAME,PARAMETER_FORM_VALUE,PARAMETER_FORM_TYPE,PARAMETER_FORM_FILENAME);
-			streams = setRequestFormParameter(request,formParameters,context,variables);
+			streams = setRequestFormParameter(node,request,formParameters,context,variables);
 		}else{
 			//设置请求参数
-			setRequestParameter(request,root.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
-			setRequestParameter(request,node.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE),context,variables);
+			setRequestParameter(root, request, root.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
+			setRequestParameter(node, request, node.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
 		}
 		//设置代理
 		String proxy = node.getStringJsonValue(PROXY);
-		if(proxy != null){
+		if(StringUtils.isNotBlank(proxy)){
 			try {
 				Object value = ExpressionUtils.execute(proxy, variables);
+				context.pause(node.getNodeId(),"common",PROXY,value);
 				if(value != null){
 					String[] proxyArr = value.toString().split(":");
 					if(proxyArr.length == 2){
@@ -246,11 +242,11 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		}
 	}
 	
-	private List<InputStream> setRequestFormParameter(HttpRequest request,List<Map<String, String>> parameters,SpiderContext context,Map<String,Object> variables){
+	private List<InputStream> setRequestFormParameter(SpiderNode node, HttpRequest request,List<Map<String, String>> parameters,SpiderContext context,Map<String,Object> variables){
 		List<InputStream> streams = new ArrayList<>();
 		if(parameters != null){
 			for (Map<String,String> nameValue : parameters) {
-				Object value = null;
+				Object value;
 				String parameterName = nameValue.get(PARAMETER_FORM_NAME);
 				if(StringUtils.isNotBlank(parameterName)){
 					String parameterValue = nameValue.get(PARAMETER_FORM_VALUE);
@@ -271,12 +267,14 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 							if(stream != null){
 								streams.add(stream);
 								request.data(parameterName, parameterFilename, stream);
+								context.pause(node.getNodeId(),"request-body",parameterName,parameterFilename);
 								logger.info("设置请求参数：{}={}",parameterName,parameterFilename);
 							}else{
 								logger.warn("设置请求参数：{}失败，无二进制内容",parameterName);
 							}
 						}else{
 							request.data(parameterName, value);
+							context.pause(node.getNodeId(),"request-body",parameterName,value);
 							logger.info("设置请求参数：{}={}",parameterName,value);
 						}
 						
@@ -289,18 +287,19 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		return streams;
 	}
 
-	private Map<String,String> getRequestCookie(HttpRequest request, List<Map<String, String>> cookies, SpiderContext context, Map<String, Object> variables) {
+	private Map<String,String> getRequestCookie(SpiderNode node, List<Map<String, String>> cookies, SpiderContext context, Map<String, Object> variables) {
 		Map<String,String> cookieMap = new HashMap<>();
 		if (cookies != null) {
 			for (Map<String, String> nameValue : cookies) {
-				Object value = null;
+				Object value;
 				String cookieName = nameValue.get(COOKIE_NAME);
 				if (StringUtils.isNotBlank(cookieName)) {
 					String cookieValue = nameValue.get(COOKIE_VALUE);
 					try {
 						value = ExpressionUtils.execute(cookieValue, variables);
 						if (value != null) {
-							cookieMap.put(cookieName, cookieValue);
+							cookieMap.put(cookieName, value.toString());
+							context.pause(node.getNodeId(),"request-cookie",cookieName,value.toString());
 							logger.info("设置请求Cookie：{}={}", cookieName, value);
 						}
 					} catch (Exception e) {
@@ -312,7 +311,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		return cookieMap;
 	}
 
-	private void setRequestParameter(HttpRequest request, List<Map<String, String>> parameters, SpiderContext context, Map<String, Object> variables) {
+	private void setRequestParameter(SpiderNode node, HttpRequest request, List<Map<String, String>> parameters, SpiderContext context, Map<String, Object> variables) {
 		if (parameters != null) {
 			for (Map<String, String> nameValue : parameters) {
 				Object value = null;
@@ -321,6 +320,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 					String parameterValue = nameValue.get(PARAMETER_VALUE);
 					try {
 						value = ExpressionUtils.execute(parameterValue, variables);
+						context.pause(node.getNodeId(),"request-parameter",parameterName,value);
 						logger.info("设置请求参数：{}={}", parameterName, value);
 					} catch (Exception e) {
 						logger.error("设置请求参数：{}出错,异常信息：{}", parameterName, e);
@@ -331,7 +331,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		}
 	}
 
-	private void setRequestHeader(HttpRequest request, List<Map<String, String>> headers, SpiderContext context, Map<String, Object> variables) {
+	private void setRequestHeader(SpiderNode node,HttpRequest request, List<Map<String, String>> headers, SpiderContext context, Map<String, Object> variables) {
 		if (headers != null) {
 			for (Map<String, String> nameValue : headers) {
 				Object value = null;
@@ -340,6 +340,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 					String headerValue = nameValue.get(HEADER_VALUE);
 					try {
 						value = ExpressionUtils.execute(headerValue, variables);
+						context.pause(node.getNodeId(),"request-header",headerName,value);
 						logger.info("设置请求Header：{}={}", headerName, value);
 					} catch (Exception e) {
 						logger.error("设置请求Header：{}出错,异常信息：{}", headerName, e);

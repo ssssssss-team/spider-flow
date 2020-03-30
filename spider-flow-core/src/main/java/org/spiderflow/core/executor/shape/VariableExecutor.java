@@ -36,6 +36,7 @@ public class VariableExecutor implements ShapeExecutor{
 			try {
 				value = ExpressionUtils.execute(variableValue, variables);
 				logger.debug("设置变量{}={}",variableName,value);
+				context.pause(node.getNodeId(),"common",variableName,value);
 			} catch (Exception e) {
 				logger.error("设置变量{}出错，异常信息：{}",variableName,e);
 				ExceptionUtils.wrapAndThrow(e);

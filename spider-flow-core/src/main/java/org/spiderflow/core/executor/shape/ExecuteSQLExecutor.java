@@ -73,6 +73,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 					return;
 				}
 				sql = sqlObject.toString();
+				context.pause(node.getNodeId(),"common",SQL,sql);
 			} catch (Exception e) {
 				logger.error("获取sql出错,异常信息:{}", e.getMessage(), e);
 				ExceptionUtils.wrapAndThrow(e);
@@ -93,7 +94,6 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 						parameterSize = Math.max(parameterSize, Array.getLength(parameter));
 					}
 				}
-
 				params[i] = parameter;
 			}
 			String statementType = node.getStringJsonValue(STATEMENT_TYPE);

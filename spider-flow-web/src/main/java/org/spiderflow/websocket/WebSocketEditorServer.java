@@ -30,8 +30,10 @@ public class WebSocketEditorServer {
     public void onMessage(String message, Session session) {
         JSONObject event = JSON.parseObject(message);
         String eventType = event.getString("eventType");
-        if ("test".equals(eventType)) {
+        boolean isDebug = "debug".equalsIgnoreCase(eventType);
+        if ("test".equalsIgnoreCase(eventType) || isDebug) {
             context = new SpiderWebSocketContext(session);
+            context.setDebug(isDebug);
             context.setRunning(true);
             new Thread(() -> {
                 String xml = event.getString("message");
@@ -45,12 +47,15 @@ public class WebSocketEditorServer {
             }).start();
         } else if ("stop".equals(eventType) && context != null) {
             context.setRunning(false);
+            context.stop();
+        } else if("resume".equalsIgnoreCase(eventType) && context != null){
+            context.resume();
         }
     }
 
     @OnClose
     public void onClose(Session session) {
         context.setRunning(false);
+        context.stop();
     }
-
 }

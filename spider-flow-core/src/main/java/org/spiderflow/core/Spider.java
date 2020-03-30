@@ -192,7 +192,7 @@ public class Spider {
 			return;
 		}
 		//判断箭头上的条件，如果不成立则不执行
-		if (!executeCondition(fromNode, node, variables)) {
+		if (!executeCondition(fromNode, node, variables, context)) {
 			return;
 		}
 		logger.debug("执行节点[{}:{}]", node.getNodeName(), node.getNodeId());
@@ -270,7 +270,7 @@ public class Spider {
 	/**
 	 *	判断箭头上的表达式是否成立
 	 */
-	private boolean executeCondition(SpiderNode fromNode, SpiderNode node, Map<String, Object> variables) {
+	private boolean executeCondition(SpiderNode fromNode, SpiderNode node, Map<String, Object> variables, SpiderContext context) {
 		if (fromNode != null) {
 			boolean hasException = variables.get("ex") != null;
 			String exceptionFlow = node.getExceptionFlow(fromNode.getNodeId());

@@ -102,10 +102,8 @@ iframe{
 	color:rgba(0, 0, 0, 0.65);
 }
 .layui-body .layui-tab .layui-tab-content{
-	top:64px !important;
-	left:24px;
-	right:24px;
-	bottom:24px !important;
+	top:41px !important;
+	left:1px;
 }
 .layui-layout-admin .layui-body,.layui-layout-admin .layui-footer{
 	background-color: #f0f2f5;

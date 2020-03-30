@@ -2,6 +2,7 @@ var $ = layui.$;
 var editor;
 var flows;
 var codeMirrorInstances = {};
+var socket;
 function renderCodeMirror(){
 	codeMirrorInstances = {};
 	$('[codemirror]').each(function(){
@@ -221,9 +222,13 @@ $(function(){
 			render();
 			return;
 		}
-		$.get('resources/templates/' + template +".html",function(content){
-			templateCache[template] = content;
-			render();
+		$.ajax({
+			url : 'resources/templates/' + template +".html",
+			async :false,
+			success : function(content){
+				templateCache[template] = content;
+				render();
+			}
 		});
 	}
 	if (!mxClient.isBrowserSupported()){
@@ -649,267 +654,360 @@ function bindToolbarClickAction(editor){
 		$(".editor-container").hide();
 		$(".xml-container textarea").val(editor.getXML());
 		$(".xml-container").show();
+		$(this).removeClass('btn-edit-xml').addClass('btn-graphical-xml');
 	}).on('click',".btn-graphical-xml",function(){
 		$(".editor-container").show();
 		$(".xml-container").hide();
+		$(this).removeClass('btn-graphical-xml').addClass('btn-edit-xml');
 //		editor.setXML($(".xml-container textarea").val());
 //		editor.onSelectedCell();
+	}).on('click','.btn-stop:not(.disabled)',function () {
+		socket.send(JSON.stringify({
+			eventType : 'stop'
+		}));
+	}).on('click','.btn-resume:not(.disabled)',function () {
+		$(this).addClass('disabled')
+		$(".spiderflow-debug-tooltip").remove();
+		socket.send(JSON.stringify({
+			eventType : 'resume'
+		}));
 	}).on('click','.btn-test',function(){
-		validXML(function(){
-			var LogViewer;
-			var tableMap = {};
-			var socket;
-			var first = true;
-			var filterText = '';
-			var testWindowIndex = layui.layer.open({
-				id : 'test-window',
-				type : 1,
-				content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="960" height="100"></canvas></div>',
-				area : ["980px","500px"],
-				shade : 0,
-				maxmin : true,
-				maxWidth : 700,
-				maxHeight : 400,
-				title : '测试窗口',
-				btn : ['关闭','显示/隐藏输出','显示/隐藏日志','停止'],
-				btn2 : function(){
-					var $output = $(".test-window-container .output-container");
-					var $log = $(".test-window-container .log-container");
-					if($output.is(":hidden")){
-						$output.show();
-						$output.find("canvas").each(function(){
-							if($log.is(":hidden")){
-								this.height = 320;
-							}else{
-								this.height = 200;
-							}
-						})
-						$log.attr('height',100)
-						LogViewer.resize();
-						for(var tableId in tableMap){
-							tableMap[tableId].instance.resize();
-						}
-					}else{
-						$output.hide();
-						$log.attr('height',400);
-						LogViewer.resize();
-						for(var tableId in tableMap){
-							tableMap[tableId].instance.resize();
-						}
-					}
-					return false;
-				},
-				btn3 : function(){
-					var $output = $(".test-window-container .output-container");
-					var $log = $(".test-window-container .log-container");
-					if($log.is(":hidden")){
-						$log.show();
-						$log.attr('height',$output.is(":hidden") ? 400 : 100)
-						$output.find("canvas").each(function(){
+		runSpider(false);
+	}).on('click','.btn-debug',function(){
+		runSpider(true);
+	}).on('click',".btn-return",function(){
+		location.href="spiderList.html"
+	}).on('click','.btn-save',function(){
+		Save();
+	})
+}
+function runSpider(debug){
+	validXML(function(){
+		$(".btn-debug,.btn-test,.btn-resume").addClass('disabled');
+		$(".btn-stop").removeClass('disabled');
+		var LogViewer;
+		var tableMap = {};
+		var first = true;
+		var filterText = '';
+		var testWindowIndex = layui.layer.open({
+			id : 'test-window',
+			type : 1,
+			skin : 'layer-test',
+			content : '<div class="test-window-container"><div class="output-container"><div class="layui-tab layui-tab-fixed layui-tab-brief"><ul class="layui-tab-title"></ul><div class="layui-tab-content"></div></div></div><canvas class="log-container" width="677" height="100"></canvas></div>',
+			area : ["680px","400px"],
+			shade : 0,
+			offset : 'rt',
+			maxmin :true,
+			maxWidth : 700,
+			maxHeight : 400,
+			title : '测试窗口',
+			btn : ['关闭','显示/隐藏输出','显示/隐藏日志','停止'],
+			btn2 : function(){
+				var $output = $(".test-window-container .output-container");
+				var $log = $(".test-window-container .log-container");
+				if($output.is(":hidden")){
+					$output.show();
+					$output.find("canvas").each(function(){
+						if($log.is(":hidden")){
+							this.height = 290;
+						}else{
 							this.height = 200;
-						});
-						LogViewer.resize();
-						for(var tableId in tableMap){
-							tableMap[tableId].instance.resize();
 						}
-					}else{
-						$log.hide();
-						$output.find("canvas").each(function(){
-							this.height = 320;
-						});
-						LogViewer.resize();
-						for(var tableId in tableMap){
-							tableMap[tableId].instance.resize();
-						}
+					})
+					$log.attr('height',100)
+					LogViewer.resize();
+					for(var tableId in tableMap){
+						tableMap[tableId].instance.resize();
 					}
-					return false;
-				},
-				btn4 : function(){
-					var $btn = $("#layui-layer" + testWindowIndex).find('.layui-layer-btn3');
-					if($btn.html() == '停止'){
+				}else{
+					$output.hide();
+					$log.attr('height',320);
+					LogViewer.resize();
+					for(var tableId in tableMap){
+						tableMap[tableId].instance.resize();
+					}
+				}
+				return false;
+			},
+			btn3 : function(){
+				var $output = $(".test-window-container .output-container");
+				var $log = $(".test-window-container .log-container");
+				if($log.is(":hidden")){
+					$log.show();
+					$log.attr('height',$output.is(":hidden") ? 320 : 100)
+					$output.find("canvas").each(function(){
+						this.height = 200;
+					});
+					LogViewer.resize();
+					for(var tableId in tableMap){
+						tableMap[tableId].instance.resize();
+					}
+				}else{
+					$log.hide();
+					$output.find("canvas").each(function(){
+						this.height = 320;
+					});
+					LogViewer.resize();
+					for(var tableId in tableMap){
+						tableMap[tableId].instance.resize();
+					}
+				}
+				return false;
+			},
+			btn4 : function(){
+				var $btn = $("#layui-layer" + testWindowIndex).find('.layui-layer-btn3');
+				if($btn.html() == '停止'){
+					socket.send(JSON.stringify({
+						eventType : 'stop'
+					}));
+				}else{
+					$(".btn-debug,.btn-test,.btn-resume").addClass('disabled');
+					$(".btn-stop").removeClass('disabled');
+					socket.send(JSON.stringify({
+						eventType : debug ? 'debug' : 'test',
+						message : editor.getXML()
+					}));
+					$btn.html('停止');
+				}
+				return false;
+			},
+			end : function(){
+				if(socket){
+					socket.close();
+					$(".spiderflow-debug-tooltip").remove();
+					$(".btn-stop,.btn-resume").addClass('disabled');
+					$(".btn-test,.btn-debug").removeClass('disabled')
+				}
+				if(LogViewer){
+					LogViewer.destory();
+				}
+				for(var tableId in tableMap){
+					tableMap[tableId].instance.destory();
+				}
+			},
+			success : function(layero,index){
+				var logElement = $(".test-window-container .log-container")[0];
+				var colors = {
+					'array' : '#2a00ff',
+					'object' : '#2a00ff',
+					'boolean' : '#600100',
+					'number' : '#000E59'
+				}
+				LogViewer = new CanvasViewer({
+					element : logElement,
+					onClick : function(e){
+						onCanvasViewerClick(e,'日志');
+					}
+				});
+				$(layero).find(".layui-layer-btn")
+					.append('<div class="layui-inline"><input type="text" class="layui-input" placeholder="输入关键字过滤日志"/></div>')
+					.on("keyup","input",function(){
+						LogViewer.filter(this.value);
+					});
+				socket = createWebSocket({
+					onopen : function(){
 						socket.send(JSON.stringify({
-							eventType : 'stop'
-						}));
-					}else{
-						socket.send(JSON.stringify({
-							eventType : 'test',
+							eventType : debug ? 'debug' : 'test',
 							message : editor.getXML()
 						}));
-						$btn.html('停止');
-					}
-					return false;
-				},
-				end : function(){
-					if(socket){
-						socket.close();
-					}
-					if(LogViewer){
-						LogViewer.destory();
-					}
-					for(var tableId in tableMap){
-						tableMap[tableId].instance.destory();
-					}
-				},
-				success : function(layero,index){
-					var logElement = $(".test-window-container .log-container")[0];
-					var colors = {
-						'array' : '#2a00ff',
-						'object' : '#2a00ff',
-						'boolean' : '#600100',
-						'number' : '#000E59'
-					}
-					LogViewer = new CanvasViewer({
-						element : logElement,
-						onClick : function(e){
-							onCanvasViewerClick(e,'日志');
-						}
-					});
-					$(layero).find(".layui-layer-btn")
-						.append('<div class="layui-inline"><input type="text" class="layui-input" placeholder="输入关键字过滤日志"/></div>')
-						.on("keyup","input",function(){
-							LogViewer.filter(this.value);
-						});
-					socket = createWebSocket({
-						onopen : function(){
-							socket.send(JSON.stringify({
-								eventType : 'test',
-								message : editor.getXML()
-							}));
-						},
-						onmessage : function(e){
-							var event = JSON.parse(e.data);
-							var eventType = event.eventType;
-							var message = event.message;
-							if(eventType == 'finish'){
-								$("#layui-layer" + testWindowIndex).find('.layui-layer-btn3').html('重新开始');
-							}else if(eventType == 'output'){
-								var tableId = 'output-' + message.nodeId;
-								var $table = $('#' + tableId);
-								if($table.length == 0){
-									tableMap[tableId] = {
-										index : 0
-									};
-									var $tab = $(".test-window-container .output-container .layui-tab")
-									var outputTitle = '输出-'+tableId;
-									var cell = editor.getModel().cells[message.nodeId];
-									if(cell){
-										outputTitle = cell.value;
-									}
-									if(first){
-										$tab.find(".layui-tab-title").append('<li  class="layui-this">' + outputTitle + '</li>');
-										$tab.find(".layui-tab-content").append('<div class="layui-tab-item layui-show" data-output="'+tableId+'"></div>');
-										first = false;
-									}else{
-										$tab.find(".layui-tab-title").append('<li>' + outputTitle + '</li>');
-										$tab.find(".layui-tab-content").append('<div class="layui-tab-item" data-output="'+tableId+'"></div>');
-									}
-									$table = $('<canvas width="960" height="200"/>').appendTo($(".test-window-container .output-container .layui-tab-item[data-output="+tableId+"]"));
-									$table.attr('id',tableId);
-									tableMap[tableId].instance = new CanvasViewer({
-										element : document.getElementById(tableId),
-										grid : true,
-										header : true,
-										style : {
-											font : 'bold 13px Consolas'
-										},
-										onClick : function(e){
-											onCanvasViewerClick(e,'表格');
-										}
-									})
-									var cols = [];
-									var texts = [new CanvasText({
-										text : '序号',
-										maxWidth : 100
-									})];
-									for(var i =0,len = message.outputNames.length;i<len;i++){
-										texts.push(new CanvasText({
-											text : message.outputNames[i],
-											maxWidth : 200,
-											click : true
-										}));
-									}
-									tableMap[tableId].instance.append(texts);
+					},
+					onmessage : function(e){
+						var event = JSON.parse(e.data);
+						var eventType = event.eventType;
+						var message = event.message;
+						if(eventType == 'finish'){
+							$(".spiderflow-debug-tooltip").remove();
+							$("#layui-layer" + testWindowIndex).find('.layui-layer-btn3').html('重新开始');
+							$(".btn-stop,.btn-resume").addClass('disabled');
+							$(".btn-test,.btn-debug").removeClass('disabled')
+						}else if(eventType == 'output'){
+							var tableId = 'output-' + message.nodeId;
+							var $table = $('#' + tableId);
+							if($table.length == 0){
+								tableMap[tableId] = {
+									index : 0
+								};
+								var $tab = $(".test-window-container .output-container .layui-tab")
+								var outputTitle = '输出-'+tableId;
+								var cell = editor.getModel().cells[message.nodeId];
+								if(cell){
+									outputTitle = cell.value;
 								}
+								if(first){
+									$tab.find(".layui-tab-title").append('<li  class="layui-this">' + outputTitle + '</li>');
+									$tab.find(".layui-tab-content").append('<div class="layui-tab-item layui-show" data-output="'+tableId+'"></div>');
+									first = false;
+								}else{
+									$tab.find(".layui-tab-title").append('<li>' + outputTitle + '</li>');
+									$tab.find(".layui-tab-content").append('<div class="layui-tab-item" data-output="'+tableId+'"></div>');
+								}
+								$table = $('<canvas width="677" height="200"/>').appendTo($(".test-window-container .output-container .layui-tab-item[data-output="+tableId+"]"));
+								$table.attr('id',tableId);
+								tableMap[tableId].instance = new CanvasViewer({
+									element : document.getElementById(tableId),
+									grid : true,
+									header : true,
+									style : {
+										font : 'bold 13px Consolas'
+									},
+									onClick : function(e){
+										onCanvasViewerClick(e,'表格');
+									}
+								})
+								var cols = [];
 								var texts = [new CanvasText({
-									text : ++tableMap[tableId].index,
-									maxWidth : 200,
-									click : true
+									text : '序号',
+									maxWidth : 100
 								})];
 								for(var i =0,len = message.outputNames.length;i<len;i++){
-									var displayText = message.values[i];
-									var variableType = 'string';
-									if(Array.isArray(displayText)){
+									texts.push(new CanvasText({
+										text : message.outputNames[i],
+										maxWidth : 200,
+										click : true
+									}));
+								}
+								tableMap[tableId].instance.append(texts);
+							}
+							var texts = [new CanvasText({
+								text : ++tableMap[tableId].index,
+								maxWidth : 200,
+								click : true
+							})];
+							for(var i =0,len = message.outputNames.length;i<len;i++){
+								var displayText = message.values[i];
+								var variableType = 'string';
+								if(Array.isArray(displayText)){
+									variableType = 'array';
+									displayText = JSON.stringify(displayText);
+								}else{
+									variableType = typeof displayText;
+									if(variableType == 'object'){
+										displayText = JSON.stringify(displayText);
+									}
+								}
+								texts.push(new CanvasText({
+									text : displayText,
+									maxWidth : 200,
+									color : colors[variableType] || 'black',
+									click : true
+								}));
+							}
+							tableMap[tableId].instance.append(texts);
+							tableMap[tableId].instance.scrollTo(-1);
+						}else if(eventType == 'log'){
+							var texts = [];
+							var defaultColor = message.level == 'error' ? 'red' : '';
+							texts.push(new CanvasText({
+								text : message.level,
+								color : defaultColor
+							}));
+							texts.push(new CanvasText({
+								text : event.timestamp,
+								color : defaultColor
+							}));
+							var temp = message.message.split("{}");
+							message.variables = message.variables || [];
+							for(var i=0,len=temp.length;i<len;i++){
+								if(temp[i]!=''){
+									texts.push(new CanvasText({
+										text : temp[i],
+										color : defaultColor
+									}))
+								}
+								var object = message.variables[i];
+								if(object != undefined){
+									var variableType = '';
+									var displayText = object;
+									if(Array.isArray(object)){
 										variableType = 'array';
 										displayText = JSON.stringify(displayText);
 									}else{
-										variableType = typeof displayText;
+										variableType = typeof object;
 										if(variableType == 'object'){
 											displayText = JSON.stringify(displayText);
 										}
 									}
 									texts.push(new CanvasText({
 										text : displayText,
-										maxWidth : 200,
-										color : colors[variableType] || 'black',
+										maxWidth : 330,
+										color : colors[variableType] || '#025900',
 										click : true
-									}));
+									}))
 								}
-								tableMap[tableId].instance.append(texts);
-								tableMap[tableId].instance.scrollTo(-1);
-							}else if(eventType == 'log'){
-								var texts = [];
-								var defaultColor = message.level == 'error' ? 'red' : '';
-								texts.push(new CanvasText({
-									text : message.level,
-									color : defaultColor
-								}));
-								texts.push(new CanvasText({
-									text : event.timestamp,
-									color : defaultColor
-								}));
-								var temp = message.message.split("{}");
-								message.variables = message.variables || [];
-								for(var i=0,len=temp.length;i<len;i++){
-									if(temp[i]!=''){
-										texts.push(new CanvasText({
-											text : temp[i],
-											color : defaultColor
-										}))
-									}
-									var object = message.variables[i];
-									if(object != undefined){
-										var variableType = '';
-										var displayText = object;
-										if(Array.isArray(object)){
-											variableType = 'array';
-											displayText = JSON.stringify(displayText);
-										}else{
-											variableType = typeof object;
-											if(variableType == 'object'){
-												displayText = JSON.stringify(displayText);
-											}
-										}
-										texts.push(new CanvasText({
-											text : displayText,
-											maxWidth : 330,
-											color : colors[variableType] || '#025900',
-											click : true
-										}))
-									}
-								}
-								LogViewer.append(texts);
-								LogViewer.scrollTo(-1);
+							}
+							LogViewer.append(texts);
+							LogViewer.scrollTo(-1);
+						}else if(eventType == 'debug'){
+							console.log(message);
+							$(".btn-resume").removeClass('disabled');
+							var type = message.event;
+							editor.selectCell(editor.graph.model.cells[message.nodeId]);
+							var selector;
+							if(type == 'request-parameter'){
+								$('.layui-tab-title li:eq(1)').click();
+							}
+							if(type == 'request-cookie'){
+								$('.layui-tab-title li:eq(2)').click();
+							}
+							if(type == 'request-header'){
+								$('.layui-tab-title li:eq(3)').click();
+							}
+							if(type == 'request-body'){
+								$('.layui-tab-title li:eq(4)').click();
+							}
+							if(type == 'common' || type == 'request-parameter' || type == 'request-header' || type == 'request-cookie'){
+								selector = '.layui-table-cell input[value='+message.key+']';
+							}
+							if($(selector).length == 0){
+								selector = '.properties-container input[name='+message.key+']';
+							}
+							if($(selector).length == 0){
+								selector = '.properties-container [codemirror='+message.key+']';
+							}
+							var o1 = $(selector).offset();
+							var $parent = $(".properties-container");
+							var o2 = $parent.offset();
+							if(o1.top > o2.top + $parent.height()){
+								$parent[0].scrollTop = o1.top - o2.top;
+							}
+							var msg = message.value;
+							var isJson = Array.isArray(msg) || typeof msg == 'object';
+							if(!isJson){
+								var temp = document.createElement("div");
+								(temp.textContent != null) ? (temp.textContent = msg) : (temp.innerText = msg);
+								msg = temp.innerHTML;
+								temp = null;
+							}
+							var content = '<div class="message-content" style="padding:10px;'+(isJson ? '':'font-weight: bold;font-family:Consolas;font-size:12px;')+'">'+(isJson ? '' : msg.replace(/\n/g,'<br>')).replace(/ /g,'&nbsp;').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;')+'</div>';
+							var tooltip = bindTooltip(content,selector);
+							if(isJson){
+								var $dom = $(tooltip.dom).find(".message-content");
+								jsonTree.create(msg,$dom[0]);
 							}
 						}
-					});
-				}
-			})
-		});
-	}).on('click',".btn-return",function(){
-		location.href="spiderList.html"
-	}).on('click','.btn-save',function(){
-		Save();
-	})
+					}
+				});
+			}
+		})
+	});
+}
+function bindTooltip(content,selector){
+	var dom = document.createElement('div');
+	var $target = $(selector);
+	var offset = $target.offset();
+	dom.className = 'spiderflow-debug-tooltip';
+	dom.style.bottom = ($("body").height() - offset.top) + 'px';
+	dom.style.left = (offset.left + $target.width() / 2) + 'px';
+	dom.innerHTML = '<div class="content">' + content + '</div>';
+	document.body.appendChild(dom);
+	$(selector).offset();
+	return {
+		dom : dom,
+		close : function(){
+			document.body.removeChild(dom);
+		}
+	}
+
 }
 //最近点击打开的弹窗
 var index;

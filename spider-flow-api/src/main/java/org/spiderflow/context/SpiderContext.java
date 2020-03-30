@@ -104,4 +104,10 @@ public class SpiderContext extends HashMap<String, Object>{
 		return cookieContext;
 	}
 
+	public void pause(String nodeId,String event,String key,Object value){}
+
+	public void resume(){}
+
+	public void stop(){}
+
 }

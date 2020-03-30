@@ -19,8 +19,20 @@ public class SpiderWebSocketContext extends SpiderContext {
 
     private Session session;
 
+    private boolean debug;
+
+    private Object lock = new Object();
+
     public SpiderWebSocketContext(Session session) {
         this.session = session;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 
     @Override
@@ -42,6 +54,91 @@ public class SpiderWebSocketContext extends SpiderContext {
                 }
             }
         } catch (Throwable ignored) {
+        }
+    }
+
+    @Override
+    public void pause(String nodeId, String event, String key, Object value) {
+        if(this.debug && this.isRunning()) {
+            synchronized (this) {
+                if(this.debug && this.isRunning()) {
+                    synchronized (lock) {
+                        try {
+                            write(new WebSocketEvent<>("debug", new DebugInfo(nodeId, event, key, value)));
+                            lock.wait();
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void resume() {
+        if(this.debug){
+            synchronized (lock){
+                lock.notify();
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        if(this.debug){
+            synchronized (lock){
+                lock.notifyAll();
+            }
+        }
+    }
+
+    class DebugInfo{
+
+        private String nodeId;
+
+        private String event;
+
+        private String key;
+
+        private Object value;
+
+        public DebugInfo(String nodeId, String event, String key, Object value) {
+            this.nodeId = nodeId;
+            this.event = event;
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getNodeId() {
+            return nodeId;
+        }
+
+        public void setNodeId(String nodeId) {
+            this.nodeId = nodeId;
+        }
+
+        public String getEvent() {
+            return event;
+        }
+
+        public void setEvent(String event) {
+            this.event = event;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
         }
     }
 }

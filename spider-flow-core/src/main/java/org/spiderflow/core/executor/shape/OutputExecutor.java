@@ -75,6 +75,7 @@ public class OutputExecutor implements ShapeExecutor{
 			String outputName = item.get(OUTPUT_NAME);
 			try {
 				value = ExpressionUtils.execute(outputValue, variables);
+				context.pause(node.getNodeId(),"common",outputName,value);
 				logger.debug("输出{}={}", outputName,value);
 			} catch (Exception e) {
 				logger.error("输出{}出错，异常信息：{}", outputName,e);
