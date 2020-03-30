@@ -6,7 +6,7 @@
     <div class="layui-tab-item layui-show">
     	<form class="layui-form editor-form-node" lay-filter="executesql-form">
 			<div class="layui-row">
-				<div class="layui-col-md4">
+				<div class="layui-col-md3">
 					<div class="layui-form-item">
 						<label class="layui-form-label">节点名称</label>
 						<div class="layui-input-block">
@@ -43,10 +43,10 @@
 						</div>
 					</div>
 				</div>
-				<div class="layui-col-md2 dynamicDiv"  {{d.data.object.statementType=='select'?'':'style="display:none;"'}} >
+				<div class="layui-col-md3 dynamicDiv"  {{d.data.object.statementType=='select' || !d.data.object.statementType ? '' : 'style="display:none;"'}} >
 					<div class="layui-form-item">
 						<div class="layui-input-block">
-							<input  type="checkbox" value="isStream"  title="输出到sqlRowSet流"tips-text="sqlRowSet流|List<Map<String,Object>"  {{d.data.object.isStream =='1'?'checked':''}}/>
+							<input  type="checkbox" value="isStream" lay-skin="primary"  title="输出到sqlRowSet流"tips-text="sqlRowSet流|List<Map<String,Object>"  {{d.data.object.isStream =='1'?'checked':''}}/>
 						</div>
 					</div>
 				</div>
