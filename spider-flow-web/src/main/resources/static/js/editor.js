@@ -454,6 +454,20 @@ $(function(){
 			renderCodeMirror();
 			serializeForm();
 		});
+        layui.form.on('select(targetCheck)', function (data) {
+            var targetDiv = $(data.elem).attr('target-div');
+            var targetValue = $(data.elem).attr('target-value');
+            // var selectValue=$(data.elem).value();
+            console.log(targetDiv, data.elem.value);
+            if (targetDiv != null) {
+                if (data.elem.value == targetValue) {
+                    $("." + targetDiv).show();
+                } else {
+                    $("." + targetDiv).hide();
+                }
+            }
+        });
+
 		layui.form.on('checkbox(targetCheck)', function (data) {
 			var targetDiv = $(data.elem).attr('target-div');
 			console.log(targetDiv);

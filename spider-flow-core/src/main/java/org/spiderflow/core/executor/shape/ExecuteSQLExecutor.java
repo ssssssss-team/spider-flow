@@ -48,7 +48,7 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 	public static final String STATEMENT_UPDATE = "update";
 
 	public static final String STATEMENT_DELETE = "delete";
-
+	public static final String SELECT_RESULT_STREAM = "isStream";
 	public static final String STATEMENT_INSERT_PK = "insertofPk";
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExecuteSQLExecutor.class);
@@ -99,10 +99,13 @@ public class ExecuteSQLExecutor implements ShapeExecutor, Grammerable {
 			String statementType = node.getStringJsonValue(STATEMENT_TYPE);
 			logger.debug("执行sql：{}", sql);
 			if (STATEMENT_SELECT.equals(statementType)) {
-				List<Map<String, Object>> rs;
+				boolean isStream = "1".equals(node.getStringJsonValue(SELECT_RESULT_STREAM));
 				try {
-					rs = template.queryForList(sql, params);
-					variables.put("rs", rs);
+					if (isStream) {
+						variables.put("rs", template.queryForRowSet(sql, params));
+					} else {
+						variables.put("rs", template.queryForList(sql, params));
+					}
 				} catch (Exception e) {
 					variables.put("rs", null);
 					logger.error("执行sql出错,异常信息:{}", e.getMessage(), e);

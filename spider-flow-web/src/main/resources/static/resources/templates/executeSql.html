@@ -14,7 +14,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="layui-col-md4">
+				<div class="layui-col-md3">
 					<div class="layui-form-item">
 						<label class="layui-form-label">数据源</label>
 						<div class="layui-input-block">
@@ -26,12 +26,11 @@
 						</div>
 					</div>
 				</div>
-				
-				<div class="layui-col-md4">
+				<div class="layui-col-md3">
 					<div class="layui-form-item">
 						<label class="layui-form-label">语句类型</label>
 						<div class="layui-input-block">
-							<select name="statementType">
+							<select name="statementType" target-div="dynamicDiv" target-value="select" lay-filter="targetCheck">
 								<option value="select" {{d.data.object.statementType == 'select' ? 'selected':''}}>select</option>
 								<option value="selectOne" {{d.data.object.statementType == 'selectOne' ? 'selected':''}}>selectOne</option>
 								<option value="selectInt" {{d.data.object.statementType == 'selectInt' ? 'selected':''}}>selectInt</option>
@@ -40,6 +39,14 @@
 								<option value="update" {{d.data.object.statementType == 'update' ? 'selected':''}}>update</option>
 								<option value="insertofPk" {{d.data.object.statementType == 'insertofPk' ? 'selected':''}}>insertofPk</option>
 							</select>
+
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md2 dynamicDiv"  {{d.data.object.statementType=='select'?'':'style="display:none;"'}} >
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<input  type="checkbox" value="isStream"  title="输出到sqlRowSet流"tips-text="sqlRowSet流|List<Map<String,Object>"  {{d.data.object.isStream =='1'?'checked':''}}/>
 						</div>
 					</div>
 				</div>
