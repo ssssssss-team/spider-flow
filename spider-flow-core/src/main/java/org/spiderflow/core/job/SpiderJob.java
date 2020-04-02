@@ -43,8 +43,8 @@ public class SpiderJob extends QuartzJobBean {
 	@Value("${spider.job.enable:true}")
 	private boolean spiderJobEnable;
 
-	@Value("${spider.job.log.path:./}")
-	private String spiderLogPath;
+	@Value("${spider.workspace}")
+	private String workspace;
 
 	private static Logger logger = LoggerFactory.getLogger(SpiderJob.class);
 
@@ -70,7 +70,7 @@ public class SpiderJob extends QuartzJobBean {
 		task.setBeginTime(new Date());
 		try {
 			taskService.save(task);
-			context = SpiderJobContext.create(this.spiderLogPath, spiderFlow.getId() + task.getId() + ".log");
+			context = SpiderJobContext.create(this.workspace, spiderFlow.getId(),task.getId());
 			SpiderContextHolder.set(context);
 			contextMap.put(task.getId(), context);
 			logger.info("开始执行任务{}", spiderFlow.getName());

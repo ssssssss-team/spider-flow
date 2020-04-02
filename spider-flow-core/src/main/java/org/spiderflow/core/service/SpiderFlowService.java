@@ -1,29 +1,31 @@
 package org.spiderflow.core.service;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerUtils;
 import org.quartz.spi.OperableTrigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spiderflow.core.job.SpiderJobManager;
 import org.spiderflow.core.mapper.SpiderFlowMapper;
 import org.spiderflow.core.model.SpiderFlow;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 爬虫流程执行服务
@@ -38,6 +40,11 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	
 	@Autowired
 	private SpiderJobManager spiderJobManager;
+
+	private static Logger logger = LoggerFactory.getLogger(SpiderFlowService.class);
+
+	@Value("${spider.workspace}")
+	private String workspace;
 
 	//项目启动后自动查询需要执行的任务进行爬取
 	@PostConstruct
@@ -99,7 +106,6 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 							.build();
 			spiderFlow.setNextExecuteTime(trigger.getStartTime());
 		}
-		//
 		if(StringUtils.isNotEmpty(spiderFlow.getId())){	//update 任务
 			sfMapper.updateSpiderFlow(spiderFlow.getId(), spiderFlow.getName(), spiderFlow.getXml());
 			spiderJobManager.remove(spiderFlow.getId());
@@ -111,6 +117,12 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 			String id = UUID.randomUUID().toString().replace("-", "");
 			sfMapper.insertSpiderFlow(id, spiderFlow.getName(), spiderFlow.getXml());
 			spiderFlow.setId(id);
+		}
+		File file = new File(workspace,spiderFlow.getId() + File.separator + "xmls" + File.separator + System.currentTimeMillis() + ".xml");
+		try {
+			FileUtils.write(file,spiderFlow.getXml(),"UTF-8");
+		} catch (IOException e) {
+			logger.error("保存历史记录出错",e);
 		}
 		return true;
 	}
@@ -175,6 +187,29 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 			list.add(dateFormat.format(date));
 		}
 		return list;
+	}
+
+	public List<Long> historyList(String id){
+		File directory = new File(workspace, id + File.separator + "xmls");
+		if(directory.exists() && directory.isDirectory()){
+			File[] files = directory.listFiles((dir, name) -> name.endsWith(".xml"));
+			if(files != null && files.length > 0){
+				return Arrays.stream(files).map(f-> Long.parseLong(f.getName().replace(".xml",""))).sorted().collect(Collectors.toList());
+			}
+		}
+		return Collections.emptyList();
+	}
+
+	public String readHistory(String id,String timestamp){
+		File file = new File(workspace, id + File.separator + "xmls" + File.separator + timestamp + ".xml");
+		if(file.exists()){
+			try {
+				return FileUtils.readFileToString(file,"UTF-8");
+			} catch (IOException e) {
+				logger.error("读取历史版本出错",e);
+			}
+		}
+		return null;
 	}
 
 	public Integer getFlowMaxTaskId(String flowId){

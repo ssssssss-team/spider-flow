@@ -3,6 +3,7 @@ var editor;
 var flows;
 var codeMirrorInstances = {};
 var socket;
+var version = 'lastest';
 function renderCodeMirror(){
 	codeMirrorInstances = {};
 	$('[codemirror]').each(function(){
@@ -48,7 +49,11 @@ function getCellData(cellId,keys){
 	return data;
 }
 function serializeForm(){
-	var cellId = $(".properties-container").attr('data-cellid');
+	var $container = $(".properties-container");
+	if($container.data('version') != version){
+		return;
+	}
+	var cellId = $container.attr('data-cellid');
 	var model = editor.getModel();
 	var cell = model.getCell(cellId);
 	if(!cell){
@@ -203,6 +208,7 @@ $(function(){
 		if(cell.isEdge()){
 			template = 'edge';
 		}
+		var v = version;
 		var render = function(){
 			layui.laytpl(templateCache[template]).render({
 				data : cell.data,
@@ -211,7 +217,7 @@ $(function(){
 				model : model,
 				cell : cell
 			},function(html){
-				$(".properties-container").html(html).attr('data-cellid',cell.id);
+				$(".properties-container").attr('data-version',v).html(html).attr('data-cellid',cell.id);
 				layui.form.render();
 				renderCodeMirror();
 				resizeSlideBar();
@@ -282,6 +288,65 @@ $(function(){
 			})
 		}).on("blur","input,textarea",function(){
 			serializeForm();
+		}).on("click",".history-version li",function(){
+			var timestamp = $(this).data("timestamp");
+			layui.layer.confirm('你确定要恢复到该版本吗？',function(index){
+				layui.layer.close(index);
+				var layerIndex = layui.layer.load(1);
+				$.ajax({
+					url : 'spider/history',
+					data : {
+						id : id,
+						timestamp : timestamp
+					},
+					success : function(data){
+						if(data.code == 1){
+							version = timestamp;
+							editor.setXML(data.data);
+							layui.layer.close(layerIndex);
+							layui.layer.msg('恢复成功')
+						}else{
+							layui.layer.msg(data.message);
+						}
+					}
+				})
+			});
+		}).on("click",".btn-history",function(){
+			$.ajax({
+				url : 'spider/history',
+				data : {
+					id : id
+				},
+				success : function(data){
+					if(data.code == 1){
+						if(data.data.length > 0){
+							var array = [];
+							for(var i = data.data.length - 1;i >=0;i--){
+								var timestamp = Number(data.data[i])
+								array.push({
+									time : new Date(timestamp).format('yyyy-MM-dd hh:mm:ss'),
+									timestamp : timestamp
+								})
+							}
+							layui.laytpl($('#history-version-tmpl').html()).render(array,function(html){
+								layui.layer.open({
+									type : 1,
+									title : '历史版本',
+									id : 'history-revert',
+									shade : 0,
+									resize : false,
+									content : html,
+									offset : 'rt'
+								})
+							})
+						}else{
+							layui.layer.msg('暂无历史版本！');
+						}
+					}else{
+						layui.layer.msg(data.message);
+					}
+				}
+			})
 		}).on("click",".table-row-add",function(){	//添加一行
 			serializeForm();
 			var tableId = $(this).attr('for');
@@ -485,7 +550,6 @@ $(function(){
 			}
 		})
 		layui.form.on('select',serializeForm);
-		//loadTemplate('root',graph.getModel().getRoot(),graph);
 		var id = getQueryString('id');
 		if(id != null){
 			$.ajax({
@@ -502,47 +566,6 @@ $(function(){
 		}
 		editor.onSelectedCell();
 	}
-	/**
-	 * 处理选择事件
-	 */
-	function processCellEvent(cell,graph){
-		if(cell != null){
-			if(cell.isEdge()){
-				cell.data = cell.data || new JsonProperty();
-				loadTemplate('edge',cell,graph);
-			}else{
-				cell.data = cell.data || new JsonProperty();
-				if(cell.data.shape != 'start'){
-					loadTemplate(cell.data.object.shape,cell,graph);	
-				}
-			}
-		}else{
-			loadTemplate('root',graph.getModel().getRoot(),graph);
-		}
-	}
-	/**
-	 * 重置已设表单array（参数、变量、Headers）
-	 */
-	function resetFormArray(graph,prefix,key){
-		var cell = graph.getSelectionCell() || graph.getModel().getRoot();
-		var array = [];
-		var names = [];
-		var values = [];
-		$(".editor-form-node input[name="+prefix+"-name]").each(function(){
-			names.push(this.value);
-		});
-		$(".editor-form-node input[name="+prefix+"-value]").each(function(){
-			values.push(this.value);
-		});
-		for(var i=0,len = names.length;i<len;i++){
-			array.push({
-				name : names[i],
-				value : values[i]
-			});
-		}
-		cell.data.set(key,array)
-	}
-	
 	/**
 	 * 加载各种图形
 	 */

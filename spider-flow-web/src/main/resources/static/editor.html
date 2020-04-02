@@ -36,6 +36,7 @@
 					<span>|</span>
 					<li class="btn-undo" title="撤销（Ctrl+Z）"></li>
 					<li class="btn-redo" title="反撤销（Ctrl+Y）"></li>
+					<li class="btn-history" title="历史版本"></li>
 					<span>|</span>
 					<li class="btn-selectAll" title="全选（Ctrl+A）"></li>
 					<li class="btn-cut" title="剪切（Ctrl+X）"></li>
@@ -126,6 +127,14 @@
 		</script>
 		<script type="text/html" id="output-value-tmpl">
 			<div class="layui-input-block array" codemirror="output-value" placeholder="输出值" data-value="{{=d['output-value']}}"></div>
+		</script>
+
+		<script type="text/html" id="history-version-tmpl">
+			<ul class="history-version">
+				{{# layui.each(d,function(index,item){ }}
+					<li data-timestamp="{{item.timestamp}}">{{item.time}}</li>
+				{{# });}}
+			</ul>
 		</script>
 
 		<script type="text/html" id="common-operation">

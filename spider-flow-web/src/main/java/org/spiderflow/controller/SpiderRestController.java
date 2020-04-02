@@ -1,8 +1,5 @@
 package org.spiderflow.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.Spider;
@@ -18,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/rest")
 public class SpiderRestController {
@@ -30,8 +30,8 @@ public class SpiderRestController {
 	@Autowired
 	private Spider spider;
 	
-	@Value("${spider.job.log.path:./}")
-	private String spiderLogPath;
+	@Value("${spider.workspace}")
+	private String workspace;
 	
 	@RequestMapping("/run/{id}")
 	public JsonBean<List<SpiderOutput>> run(@PathVariable("id")String id,@RequestBody(required = false)Map<String,Object> params){
@@ -41,8 +41,7 @@ public class SpiderRestController {
 		}
 		List<SpiderOutput> outputs = null;
 		Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
-		String taskId = maxId == null ? "" : maxId.toString();
-		SpiderJobContext context = SpiderJobContext.create(spiderLogPath, id + taskId + ".log");
+		SpiderJobContext context = SpiderJobContext.create(workspace, id,maxId);
 		try{
 			outputs = spider.run(flow,context, params);	
 		}catch(Exception e){

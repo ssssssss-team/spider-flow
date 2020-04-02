@@ -32,14 +32,15 @@ public class SpiderJobContext extends SpiderContext{
 		return this.outputstream;
 	}
 	
-	public static SpiderJobContext create(String directory,String file){
+	public static SpiderJobContext create(String directory,String id,Integer taskId){
 		OutputStream os = null;
 		try {
-			File dirFile = new File(directory);
+			File file = new File(new File(directory),id + File.separator + "logs" + File.separator + taskId + ".log");
+			File dirFile = file.getParentFile();
 			if(!dirFile.exists()){
 				dirFile.mkdirs();
 			}
-			os = new FileOutputStream(new File(directory,file), true);
+			os = new FileOutputStream(file, true);
 		} catch (Exception e) {
 			logger.error("创建日志文件出错",e);
 		}

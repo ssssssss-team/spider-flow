@@ -2,6 +2,7 @@
     <img src="https://www.spiderflow.org/images/logo.svg" width="600">
 </p>
 <p align="center">
+    <a target="_blank" href="https://github.com/javamxd/spider-flow/releases"><img src="https://img.shields.io/github/v/release/javamxd/spider-flow"></a>
     <a target="_blank" href="https://www.oracle.com/technetwork/java/javase/downloads/index.html"><img src="https://img.shields.io/badge/JDK-1.8+-green.svg" /></a>
     <a target="_blank" href="https://www.spiderflow.org"><img src="https://img.shields.io/badge/Docs-latest-blue.svg"/></a>
     <a target="_blank" href='https://gitee.com/jmxd/spider-flow'><img src="https://gitee.com/jmxd/spider-flow/badge/star.svg?theme=white" /></a>

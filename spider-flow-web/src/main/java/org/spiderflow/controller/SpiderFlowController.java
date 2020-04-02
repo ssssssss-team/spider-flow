@@ -63,8 +63,8 @@ public class SpiderFlowController {
 	@Autowired(required = false)
 	private List<PluginConfig> pluginConfigs;
 	
-	@Value("${spider.job.log.path:./}")
-	private String spiderLogPath;
+	@Value("${spider.workspace}")
+	private String workspace;
 	
 	private final List<Grammer> grammers = new ArrayList<Grammer>();
 	
@@ -108,6 +108,15 @@ public class SpiderFlowController {
 	public String save(SpiderFlow spiderFlow){
 		spiderFlowService.save(spiderFlow);
 		return spiderFlow.getId();
+	}
+
+	@RequestMapping("/history")
+	public JsonBean<?> history(String id,String timestamp){
+		if(StringUtils.isNotBlank(timestamp)){
+			return new JsonBean<>(spiderFlowService.readHistory(id,timestamp));
+		}else{
+			return new JsonBean<>(spiderFlowService.historyList(id));
+		}
 	}
 	
 	@RequestMapping("/get")
@@ -159,8 +168,7 @@ public class SpiderFlowController {
 			Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
 			taskId = maxId == null ? "" : maxId.toString();
 		}
-		String finalTaskId = taskId;
-		File file = new File(spiderLogPath, id + finalTaskId + ".log");
+		File file = new File(workspace, id + File.separator + "logs" + File.separator + taskId + ".log");
 		return ResponseEntity.ok()
 				.header("Content-Disposition","attachment; filename=spider.log")
 				.contentType(MediaType.parseMediaType("application/octet-stream"))
@@ -173,7 +181,8 @@ public class SpiderFlowController {
 			Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
 			taskId = maxId == null ? "" : maxId.toString();
 		}
-		try (RandomAccessFileReader reader = new RandomAccessFileReader(new RandomAccessFile(new File(spiderLogPath,id + taskId +".log"),"r"), index == null ? -1 : index, reversed == null || reversed)){
+		File logFile = new File(workspace, id + File.separator + "logs" + File.separator + taskId + ".log");
+		try (RandomAccessFileReader reader = new RandomAccessFileReader(new RandomAccessFile(logFile,"r"), index == null ? -1 : index, reversed == null || reversed)){
 			return new JsonBean<>(reader.readLine(count == null ? 10 : count,keywords,matchcase != null && matchcase,regx != null && regx));
 		} catch(FileNotFoundException e){
 			return new JsonBean<>(0,"日志文件不存在");
