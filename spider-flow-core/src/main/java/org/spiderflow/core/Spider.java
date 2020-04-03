@@ -10,9 +10,11 @@ import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecu
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.context.SpiderContextHolder;
 import org.spiderflow.core.model.SpiderFlow;
+import org.spiderflow.core.service.FlowNoticeService;
 import org.spiderflow.core.utils.ExecutorsUtils;
 import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.core.utils.SpiderFlowUtils;
+import org.spiderflow.enums.FlowNoticeType;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.listener.SpiderListener;
 import org.spiderflow.model.SpiderNode;
@@ -48,6 +50,9 @@ public class Spider {
 
 	@Value("${spider.detect.dead-cycle:5000}")
 	private Integer deadCycle;
+	
+	@Autowired
+	private FlowNoticeService flowNoticeService;
 
 	private static SpiderFlowThreadPoolExecutor threadPoolExecutor;
 
@@ -65,7 +70,11 @@ public class Spider {
 			variables = new HashMap<>();
 		}
 		SpiderNode root = SpiderFlowUtils.loadXMLFromString(spiderFlow.getXml());
+		// 流程开始通知
+		flowNoticeService.sendFlowNotice(spiderFlow, FlowNoticeType.startNotice);
 		executeRoot(root, context, variables);
+		// 流程结束通知
+		flowNoticeService.sendFlowNotice(spiderFlow, FlowNoticeType.endNotice);
 		return context.getOutputs();
 	}
 

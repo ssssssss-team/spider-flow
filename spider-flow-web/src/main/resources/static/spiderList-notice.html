@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>流程通知设置</title>
+	<link rel="stylesheet" href="js/layui/css/layui.css" />
+	<script type="text/javascript" src="js/layui/layui.all.js"></script>
+</head>
+
+<body style="padding: 10px;">
+	<div>
+		<form class="layui-form" action="" lay-filter="flowNotice" id="formFlowNotice">
+			<input type="hidden" name="id" />
+			<div class="layui-form-item">
+				<label class="layui-form-label">收件人</label>
+				<div class="layui-input-block">
+					<textarea name="recipients" placeholder="请输入收件人" class="layui-textarea"></textarea>
+				</div>
+				<div class="layui-form-mid layui-word-aux">
+					<p>收件人,多个收件人用","隔开，每个收件人可添加单独通知标记,如不添加通知标记则使用默认配置通知方式</p>
+					<p>例：sms:13012345678,email:12345678@qq.com,13012345670</p>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">通知方式</label>
+				<div class="layui-input-block">
+					<select name="noticeWay" id="noticeWay"></select>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">通知类型</label>
+				<div class="layui-input-block">
+					<input type="checkbox" name="startNotice" title="流程开始" />
+					<input type="checkbox" name="exceptionNotice" title="流程异常" />
+					<input type="checkbox" name="endNotice" title="流程结束" />
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button type="button" class="layui-btn" id="save">保存</button>
+					<button type="button" class="layui-btn layui-btn-primary" id="cancel">取消</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<script type="text/javascript">
+		var $ = layui.$;
+		var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+		var id = getURLParameter("id");
+
+		function getURLParameter(name) {
+			var query = decodeURI(window.location.search.substring(1));
+			var vars = query.split("&");
+			for (var i = 0; i < vars.length; i++) {
+				var pair = vars[i].split("=");
+				if (pair[0] === name) {
+					return pair[1];
+				}
+			}
+			return "";
+		}
+
+		function getNoticeWay(successFun) {
+			$.ajax({
+				url: '/flowNotice/getNoticeWay',
+				success: successFun,
+				error: function () {
+					parent.layer.msg('获取通知方式类型失败');
+				}
+			});
+		}
+
+		function getNoticeDetail(successFun) {
+			$.ajax({
+				url: '/flowNotice/find',
+				data: {
+					id: id
+				},
+				success: successFun,
+				error: function () {
+					parent.layer.msg('获取通知详情失败');
+				}
+			});
+		}
+
+		var form = layui.form;
+
+		getNoticeWay(function (result) {
+			var data = result.data;
+			var $noticeWay = $("#noticeWay");
+			for (var key in data) {
+				$noticeWay.append($("<option value='" + key + "'>" + data[key] + "</option>"))
+			}
+			getNoticeDetail(function (resultDetail) {
+				var data = resultDetail.data;
+				data.startNotice = data.startNotice === "1" ? true : false;
+				data.exceptionNotice = data.exceptionNotice === "1" ? true : false;
+				data.endNotice = data.endNotice === "1" ? true : false;
+				form.val('flowNotice', data);
+			});
+		});
+
+		//保存按钮
+		$('#save').on('click', function () {
+			var data = {};
+			$("#formFlowNotice [name]").each(function () {
+				var $this = $(this);
+				var value = "";
+				switch ($this.attr("type")) {
+					case "checkbox":
+						if ($this.is(':checked')) {
+							value = 1;
+						} else {
+							value = 0;
+						}
+						break;
+					default:
+						value = $this.val();
+						break;
+				}
+				data[$this.attr("name")] = value;
+			});
+			$.ajax({
+				url: '/flowNotice/save',
+				data: data,
+				success: function (result) {
+					if (result.code === 1) {
+						parent.layer.close(index);
+					}
+					parent.layer.msg(result.message);
+				},
+				error: function () {
+					parent.layer.msg('保存通知详情失败');
+				}
+			});
+			return false;
+		});
+
+		//取消按钮
+		$('#cancel').on('click', function () {
+			parent.layer.close(index);
+		});
+	</script>
+</body>
+
+</html>

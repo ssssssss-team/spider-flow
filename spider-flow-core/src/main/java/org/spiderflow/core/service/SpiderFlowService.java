@@ -14,6 +14,7 @@ import org.quartz.spi.OperableTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.core.job.SpiderJobManager;
+import org.spiderflow.core.mapper.FlowNoticeMapper;
 import org.spiderflow.core.mapper.SpiderFlowMapper;
 import org.spiderflow.core.model.SpiderFlow;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	
 	@Autowired
 	private SpiderJobManager spiderJobManager;
+	
+	@Autowired
+	private FlowNoticeMapper flowNoticeMapper;
 
 	private static Logger logger = LoggerFactory.getLogger(SpiderFlowService.class);
 
@@ -154,6 +158,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	public void remove(String id){
 		sfMapper.deleteById(id);
 		spiderJobManager.remove(id);
+		flowNoticeMapper.deleteById(id);
 	}
 	
 	public List<SpiderFlow> selectOtherFlows(String id){

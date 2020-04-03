@@ -64,3 +64,14 @@ CREATE TABLE `sp_function`  (
   `create_date` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+DROP TABLE IF EXISTS `sp_flow_notice`;
+CREATE TABLE `sp_flow_notice` (
+  `id` varchar(32) NOT NULL,
+  `recipients` varchar(200) DEFAULT NULL COMMENT '收件人',
+  `notice_way` char(10) DEFAULT NULL COMMENT '通知方式',
+  `start_notice` char(1) DEFAULT '0' COMMENT '流程开始通知:1:开启通知,0:关闭通知',
+  `exception_notice` char(1) DEFAULT '0' COMMENT '流程异常通知:1:开启通知,0:关闭通知',
+  `end_notice` char(1) DEFAULT '0' COMMENT '流程结束通知:1:开启通知,0:关闭通知',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '爬虫任务通知表';

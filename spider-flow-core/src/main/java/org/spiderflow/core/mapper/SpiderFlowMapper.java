@@ -69,4 +69,7 @@ public interface SpiderFlowMapper extends BaseMapper<SpiderFlow>{
 
 	@Select("select max(a.id) from `sp_task` a left join sp_flow b on a.flow_id = b.id where b.id = #{id}")
 	Integer getFlowMaxTaskId(@Param("id")String id);
+	
+	@Select("select COUNT(id) from sp_flow where id = #{id}")
+	Integer getCountById(@Param("id")String id);
 }

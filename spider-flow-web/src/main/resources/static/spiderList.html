@@ -182,12 +182,23 @@
 		});
 	}).on('click','.btn-details',function () {
 		parent.openTab($(this).data('name') +'-编辑',$(this).data('id') + '-edit','editor.html?id='+$(this).data('id'));
+	}).on('click','.btn-notice',function () {
+		var id = $(this).data('id');
+		parent.$table = $table;
+		parent.layer.open({
+			type: 2,
+			area: ['700px', '400px'],
+			fixed: false, //不固定
+			maxmin: true,
+			content: 'spiderList-notice.html?id=' + id
+		});
 	})
 </script>
 <script type="text/html" id="execute-count">
 	<a class="layui-btn layui-btn-sm btn-task" data-name="{{d.name}}" data-id="{{d.id}}">{{d.running || 0}}/{{d.executeCount || 0}}</a>
 </script>
 <script type="text/html" id="buttons">
+	<a class="layui-btn layui-btn-sm btn-notice" data-id="{{d.id}}">通知设置</a>
 	<a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}">手动运行</a>
 	<a class="layui-btn layui-btn-sm btn-log" data-name="{{d.name}}" data-id="{{d.id}}">最新日志</a>
 	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
