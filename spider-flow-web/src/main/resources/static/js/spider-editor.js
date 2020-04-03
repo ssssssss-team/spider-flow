@@ -30,6 +30,25 @@ function SpiderEditor(options){
 		this.registerJsonCodec();
 		//配置样式
 		this.configureStylesheet();
+		var _this = this;
+		var pasteCount = 0;
+		mxEvent.addListener(options.element,'paste',function(e){
+			var pasteText = e.clipboardData.getData("Text");
+			var doc = mxUtils.parseXml(pasteText);
+			if(doc){
+				var root = doc.documentElement;
+				var dec = new mxCodec(root.ownerDocument);
+				var cells = dec.decode(root);
+				if(cells&&cells.length > 0){
+					pasteCount++;
+					_this.graph.setSelectionCells(_this.graph.importCells(cells, pasteCount * 10, pasteCount * 10, _this.graph.getDefaultParent()));
+				}else{
+					_this.execute('paste');
+				}
+			}else{
+				_this.execute('paste');
+			}
+		});
 		this.keyHandler = new mxKeyHandler(this.graph);
 		this.keyHandler.getFunction = function(evt) {
 			if (evt != null)
@@ -61,17 +80,8 @@ SpiderEditor.prototype.bindKeyAction = function(){
 		_this.execute('cut');
 	});
 	this.keyHandler.bindControlKey(67, function(){	// Ctrl+C
-		_this.execute('copy');
+		_this.executeCopy();
 	});
-	this.keyHandler.bindControlKey(86,function(){	// Ctrl+V
-		_this.execute('paste');
-	});
-	/*keyHandler.bindControlKey(83,function(){	// Ctrl+S
-		Save();
-	});
-	keyHandler.bindControlKey(81,function(){	// Ctrl+S
-		$(".btn-test").click();
-	});*/
 	this.keyHandler.bindControlKey(65,function(){	// Ctrl+A
 		editor.execute('selectAll');
 	});
@@ -179,8 +189,27 @@ SpiderEditor.prototype.onSelectedCell = function(sender,evt){
 SpiderEditor.prototype.getModel = function(){
 	return this.graph.getModel();
 }
+SpiderEditor.prototype.executeCopy = function(){
+	this.editor.execute('copy');
+	var cells = this.graph.getSelectionCells();
+	if(cells && cells.length > 0){
+		var copyText = document.createElement('textarea');
+		copyText.style = 'position:absolute;left:-99999999px';
+		document.body.appendChild(copyText);
+		copyText.innerHTML = mxUtils.getPrettyXml(new mxCodec().encode(cells));
+		copyText.readOnly = false;
+		copyText.select();
+		copyText.setSelectionRange(0, copyText.value.length);
+		document.execCommand("copy");
+		document.body.removeChild(copyText);
+	}
+}
 SpiderEditor.prototype.execute = function(action){
-	this.editor.execute(action);
+	if('copy' == action){
+		this.executeCopy();
+	}else{
+		this.editor.execute(action);
+	}
 }
 SpiderEditor.prototype.getSelectedCell = function(){
 	var cell = this.graph.getSelectionCell() || this.graph.getModel().getRoot();
