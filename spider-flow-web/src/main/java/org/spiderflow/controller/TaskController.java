@@ -41,6 +41,11 @@ public class TaskController {
 
 	@RequestMapping("/remove")
 	public JsonBean<Boolean> remove(Integer id){
+		//删除任务记录之前先停止
+		SpiderContext context = SpiderJob.getSpiderContext(id);
+		if(context != null){
+			context.setRunning(false);
+		}
 		return new JsonBean<>(taskService.removeById(id));
 	}
 }
