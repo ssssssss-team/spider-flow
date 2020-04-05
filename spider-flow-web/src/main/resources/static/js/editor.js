@@ -50,7 +50,8 @@ function getCellData(cellId,keys){
 }
 function serializeForm(){
 	var $container = $(".properties-container");
-	if($container.data('version') != version){
+	var _version = $container.data('version');
+	if(_version && _version != version){
 		return;
 	}
 	var cellId = $container.attr('data-cellid');
@@ -522,8 +523,6 @@ $(function(){
         layui.form.on('select(targetCheck)', function (data) {
             var targetDiv = $(data.elem).attr('target-div');
             var targetValue = $(data.elem).attr('target-value');
-            // var selectValue=$(data.elem).value();
-            console.log(targetDiv, data.elem.value);
             if (targetDiv != null) {
                 if (data.elem.value == targetValue) {
                     $("." + targetDiv).show();
@@ -535,7 +534,6 @@ $(function(){
 
 		layui.form.on('checkbox(targetCheck)', function (data) {
 			var targetDiv = $(data.elem).attr('target-div');
-			console.log(targetDiv);
 			if (targetDiv != null) {
 				if (data.elem.checked) {
 					$("." + targetDiv).show();
@@ -975,7 +973,6 @@ function runSpider(debug){
 							LogViewer.append(texts);
 							LogViewer.scrollTo(-1);
 						}else if(eventType == 'debug'){
-							console.log(message);
 							$(".btn-resume").removeClass('disabled');
 							var type = message.event;
 							editor.selectCell(editor.graph.model.cells[message.nodeId]);

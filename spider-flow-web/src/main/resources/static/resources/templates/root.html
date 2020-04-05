@@ -73,92 +73,90 @@
   </div>
 </div>
 <script>
-	$(function(){
-		function renderGlobalParameter(data){
-			layui.table.render({
-				elem : '#global-parameter',
-				limit: 50,
-				cols : [[{
-					title : '参数名',
-					width : 150,
-					templet : '#parameter-name-tmpl'
-				},{
-					title : '参数值',
-					templet : '#parameter-value-tmpl'
-				},{
-					title : '参数描述',
-					width : 250,
-					templet : '#parameter-description-tmpl'
-				},{
-					title : '操作',
-					width : 120,
-					align : 'center',
-					templet : '#common-operation'
-				}]],
-				data : data,
-				text : {
-					none : '暂未设置参数'
-				}
-			})
-		}
-		function renderGlobalCookie(data){
-			layui.table.render({
-				elem : '#global-cookie',
-				limit: 50,
-				cols : [[{
-					title : 'Cookie名',
-					width : 150,
-					templet : '#cookie-name-tmpl'
-				},{
-					title : 'Cookie值',
-					templet : '#cookie-value-tmpl'
-				},{
-					title : '描述',
-					width : 250,
-					templet : '#cookie-description-tmpl'
-				},{
-					title : '操作',
-					width : 120,
-					align : 'center',
-					templet : '#common-operation'
-				}]],
-				data : data,
-				text : {
-					none : '暂未设置Cookie'
-				}
-			})
-		}
+	function renderGlobalParameter(data){
+		layui.table.render({
+			elem : '#global-parameter',
+			limit: 50,
+			cols : [[{
+				title : '参数名',
+				width : 150,
+				templet : '#parameter-name-tmpl'
+			},{
+				title : '参数值',
+				templet : '#parameter-value-tmpl'
+			},{
+				title : '参数描述',
+				width : 250,
+				templet : '#parameter-description-tmpl'
+			},{
+				title : '操作',
+				width : 120,
+				align : 'center',
+				templet : '#common-operation'
+			}]],
+			data : data,
+			text : {
+				none : '暂未设置参数'
+			}
+		})
+	}
+	function renderGlobalCookie(data){
+		layui.table.render({
+			elem : '#global-cookie',
+			limit: 50,
+			cols : [[{
+				title : 'Cookie名',
+				width : 150,
+				templet : '#cookie-name-tmpl'
+			},{
+				title : 'Cookie值',
+				templet : '#cookie-value-tmpl'
+			},{
+				title : '描述',
+				width : 250,
+				templet : '#cookie-description-tmpl'
+			},{
+				title : '操作',
+				width : 120,
+				align : 'center',
+				templet : '#common-operation'
+			}]],
+			data : data,
+			text : {
+				none : '暂未设置Cookie'
+			}
+		})
+	}
 
-		function renderGlobalHeader(data){
-			layui.table.render({
-				elem : '#global-header',
-				limit: 50,
-				cols : [[{
-					title : 'Header名',
-					width : 150,
-					templet : '#header-name-tmpl'
-				},{
-					title : 'header值',
-					minWidth : 400,
-					templet : '#header-value-tmpl'
-				},{
-					title : '描述',
-					width : 250,
-					templet : '#header-description-tmpl'
-				},{
-					title : '操作',
-					width : 120,
-					align : 'center',
-					templet : '#common-operation'
-				}]],
-				data : data,
-				text : {
-					none : '暂未设置Header'
-				}
-			})
-		}
-		renderGlobalParameter(getCellData({{d.cell.id}},$("#global-parameter").data('keys').split(",")));
-		renderGlobalCookie(getCellData({{d.cell.id}},$("#global-cookie").data('keys').split(",")));
-		renderGlobalHeader(getCellData({{d.cell.id}},$("#global-header").data('keys').split(",")));
-	});
+	function renderGlobalHeader(data){
+		layui.table.render({
+			elem : '#global-header',
+			limit: 50,
+			cols : [[{
+				title : 'Header名',
+				width : 150,
+				templet : '#header-name-tmpl'
+			},{
+				title : 'header值',
+				minWidth : 400,
+				templet : '#header-value-tmpl'
+			},{
+				title : '描述',
+				width : 250,
+				templet : '#header-description-tmpl'
+			},{
+				title : '操作',
+				width : 120,
+				align : 'center',
+				templet : '#common-operation'
+			}]],
+			data : data,
+			text : {
+				none : '暂未设置Header'
+			}
+		})
+	}
+	renderGlobalParameter(getCellData({{d.cell.id}},$("#global-parameter").data('keys').split(",")));
+	renderGlobalCookie(getCellData({{d.cell.id}},$("#global-cookie").data('keys').split(",")));
+	renderGlobalHeader(getCellData({{d.cell.id}},$("#global-header").data('keys').split(",")));
 </script>

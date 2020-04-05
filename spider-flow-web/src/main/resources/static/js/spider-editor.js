@@ -239,6 +239,7 @@ SpiderEditor.prototype.setXML = function(xml){
 	var root = doc.documentElement;
 	var dec = new mxCodec(root.ownerDocument);
 	dec.decode(root,this.getModel());
+	this.selectedCellListener(this.getSelectedCell());
 }
 SpiderEditor.prototype.importFromUrl = function(url){
 	var req = mxUtils.load(url);
