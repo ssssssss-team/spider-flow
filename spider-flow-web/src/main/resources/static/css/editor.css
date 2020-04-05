@@ -387,7 +387,7 @@ html,body{
 	left: 50%;
 	border-width: 8px;
 	border-style: solid;
-	border-color: #eee transparent transparent transparent;
+	border-color: #999 transparent transparent transparent;
 	margin-left: -4px;
 }
 .spiderflow-debug-tooltip::after{
