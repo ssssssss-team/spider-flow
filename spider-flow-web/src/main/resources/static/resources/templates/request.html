@@ -87,6 +87,24 @@
 			<div class="layui-row">
 				<div class="layui-col-md4">
 					<div class="layui-form-item">
+						<label class="layui-form-label">重试次数</label>
+						<div class="layui-input-block">
+							<input type="text" name="retryCount" placeholder="请输入重试次数" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.retryCount}}">
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">重试间隔</label>
+						<div class="layui-input-block">
+							<input type="text" name="retryInterval" placeholder="请输入重试间隔" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.retryInterval}}">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-row">
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
 						<label class="layui-form-label">代理</label>
 						<div class="layui-input-block" placeholder="host:port" codemirror="proxy" data-value="{{=d.data.object.proxy}}"></div>
 					</div>

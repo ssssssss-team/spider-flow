@@ -44,6 +44,8 @@ public class SpiderJobContext extends SpiderContext{
 		} catch (Exception e) {
 			logger.error("创建日志文件出错",e);
 		}
-		return new SpiderJobContext(os);
+		SpiderJobContext context = new SpiderJobContext(os);
+		context.setFlowId(id);
+		return context;
 	}
 }

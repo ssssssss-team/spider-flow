@@ -1,10 +1,6 @@
 package org.spiderflow.core.executor.shape;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -20,9 +16,15 @@ import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.io.SpiderResponse;
 import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * 请求执行器
@@ -67,7 +69,11 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 	public static final String HEADER_VALUE = "header-value";
 	
 	public static final String TIMEOUT = "timeout";
-	
+
+	public static final String RETRY_COUNT = "retryCount";
+
+	public static final String RETRY_INTERVAL = "retryInterval";
+
 	public static final String RESPONSE_CHARSET = "response-charset";
 	
 	public static final String FOLLOW_REDIRECT = "follow-redirect";
@@ -77,6 +83,9 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 	public static final String LAST_EXECUTE_TIME = "__last_execute_time_";
 
 	public static final String COOKIE_AUTO_SET = "cookie-auto-set";
+
+	@Value("${spider.workspace}")
+	private String workspcace;
 
 	private static final Logger logger = LoggerFactory.getLogger(RequestExecutor.class);
 	
@@ -118,126 +127,163 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 				logger.error("设置延迟时间失败:{}", t);
 			}
 		}
-		HttpRequest request = HttpRequest.create();
-		//设置请求url
-		String url = null;
-		try {
-			url = ExpressionUtils.execute(node.getStringJsonValue(URL), variables).toString();
-		} catch (Exception e) {
-			logger.error("设置请求url出错，异常信息：{}", e);
-			ExceptionUtils.wrapAndThrow(e);
-		}
-		context.pause(node.getNodeId(),"common",URL,url);
-		logger.info("设置请求url:{}", url);
-		request.url(url);
-		//设置请求超时时间
-		int timeout = NumberUtils.toInt(node.getStringJsonValue(TIMEOUT), 60000);
-		logger.debug("设置请求超时时间:{}", timeout);
-		request.timeout(timeout);
-		
-		String method = Objects.toString(node.getStringJsonValue(REQUEST_METHOD), "GET");
-		//设置请求方法
-		request.method(method);
-		logger.debug("设置请求方法:{}", method);
-		
-		//是否跟随重定向
-		boolean followRedirects = !"0".equals(node.getStringJsonValue(FOLLOW_REDIRECT));
-		request.followRedirect(followRedirects);
-		logger.debug("设置跟随重定向：{}", followRedirects);
-		
-		//是否验证TLS证书,默认是验证
-		if("0".equals(node.getStringJsonValue(TLS_VALIDATE))){
-			request.validateTLSCertificates(false);
-			logger.debug("设置TLS证书验证：{}", false);
-		}
-		SpiderNode root = context.getRootNode();
-		//设置请求header
-		setRequestHeader(root, request, root.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
-		setRequestHeader(node, request, node.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
-
-		//设置全局Cookie
-		Map<String, String> cookies = getRequestCookie(root, root.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
-		if(!cookies.isEmpty()){
-			logger.info("设置全局Cookie：{}", cookies);
-			request.cookies(cookies);
-		}
-		//设置自动管理的Cookie
-		boolean cookieAutoSet = !"0".equals(node.getStringJsonValue(COOKIE_AUTO_SET));
-		if(cookieAutoSet && !cookieContext.isEmpty()){
-			context.pause(node.getNodeId(),COOKIE_AUTO_SET,COOKIE_AUTO_SET,cookieContext);
-			request.cookies(cookieContext);
-			logger.info("自动设置Cookie：{}", cookieContext);
-		}
-		//设置本节点Cookie
-		cookies = getRequestCookie(node, node.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
-		if(!cookies.isEmpty()){
-			request.cookies(cookies);
-			logger.debug("设置Cookie：{}", cookies);
-		}
-		if(cookieAutoSet){
-			cookieContext.putAll(cookies);
-		}
-
-		String bodyType = node.getStringJsonValue(BODY_TYPE);
-		List<InputStream> streams = null;
-		if("raw".equals(bodyType)){
-			String contentType = node.getStringJsonValue(BODY_CONTENT_TYPE);
-			request.contentType(contentType);
+		//重试次数
+		int retryCount = NumberUtils.toInt(node.getStringJsonValue(RETRY_COUNT), 0) + 1;
+		//重试间隔时间，单位毫秒
+		int retryInterval = NumberUtils.toInt(node.getStringJsonValue(RETRY_INTERVAL), 0);
+        boolean successed = false;
+		for (int i = 0; i < retryCount && !successed; i++) {
+			HttpRequest request = HttpRequest.create();
+			//设置请求url
+			String url = null;
 			try {
-				Object requestBody = ExpressionUtils.execute(node.getStringJsonValue(REQUEST_BODY), variables);
-				context.pause(node.getNodeId(),"request-body",REQUEST_BODY,requestBody);
-				request.data(requestBody);
-				logger.info("设置请求Body:{}", requestBody);
+				url = ExpressionUtils.execute(node.getStringJsonValue(URL), variables).toString();
 			} catch (Exception e) {
-				logger.debug("设置请求Body出错:{}", e);
+				logger.error("设置请求url出错，异常信息：{}", e);
+				ExceptionUtils.wrapAndThrow(e);
 			}
-		}else if("form-data".equals(bodyType)){
-			List<Map<String, String>> formParameters = node.getListJsonValue(PARAMETER_FORM_NAME,PARAMETER_FORM_VALUE,PARAMETER_FORM_TYPE,PARAMETER_FORM_FILENAME);
-			streams = setRequestFormParameter(node,request,formParameters,context,variables);
-		}else{
-			//设置请求参数
-			setRequestParameter(root, request, root.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
-			setRequestParameter(node, request, node.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
-		}
-		//设置代理
-		String proxy = node.getStringJsonValue(PROXY);
-		if(StringUtils.isNotBlank(proxy)){
+			context.pause(node.getNodeId(),"common",URL,url);
+			logger.info("设置请求url:{}", url);
+			request.url(url);
+			//设置请求超时时间
+			int timeout = NumberUtils.toInt(node.getStringJsonValue(TIMEOUT), 60000);
+			logger.debug("设置请求超时时间:{}", timeout);
+			request.timeout(timeout);
+
+			String method = Objects.toString(node.getStringJsonValue(REQUEST_METHOD), "GET");
+			//设置请求方法
+			request.method(method);
+			logger.debug("设置请求方法:{}", method);
+
+			//是否跟随重定向
+			boolean followRedirects = !"0".equals(node.getStringJsonValue(FOLLOW_REDIRECT));
+			request.followRedirect(followRedirects);
+			logger.debug("设置跟随重定向：{}", followRedirects);
+
+			//是否验证TLS证书,默认是验证
+			if("0".equals(node.getStringJsonValue(TLS_VALIDATE))){
+				request.validateTLSCertificates(false);
+				logger.debug("设置TLS证书验证：{}", false);
+			}
+			SpiderNode root = context.getRootNode();
+			//设置请求header
+			setRequestHeader(root, request, root.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
+			setRequestHeader(node, request, node.getListJsonValue(HEADER_NAME,HEADER_VALUE), context, variables);
+
+			//设置全局Cookie
+			Map<String, String> cookies = getRequestCookie(root, root.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
+			if(!cookies.isEmpty()){
+				logger.info("设置全局Cookie：{}", cookies);
+				request.cookies(cookies);
+			}
+			//设置自动管理的Cookie
+			boolean cookieAutoSet = !"0".equals(node.getStringJsonValue(COOKIE_AUTO_SET));
+			if(cookieAutoSet && !cookieContext.isEmpty()){
+				context.pause(node.getNodeId(),COOKIE_AUTO_SET,COOKIE_AUTO_SET,cookieContext);
+				request.cookies(cookieContext);
+				logger.info("自动设置Cookie：{}", cookieContext);
+			}
+			//设置本节点Cookie
+			cookies = getRequestCookie(node, node.getListJsonValue(COOKIE_NAME, COOKIE_VALUE), context, variables);
+			if(!cookies.isEmpty()){
+				request.cookies(cookies);
+				logger.debug("设置Cookie：{}", cookies);
+			}
+			if(cookieAutoSet){
+				cookieContext.putAll(cookies);
+			}
+
+			String bodyType = node.getStringJsonValue(BODY_TYPE);
+			List<InputStream> streams = null;
+			if("raw".equals(bodyType)){
+				String contentType = node.getStringJsonValue(BODY_CONTENT_TYPE);
+				request.contentType(contentType);
+				try {
+					Object requestBody = ExpressionUtils.execute(node.getStringJsonValue(REQUEST_BODY), variables);
+					context.pause(node.getNodeId(),"request-body",REQUEST_BODY,requestBody);
+					request.data(requestBody);
+					logger.info("设置请求Body:{}", requestBody);
+				} catch (Exception e) {
+					logger.debug("设置请求Body出错:{}", e);
+				}
+			}else if("form-data".equals(bodyType)){
+				List<Map<String, String>> formParameters = node.getListJsonValue(PARAMETER_FORM_NAME,PARAMETER_FORM_VALUE,PARAMETER_FORM_TYPE,PARAMETER_FORM_FILENAME);
+				streams = setRequestFormParameter(node,request,formParameters,context,variables);
+			}else{
+				//设置请求参数
+				setRequestParameter(root, request, root.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
+				setRequestParameter(node, request, node.getListJsonValue(PARAMETER_NAME,PARAMETER_VALUE), context, variables);
+			}
+			//设置代理
+			String proxy = node.getStringJsonValue(PROXY);
+			if(StringUtils.isNotBlank(proxy)){
+				try {
+					Object value = ExpressionUtils.execute(proxy, variables);
+					context.pause(node.getNodeId(),"common",PROXY,value);
+					if(value != null){
+						String[] proxyArr = value.toString().split(":");
+						if(proxyArr.length == 2){
+							request.proxy(proxyArr[0], Integer.parseInt(proxyArr[1]));
+							logger.info("设置代理：{}",proxy);
+						}
+					}
+				} catch (Exception e) {
+					logger.error("设置代理出错，异常信息:{}",e);
+				}
+			}
+			Throwable exception = null;
 			try {
-				Object value = ExpressionUtils.execute(proxy, variables);
-				context.pause(node.getNodeId(),"common",PROXY,value);
-				if(value != null){
-					String[] proxyArr = value.toString().split(":");
-					if(proxyArr.length == 2){
-						request.proxy(proxyArr[0], Integer.parseInt(proxyArr[1]));
-						logger.info("设置代理：{}",proxy);
-					}
-				}
-			} catch (Exception e) {
-				logger.error("设置代理出错，异常信息:{}",e);
-			}
-		}
-		try {
-			HttpResponse response = request.execute();
-			String charset = node.getStringJsonValue(RESPONSE_CHARSET);
-			if(StringUtils.isNotBlank(charset)){
-				response.setCharset(charset);
-				logger.debug("设置response charset:{}",charset);
-			}
-			//cookie存入cookieContext
-			cookieContext.putAll(response.getCookies());
-			//结果存入变量
-			variables.put("resp", response);
-		} catch (IOException e) {
-			logger.error("请求{}出错,异常信息:{}",url,e);
-			ExceptionUtils.wrapAndThrow(e);
-		} finally{
-			if(streams != null){
-				for (InputStream is : streams) {
-					try {
-						is.close();
-					} catch (Exception e) {
-					}
-				}
+				HttpResponse response = request.execute();
+                successed = response.getStatusCode() == 200;
+                if(successed){
+                    String charset = node.getStringJsonValue(RESPONSE_CHARSET);
+                    if(StringUtils.isNotBlank(charset)){
+                        response.setCharset(charset);
+                        logger.debug("设置response charset:{}",charset);
+                    }
+                    //cookie存入cookieContext
+                    cookieContext.putAll(response.getCookies());
+                    //结果存入变量
+                    variables.put("resp", response);
+                }
+			} catch (IOException e) {
+				successed = false;
+                exception = e;
+			} finally{
+                if(streams != null){
+                    for (InputStream is : streams) {
+                        try {
+                            is.close();
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+                if(!successed){
+                    if(i + 1 < retryCount){
+                        if(retryInterval > 0){
+                            try {
+                                Thread.sleep(retryInterval);
+                            } catch (InterruptedException ignored) {
+                            }
+                        }
+                        logger.info("第{}次重试:{}",i + 1,url);
+                    }else{
+                        //记录访问失败的日志
+						if(context.getFlowId() != null){ //测试环境
+							//TODO 需增加记录请求参数
+							File file = new File(workspcace, context.getFlowId() + File.separator + "logs" + File.separator + "access_error.log");
+							try {
+								File directory = file.getParentFile();
+								if(!directory.exists()){
+									directory.mkdirs();
+								}
+								FileUtils.write(file,url + "\r\n","UTF-8",true);
+							} catch (IOException ignored) {
+							}
+						}
+                        logger.error("请求{}出错,异常信息:{}",url,exception);
+                    }
+                }
 			}
 		}
 	}

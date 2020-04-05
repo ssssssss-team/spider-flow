@@ -17,6 +17,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SpiderContext extends HashMap<String, Object>{
 	
 	private String id = UUID.randomUUID().toString().replace("-", "");
+
+	/**
+	 * 流程ID
+	 */
+	private String flowId;
 	
 	private static final long serialVersionUID = 8379177178417619790L;
 	/**
@@ -60,6 +65,14 @@ public class SpiderContext extends HashMap<String, Object>{
 	public <T> T get(String key,T defaultValue){
 		T value = this.get(key);
 		return value == null ? defaultValue : value;
+	}
+
+	public String getFlowId() {
+		return flowId;
+	}
+
+	public void setFlowId(String flowId) {
+		this.flowId = flowId;
 	}
 
 	public LinkedBlockingQueue<Future<?>> getFutureQueue() {
