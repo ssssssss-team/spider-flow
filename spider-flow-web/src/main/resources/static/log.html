@@ -243,7 +243,7 @@
                 viewer.setOptions('reversed',true);
                 viewer.init();
             }).on('click','.btn-download',function(){
-                window.open('spider/log/download?id=' + logId + "&taskId=" + taskId);
+                window.open('spider/log/download?id=' + logId + "&taskId=" + (taskId || ''));
             });
 		});
 	</script>

@@ -3,6 +3,7 @@ package org.spiderflow.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spiderflow.Grammerable;
@@ -164,7 +165,7 @@ public class SpiderFlowController {
 
 	@RequestMapping("/log/download")
 	public ResponseEntity<FileSystemResource> download(String id, String taskId)  {
-		if (StringUtils.isBlank(taskId)) {
+		if (StringUtils.isBlank(taskId) || NumberUtils.toInt(taskId,0) == 0) {
 			Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
 			taskId = maxId == null ? "" : maxId.toString();
 		}
