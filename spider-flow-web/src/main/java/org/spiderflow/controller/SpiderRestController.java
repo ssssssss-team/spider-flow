@@ -41,7 +41,7 @@ public class SpiderRestController {
 		}
 		List<SpiderOutput> outputs = null;
 		Integer maxId = spiderFlowService.getFlowMaxTaskId(id);
-		SpiderJobContext context = SpiderJobContext.create(workspace, id,maxId);
+		SpiderJobContext context = SpiderJobContext.create(workspace, id,maxId,true);
 		try{
 			outputs = spider.run(flow,context, params);	
 		}catch(Exception e){

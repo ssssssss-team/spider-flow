@@ -124,7 +124,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 					}
 				}
 			} catch (Throwable t) {
-				logger.error("设置延迟时间失败:{}", t);
+				logger.error("设置延迟时间失败", t);
 			}
 		}
 		//重试次数
@@ -139,7 +139,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 			try {
 				url = ExpressionUtils.execute(node.getStringJsonValue(URL), variables).toString();
 			} catch (Exception e) {
-				logger.error("设置请求url出错，异常信息：{}", e);
+				logger.error("设置请求url出错，异常信息", e);
 				ExceptionUtils.wrapAndThrow(e);
 			}
 			context.pause(node.getNodeId(),"common",URL,url);
@@ -204,7 +204,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 					request.data(requestBody);
 					logger.info("设置请求Body:{}", requestBody);
 				} catch (Exception e) {
-					logger.debug("设置请求Body出错:{}", e);
+					logger.debug("设置请求Body出错", e);
 				}
 			}else if("form-data".equals(bodyType)){
 				List<Map<String, String>> formParameters = node.getListJsonValue(PARAMETER_FORM_NAME,PARAMETER_FORM_VALUE,PARAMETER_FORM_TYPE,PARAMETER_FORM_FILENAME);

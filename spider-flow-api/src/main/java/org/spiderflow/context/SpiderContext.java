@@ -24,10 +24,6 @@ public class SpiderContext extends HashMap<String, Object>{
 	private String flowId;
 	
 	private static final long serialVersionUID = 8379177178417619790L;
-	/**
-	 * 爬虫输出参数列表
-	 */
-	private List<SpiderOutput> outputs = new ArrayList<>();
 
 	/**
 	 * 流程执行线程
@@ -55,7 +51,7 @@ public class SpiderContext extends HashMap<String, Object>{
 	private CookieContext cookieContext = new CookieContext();
 
 	public List<SpiderOutput> getOutputs() {
-		return outputs;
+		return Collections.emptyList();
 	}
 
 	public <T> T get(String key){
@@ -88,9 +84,7 @@ public class SpiderContext extends HashMap<String, Object>{
 	}
 
 	public void addOutput(SpiderOutput output){
-		synchronized (this.outputs){
-			this.outputs.add(output);
-		}
+
 	}
 
 	public SubThreadPoolExecutor getThreadPool() {

@@ -70,7 +70,7 @@ public class SpiderJob extends QuartzJobBean {
 		task.setBeginTime(new Date());
 		try {
 			taskService.save(task);
-			context = SpiderJobContext.create(this.workspace, spiderFlow.getId(),task.getId());
+			context = SpiderJobContext.create(this.workspace, spiderFlow.getId(),task.getId(),false);
 			SpiderContextHolder.set(context);
 			contextMap.put(task.getId(), context);
 			logger.info("开始执行任务{}", spiderFlow.getName());

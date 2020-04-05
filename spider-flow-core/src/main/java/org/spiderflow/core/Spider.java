@@ -264,7 +264,7 @@ public class Spider {
 			}
 			LinkedBlockingQueue<Future<?>> futureQueue = context.getFutureQueue();
 			for (SpiderTask task : tasks) {
-				if(executor.isThread()){	//【判断节点是否是异步运行
+				if(executor.isThread()){	//判断节点是否是异步运行
 					//提交任务至线程池中,并将Future添加到队列末尾
 					futureQueue.add(context.getThreadPool().submitAsync(task.runnable, task, node));
 				}else{

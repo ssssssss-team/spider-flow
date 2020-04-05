@@ -37,7 +37,6 @@ public class SpiderWebSocketContext extends SpiderContext {
 
     @Override
     public void addOutput(SpiderOutput output) {
-        super.addOutput(output);
         this.write(new WebSocketEvent<>("output", output));
     }
 
