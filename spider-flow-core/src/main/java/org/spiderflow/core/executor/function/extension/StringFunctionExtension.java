@@ -2,6 +2,7 @@ package org.spiderflow.core.executor.function.extension;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
@@ -132,5 +133,11 @@ public class StringFunctionExtension implements FunctionExtension{
 	@Example("${strVar.toDate('yyyy-MM-dd HH:mm:ss')}")
 	public static Date toDate(String source,String pattern) throws ParseException{
 		return DateFunctionExecutor.parse(source, pattern);
+	}
+
+	@Comment("反转义字符串")
+	@Example("${strVar.unescape()}")
+	public static String unescape(String source){
+		return StringEscapeUtils.unescapeJava(source);
 	}
 }
