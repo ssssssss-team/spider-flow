@@ -177,29 +177,6 @@ $(function(){
 		$('input,textarea').blur();
 		$(".btn-test").click();
 	});
-	var resize = $('.resize-container')[0]
-	resize.onmousedown = function(e){
-	    var startY = e.clientY;
-	    resize.top = resize.offsetTop;
-	    var box = $("body")[0];
-		var maxT = box.clientHeight;
-	    document.onmousemove = function(e){
-	      var moveLen = e.clientY;
-	      if(moveLen<250) moveLen = 250;
-	      if(moveLen>maxT-150) moveLen = maxT-150;
-	      resize.style.top = moveLen + 'px';
-	      resizeSlideBar();
-	      $(".editor-container,.sidebar-container,.xml-container").css('bottom',($('body').height() - moveLen) + 'px');
-	      $(".properties-container").height(box.clientHeight - moveLen - 5);
-	    }
-	    document.onmouseup = function(evt){
-	    	document.onmousemove = null;
-	    	document.onmouseup = null; 
-	    	resize.releaseCapture && resize.releaseCapture();
-	    }
-	    resize.setCapture && resize.setCapture();
-	    return false;
-	}
 	resizeSlideBar();
 	var templateCache = {};
 	function loadTemplate(cell,model,callback){
@@ -714,7 +691,71 @@ function bindToolbarClickAction(editor){
 		parent.openTab('爬虫列表','welcome','spiderList.html')
 	}).on('click','.btn-save',function(){
 		Save();
+	}).on('click','.btn-dock-right',function(){
+		$('.main-container').addClass('right');
+		$('.main-container .properties-container').width('40%');
+		$('.main-container .resize-container').attr('style','top:0px;left:auto;');
+		layui.table.resize('spider-variable');
+		var resize = $('.resize-container')[0]
+		resize.onmousedown = function(e){
+			var startX = e.clientX;
+			resize.left = resize.offsetLeft;
+			var box = $("body")[0];
+			document.onmousemove = function(e){
+				layui.table.resize('spider-variable');
+				var endX = e.clientX;
+				var moveLen = resize.left + (endX - startX);
+				var maxT = box.clientWidth - resize.offsetWidth;
+				if(moveLen<150) moveLen = 150;
+				if(moveLen>maxT-150) moveLen = maxT-150;
+				if(box.clientWidth - moveLen < 400 || box.clientWidth - moveLen > 800){
+				return;
+				}
+				resize.style.left = moveLen + 'px';
+				$(".editor-container").css('right',($('body').width() - moveLen) + 'px')
+				$(".properties-container").width(box.clientWidth - moveLen - 5);
+				$(".xml-container").width($(".main-container").width() - $(".properties-container").width() - $(".sidebar-container").width() + 8);
+			}
+			document.onmouseup = function(evt){
+				document.onmousemove = null;
+				document.onmouseup = null;
+				resize.releaseCapture && resize.releaseCapture();
+			}
+			resize.setCapture && resize.setCapture();
+			return false;
+		}
+	}).on('click','.btn-dock-bottom',function(){
+		resizeSlideBar();
+		$('.main-container').removeClass('right');
+		$('.properties-container').height(200).width('100%');
+		$('.sidebar-container').css('bottom','200px');
+		$('.editor-container').css('bottom','200px');
+		$('.main-container .resize-container').attr('style','left:0px;top:auto;bottom:190px');
+		var resize = $('.resize-container')[0]
+		resize.onmousedown = function(e){
+			var startY = e.clientY;
+			resize.top = resize.offsetTop;
+			var box = $("body")[0];
+			var maxT = box.clientHeight;
+			document.onmousemove = function(e){
+			  var moveLen = e.clientY;
+			  if(moveLen<250) moveLen = 250;
+			  if(moveLen>maxT-150) moveLen = maxT-150;
+			  resize.style.top = moveLen + 'px';
+			  resizeSlideBar();
+			  $(".editor-container,.sidebar-container,.xml-container").css('bottom',($('body').height() - moveLen) + 'px');
+			  $(".properties-container").height(box.clientHeight - moveLen - 5);
+			}
+			document.onmouseup = function(evt){
+				document.onmousemove = null;
+				document.onmouseup = null;
+				resize.releaseCapture && resize.releaseCapture();
+			}
+			resize.setCapture && resize.setCapture();
+			return false;
+		}
 	})
+	$('.btn-dock-bottom').click();
 }
 function runSpider(debug){
 	validXML(function(){

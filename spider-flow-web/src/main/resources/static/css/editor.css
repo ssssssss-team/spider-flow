@@ -348,6 +348,12 @@ html,body{
 .toolbar-container ul li.btn-history{
 	background-image : url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADWUlEQVRYR8WXW2gUZxTHf2c2iRQvRFEz24JgKwoKKih9qOCNolgUH4qhor55AZXsRBRpXxpBFBGzk6CC2gdfpHhB0AdbEGl8qL644AWVSr2gmJ0YqVRtITW7p3zDLG6WmZ1xkGSeFr7zne/3nXO+8z8rjPAnI3w+oQC2q78ZMM+RJdWAnx3W6aVBVgErUT5FyILvo0+gT+F8qZEL/dvkz6QXiwLQAMBfz3bqMs2wHmVDQscXVejuy8mVOPu6AOUSczMZdiusDRz1C1wG7pfhZkkp8B9vR40mW3rnR8REZhXCdGMvwk/FnGyqB1EXAOgHJgUOjpYtOl+0ycO4W2W7dLMqm4F5wG3PkTlRe+IAzL6LKHnfQYYXXpvciwOorNuungHWVKezdm8SgCF7RJhfzEkhMUReOxB+BH7xHPkmKcARYGbIIfcGlb0v26WYFMAv4i7dp8r3YTWRug9k87pOLV55ObmUBMZ29RYwW4Wvq19HKgA7r4sRTK/oqe0VUTB2XnciHDQ15TmyumI3bACTXW2xhPso47GYVSnmYQMwN7ZdPQd8i7LHa5cOv1ckyV+tTZoUGB8tnfqdWPwscK3oyIJhB7C7dSZl7gIPPUemDQGIEqCwCKWNwIRuHddU5m/grefI2FqAN8CYwQHGvdwt5nfklxZg4gEd2zCK11EARkK/yDQw4/l2eZAUAOVqHdser116KuuBnP8RmoKsq78rfIWypHpTTArq13BVtfuvIOgfoUVYaZfAIc+RnXGvw3Z1K8rkGLshEch26QlVNoY+w6yryxV+RXngtcuMOIA067arj4CpoY0oqNA7wBQRthRzcjzNIVF7ghnhWN1W7IcVjBIWPEfmf0wA29UbZkCJFSPbVaNuK4CzniOtHwPiw+S4QxvsZt75B9dUcRoY+/1AUrA+YWHvFvm32k/4RNSlrSin/U4l7C/m5IdUh1eNZFYjU3q3ybNaP5Fi1JLXpSJUxuqCCMeTFmbNUOqJsDJqjKuvhms0Yy9gP7ArIH9soLTMqUwjvQP/4I9mUWM5cLKpiR1Pt8qrqAgmkmO7U1uxfJDPE6biSVA/J+PsEwEYJ815bW6CxSIssuBLhRYj8cEB/l8zhKtGGwYsrv/VJkZ0Yr/EALGeUhqMOMD/LOV+MJQ5P0UAAAAASUVORK5CYII=");
 }
+.toolbar-container ul li.btn-dock-right{
+	background-image : url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAqElEQVRYR+2XwQlCMRAFZ1tQhJTzLUILsAFzsQo/qG3YhJYTFGwhEvDg10BEAnt5OSabzWRyeTGchzmfjwCqBsIp78lsgFmnJ7oD1xRt/dnvCyAc8xlYdTp42sYY09Z275M1gBuwKMR/QAyNPY8Ubd4CyK+Comz5K0Q45AHj0qpP0SaXrhkQgAzIgAzIgAzIgAy4G3CPZL6htGQ611jeCpW91/U1czfwBJRbxiFeN0yUAAAAAElFTkSuQmCC");
+}
+.toolbar-container ul li.btn-dock-bottom{
+	background-image : url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA1UlEQVRYR+2XwQnCQBBF37SgKClHi9ACbMA9mLN41kNswAK0CC1nMZgWVhaDmE0gKCO5TI5LmHnzFnb/CgN/MnB/DKDTQFaEMzADJkpbVAI372SZ1msBZMewJ7BRatwsIxz8WvLPxTZAER7AKBIrQ0SjlXcy7gMI9Q9R2VwDIivCtd5SvJPG0F0GDMAMmAEzYAbeBgjsNI5ihO0vR7FK77TIN3eBAZiBwQzcFcNoOkTpnUz7IllMxIu/jA+XNBl3x/JXMl7V4VSDpUI4pYk4FraXkRl4Aos4pSGe+LbHAAAAAElFTkSuQmCC");
+}
 .spiderflow-debug-tooltip{
 	position: absolute;
 	z-index: 2147483647;
@@ -387,7 +393,7 @@ html,body{
 	left: 50%;
 	border-width: 8px;
 	border-style: solid;
-	border-color: #999 transparent transparent transparent;
+	border-color: #eee transparent transparent transparent;
 	margin-left: -4px;
 }
 .spiderflow-debug-tooltip::after{
@@ -568,4 +574,37 @@ html,body{
 }
 .history-version li:hover{
 	color : #1890FF;
+}
+
+.main-container.right .sidebar-container{
+	bottom: 0px!important;
+	width: 50px!important;
+}
+.main-container.right .editor-container{
+	bottom:0px!important;
+	left:38px!important;
+}
+.main-container.right .properties-container{
+	right: 0px;
+	height: 100%!important;
+	background: white;
+}
+.main-container.right .layui-col-md2,
+.main-container.right .layui-col-md3,
+.main-container.right .layui-col-md4,
+.main-container.right .layui-col-md10{
+	width: 100%!important;
+}
+.main-container.right .resize-container{
+	height:100%!important;
+	right:40%!important;
+	width: 20px;
+	bottom:0px;
+	cursor: e-resize;
+}
+
+.layui-table-body.layui-table-main .layui-table,
+.layui-table-body.layui-table-main .layui-table input,
+.layui-table-box .layui-table-header .layui-table{
+	width: 100%;
 }
