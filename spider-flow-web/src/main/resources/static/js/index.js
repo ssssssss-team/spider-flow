@@ -1,4 +1,24 @@
 var $ = layui.$;
+function setCookie(name,value){
+	var Days = 30;
+	var exp = new Date();
+	exp.setTime(exp.getTime() + Days*24*60*60*1000);
+	document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+}
+function getCookie(name){
+	var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+	if(arr=document.cookie.match(reg))
+		return unescape(arr[2]);
+	else
+		return null;
+}
+function setTheSkin(value){
+	if(!value){
+		value = "layui-blue";
+	}
+	document.querySelector('#theSkin').setAttribute('href','css/'+value+'.css');
+}
+setTheSkin(getCookie('theSkin'));
 function openTab(title,id,href){
 	if($(".layui-tab[lay-filter=admin-tab]").find("[lay-id="+id+"]").length > 0){	//判断是否已打开
 		var $dom =  $(".layui-tab[lay-filter=admin-tab]");
@@ -26,7 +46,6 @@ $(function(){
 		}
 	})
 });
-
 function initMenu() {
 	$("body").on('click','.menu-list li a',function(){
 		$(this).parents("ul").siblings().find("li.layui-this,dd.layui-this").removeClass('layui-this')
@@ -39,5 +58,10 @@ function initMenu() {
 			openTab(title, title, href);
 			return false;
 		}
+	}).on('click','.layui-layout-right .layui-nav-child a',function(e){
+		e.preventDefault();
+		var value = $(this).data('value');
+		setTheSkin(value);
+		setCookie('theSkin',value);
 	});
 }

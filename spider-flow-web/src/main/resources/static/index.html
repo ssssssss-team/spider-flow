@@ -4,7 +4,7 @@
 		<meta charset="UTF-8">
 		<title>SpiderFlow</title>
 		<link rel="stylesheet" href="js/layui/css/layui.css" />
-		<link rel="stylesheet" href="css/layui-blue.css" />
+		<link rel="stylesheet" id="theSkin" />
 		<link rel="stylesheet" href="css/index.css" />
 		<script>SPIDER_FLOW_VERSION = '0.4.3'</script>
 		<script type="text/javascript" src="js/layui/layui.all.js" ></script>
@@ -16,6 +16,15 @@
 			<div class="layui-logo">SpiderFlow平台</div>
 			<ul class="layui-nav layui-layout-left"></ul>
 			<ul class="layui-nav layui-layout-right">
+			  	<li class="layui-nav-item">
+					<a href="javascript:;" style="padding: 0 20px;">
+					  换肤
+					</a>
+					<dl class="layui-nav-child">
+					  <dd><a data-value="layui-blue">默认</a></dd>
+					  <dd><a data-value="layui-black-gray">黑色</a></dd>
+					</dl>
+			  	</li>
 				<li class="layui-nav-item"><a target="_blank" href="https://www.spiderflow.org">帮助文档</a></li>
 				<li class="layui-nav-item"><a target="_blank" href="https://shang.qq.com/wpa/qunwpa?idkey=10faa4cf9743e0aa379a72f2ad12a9e576c81462742143c8f3391b52e8c3ed8d">加入QQ群</li>
 				<li class="layui-nav-item"><a target="_blank" href='https://gitee.com/jmxd/spider-flow'><img src='https://gitee.com/jmxd/spider-flow/badge/star.svg?theme=white' alt='gitee star' /></a></li>
@@ -46,7 +55,7 @@
 		</div>
 		<script>
 			var title = $(".layui-logo");
-			title.append('v' + SPIDER_FLOW_VERSION);
+			title.append('<span class="version-no">v' + SPIDER_FLOW_VERSION + '</span>');
 		</script>
 	</body>
 </html>

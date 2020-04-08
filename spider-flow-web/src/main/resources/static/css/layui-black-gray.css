@@ -1,0 +1,42 @@
+.menu-list,
+.layui-nav.layui-nav-tree,
+.layui-layout-admin .layui-logo{
+    background: #304156;
+}
+.layui-nav-tree .layui-this,
+.layui-nav-tree .layui-this>a{
+    background: transparent;
+    color:#1890ff!important;
+}
+.layui-nav-tree .layui-nav-item.layui-nav-itemed > a:hover{
+    background: #263445;
+}
+.layui-nav-bar{
+    display: none;
+}
+.layui-layout-admin .layui-logo{
+    color:#fff!important;
+    font-size: 18px;
+    font-weight: 600;
+}
+.layui-layout-admin .layui-header{
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,21,41,.08);
+}
+.layui-nav .layui-nav-item a{
+    color:black;
+}
+.version-no{
+    font-size: 12px;
+    text-indent: 5px;
+    display: inline-block;
+}
+.layui-layout-right .layui-nav-item a:hover{
+    color:black!important;
+}
+.layui-nav .layui-nav-more{
+    border-color: black transparent transparent;
+}
+.layui-nav .layui-nav-mored{
+    transform: rotate(180deg);
+}
