@@ -42,6 +42,10 @@ public class SpiderFlowThreadPoolExecutor {
 		});
 	}
 
+	public Future<?> submit(Runnable runnable){
+		return this.executor.submit(runnable);
+	}
+
 
 	/**
 	 * 创建子线程池

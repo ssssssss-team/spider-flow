@@ -54,7 +54,7 @@ public class Spider {
 	@Autowired
 	private FlowNoticeService flowNoticeService;
 
-	private static SpiderFlowThreadPoolExecutor threadPoolExecutor;
+	public static SpiderFlowThreadPoolExecutor executorInstance;
 
 	private static final String ATOMIC_DEAD_CYCLE = "__atomic_dead_cycle";
 
@@ -62,7 +62,7 @@ public class Spider {
 
 	@PostConstruct
 	private void init() {
-		threadPoolExecutor = new SpiderFlowThreadPoolExecutor(totalThreads);
+		executorInstance = new SpiderFlowThreadPoolExecutor(totalThreads);
 	}
 
 	public List<SpiderOutput> run(SpiderFlow spiderFlow, SpiderContext context, Map<String, Object> variables) {
@@ -120,7 +120,7 @@ public class Spider {
 			submitStrategy = new RandomThreadSubmitStrategy();
 		}
 		//创建子线程池，采用一父多子的线程池,子线程数不能超过总线程数（超过时进入队列等待）,+1是因为会占用一个线程用来调度执行下一级
-		SubThreadPoolExecutor pool = threadPoolExecutor.createSubThreadPoolExecutor(Math.max(nThreads,1) + 1,submitStrategy);
+		SubThreadPoolExecutor pool = executorInstance.createSubThreadPoolExecutor(Math.max(nThreads,1) + 1,submitStrategy);
 		context.setRootNode(root);
 		context.setThreadPool(pool);
 		//触发监听器

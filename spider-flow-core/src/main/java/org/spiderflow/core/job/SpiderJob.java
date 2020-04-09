@@ -55,7 +55,9 @@ public class SpiderJob extends QuartzJobBean {
 		}
 		JobDataMap dataMap = context.getMergedJobDataMap();
 		SpiderFlow spiderFlow = (SpiderFlow) dataMap.get(SpiderJobManager.JOB_PARAM_NAME);
-		run(spiderFlow, context.getNextFireTime());
+		if("1".equalsIgnoreCase(spiderFlow.getEnabled())){
+			run(spiderFlow, context.getNextFireTime());
+		}
 	}
 
 	public void run(String id) {
@@ -63,13 +65,17 @@ public class SpiderJob extends QuartzJobBean {
 	}
 
 	public void run(SpiderFlow spiderFlow, Date nextExecuteTime) {
-		SpiderJobContext context = null;
-		Date now = new Date();
 		Task task = new Task();
 		task.setFlowId(spiderFlow.getId());
 		task.setBeginTime(new Date());
+		taskService.save(task);
+		run(spiderFlow,task,nextExecuteTime);
+	}
+
+	public void run(SpiderFlow spiderFlow, Task task,Date nextExecuteTime) {
+		SpiderJobContext context = null;
+		Date now = new Date();
 		try {
-			taskService.save(task);
 			context = SpiderJobContext.create(this.workspace, spiderFlow.getId(),task.getId(),false);
 			SpiderContextHolder.set(context);
 			contextMap.put(task.getId(), context);

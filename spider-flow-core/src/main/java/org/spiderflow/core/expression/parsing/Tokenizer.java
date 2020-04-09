@@ -21,7 +21,6 @@ public class Tokenizer {
 		stream.startSpan();
 
 		RuntimeException re = null;
-		// TODO: this will fall on its face if we have something like {{ "}}" }}.
 		while (stream.hasMore()) {
 			if (stream.match("${", false)) {
 				if (!stream.isSpanEmpty()) tokens.add(new Token(TokenType.TextBlock, stream.endSpan()));

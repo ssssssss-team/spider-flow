@@ -11,6 +11,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spiderflow.core.Spider;
 import org.spiderflow.core.model.SpiderFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -70,9 +71,9 @@ public class SpiderJobManager {
 	}
 	
 	public void run(String id){
-		new Thread(()->{
+		Spider.executorInstance.submit(()->{
 			spiderJob.run(id);
-		}).start();
+		});
 	}
 	
 	public boolean remove(String id){
