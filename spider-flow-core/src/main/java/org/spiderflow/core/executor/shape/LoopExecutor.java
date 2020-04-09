@@ -15,9 +15,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoopExecutor implements ShapeExecutor{
 	
-	public static final String LOOP_NODE_KEY = "__loop_node_";
+	public static final String LOOP_ITEM = "loopItem";
 	
-	public static final String BEFORE_LOOP_VARIABLE = "__loop_before_variable_";
+	public static final String LOOP_START = "loopStart";
+
+	public static final String LOOP_END = "loopEnd";
 	
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {

@@ -9,6 +9,7 @@ import org.spiderflow.concurrent.*;
 import org.spiderflow.concurrent.SpiderFlowThreadPoolExecutor.SubThreadPoolExecutor;
 import org.spiderflow.context.SpiderContext;
 import org.spiderflow.context.SpiderContextHolder;
+import org.spiderflow.core.executor.shape.LoopExecutor;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.service.FlowNoticeService;
 import org.spiderflow.core.utils.ExecutorsUtils;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -162,7 +164,9 @@ public class Spider {
 						}
 						//睡眠1ms,让出cpu
 						Thread.sleep(1);
-					} catch (InterruptedException | ExecutionException ignored) {
+					} catch (InterruptedException ignored) {
+					} catch (Throwable t){
+						logger.error("程序发生异常",t);
 					}
 				}
 				//等待线程池结束
@@ -211,15 +215,37 @@ public class Spider {
 			logger.error("执行失败,找不到对应的执行器:{}", shape);
 			context.setRunning(false);
 		}
-		//循环次数默认为1,如果节点有循环属性且填了循环次数,则取出循环次数
-		int loopCount = 1;
+		int loopCount = 1;	//循环次数默认为1,如果节点有循环属性且填了循环次数/集合,则取出循环次数
+		int loopStart = 0;	//循环起始位置
+		int loopEnd = 1;	//循环结束位置
 		String loopCountStr = node.getStringJsonValue(ShapeExecutor.LOOP_COUNT);
-		if (StringUtils.isNotBlank(loopCountStr)) {
+		Object loopArray = null;
+		boolean isLoop = false;
+		if (isLoop = StringUtils.isNotBlank(loopCountStr)) {
 			try {
-				Object result = ExpressionUtils.execute(loopCountStr, variables);
-				result = result == null ? 0 : result;
-				logger.info("获取循环次数{}={}", loopCountStr, result);
-				loopCount = Integer.parseInt(result.toString());
+				loopArray = ExpressionUtils.execute(loopCountStr, variables);
+				if(loopArray == null){
+					loopCount = 0;
+				}else if(loopArray instanceof Collection){
+					loopCount = ((Collection)loopArray).size();
+					loopArray = ((Collection)loopArray).toArray();
+				}else if(loopArray.getClass().isArray()){
+					loopCount = Array.getLength(loopArray);
+				}else{
+					loopCount = NumberUtils.toInt(loopArray.toString(),0);
+					loopArray = null;
+				}
+				loopEnd = loopCount;
+				if(loopCount > 0){
+					loopStart = Math.max(NumberUtils.toInt(node.getStringJsonValue(LoopExecutor.LOOP_START), 0),0);
+					int end = NumberUtils.toInt(node.getStringJsonValue(LoopExecutor.LOOP_END), -1);
+					if(end >=0){
+						loopEnd = Math.min(end,loopEnd);
+					}else{
+						loopEnd = Math.max(loopEnd + end + 1,0);
+					}
+				}
+				logger.info("获取循环次数{}={}", loopCountStr, loopCount);
 			} catch (Throwable t) {
 				loopCount = 0;
 				logger.error("获取循环次数失败,异常信息：{}", t);
@@ -228,8 +254,9 @@ public class Spider {
 		if (loopCount > 0) {
 			//获取循环下标的变量名称
 			String loopVariableName = node.getStringJsonValue(ShapeExecutor.LOOP_VARIABLE_NAME);
+			String loopItem = node.getStringJsonValue(LoopExecutor.LOOP_ITEM,"item");
 			List<SpiderTask> tasks = new ArrayList<>();
-			for (int i = 0; i < loopCount; i++) {
+			for (int i = loopStart; i < loopEnd; i++) {
 				node.increment();	//节点执行次数+1(后续Join节点使用)
 				if (context.isRunning()) {
 					Map<String, Object> nVariables = new HashMap<>();
@@ -237,9 +264,13 @@ public class Spider {
 					if(fromNode == null || node.isTransmitVariable(fromNode.getNodeId())){
 						nVariables.putAll(variables);
 					}
-					// 存入下标变量
-					if (!StringUtils.isBlank(loopVariableName)) {
-						nVariables.put(loopVariableName, i);
+					if(isLoop){
+						// 存入下标变量
+						if (!StringUtils.isBlank(loopVariableName)) {
+							nVariables.put(loopVariableName, i);
+						}
+						// 存入item
+						nVariables.put(loopItem,loopArray == null ? i : Array.get(loopArray, i));
 					}
 					tasks.add(new SpiderTask(TtlRunnable.get(() -> {
 						if (context.isRunning()) {
