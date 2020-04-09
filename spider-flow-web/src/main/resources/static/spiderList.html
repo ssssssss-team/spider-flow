@@ -38,7 +38,7 @@
 		},
 		cols : [[{
 			title : '序号',
-			width : 60,
+			width : 35,
 			type : 'numbers',
 			align : 'center'
 		},{
@@ -48,18 +48,18 @@
 				return '<a class="layui-btn layui-btn-sm btn-details" data-name="'+row.name+'" data-id="'+row.id+'">'+row.name+'</a>';
 			}
 		},{
-			title : 'cron表达式',
+			title : 'cron',
 			field : 'cron',
-			width : 100,
+			width : 80,
 			templet : function(row){
 				return '<a class="layui-btn layui-btn-sm btn-edit-cron" data-id="'+row.id+'" data-cron="'+row.cron+'">'+(row.cron || '编辑cron')+'</a>';
 			}
 		},{
-			title : '启用',
+			title : '定时/长任务',
 			field : 'enabled',
-			width : 80,
+			width : 105,
 			templet : function(row){
-				return '<input type="checkbox" data-cron="'+(row.cron||'')+'" name="switch" lay-skin="switch" value="'+row.id+'" '+(row.enabled == 1 ? 'checked':'')+'>';
+				return '<input type="checkbox" data-cron="'+(row.cron||'')+'" name="switch" lay-skin="switch" lay-text="定时|长任务" value="'+row.id+'" '+(row.enabled == 1 ? 'checked':'')+'>';
 			}
 		},{
 			title : '创建时间',
@@ -84,7 +84,7 @@
 			align : 'center'
 		},{
 			title : '操作',
-			width : 250,
+			width : 195,
 			align : 'center',
 			templet : '#buttons'
 		}]]
@@ -102,10 +102,10 @@
 				id : e.value
 			},
 			success : function(){
-				layui.layer.msg((e.elem.checked ? '启用': '禁用') + '成功');
+				layui.layer.msg((e.elem.checked ? '切换为定时任务': '切换为长任务') + '成功');
 			},
 			error : function(){
-				layui.layer.msg((e.elem.checked ? '启用': '禁用') + '成功');
+				layui.layer.msg((e.elem.checked ? '切换为定时任务': '切换为长任务') + '成功');
 			}
 		})
 	})
@@ -198,10 +198,11 @@
 	<a class="layui-btn layui-btn-sm btn-task" data-name="{{d.name}}" data-id="{{d.id}}">{{d.running || 0}}/{{d.executeCount || 0}}</a>
 </script>
 <script type="text/html" id="buttons">
-	<a class="layui-btn layui-btn-sm btn-notice" data-id="{{d.id}}">通知设置</a>
-	<a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}">手动运行</a>
-	<a class="layui-btn layui-btn-sm btn-log" data-name="{{d.name}}" data-id="{{d.id}}">最新日志</a>
-	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
+	<a class="layui-btn layui-btn-sm btn-details" data-id="{{d.id}}" data-name="{{d.name}}" title="查看"><i class="layui-icon">&#xe615;</i></a>
+	<a class="layui-btn layui-btn-sm btn-notice" data-id="{{d.id}}" title="通知设置"><i class="layui-icon">&#xe667;</i></a>
+	<a class="layui-btn layui-btn-sm btn-run" data-id="{{d.id}}" title="手动运行"><i class="layui-icon">&#xe623;</i></a>
+	<a class="layui-btn layui-btn-sm btn-log" data-name="{{d.name}}" data-id="{{d.id}}" title="日志"><i class="layui-icon">&#xe60e;</i></a>
+	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}" title="删除"><i class="layui-icon">&#xe640;</i></a>
 </script>
 </body>
 </html>
