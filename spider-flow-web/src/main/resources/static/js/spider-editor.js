@@ -128,14 +128,19 @@ SpiderEditor.prototype.deleteSelectCells = function(){
 }
 SpiderEditor.prototype.addShape = function(shape,label,element,defaultAdd){
 	var style = new Object();
-	style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
-	style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-	style[mxConstants.STYLE_IMAGE_WIDTH] = 32;
-	style[mxConstants.STYLE_IMAGE_HEIGHT] = 32;
-	style[mxConstants.STYLE_IMAGE] = element.src;
-	style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+	if(shape == 'comment'){
+		style[mxConstants.STYLE_FILLCOLOR] = 'none';
+		style[mxConstants.STYLE_STROKECOLOR] = 'none';
+	}else{
+		style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
+		style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
+		style[mxConstants.STYLE_IMAGE_WIDTH] = 32;
+		style[mxConstants.STYLE_IMAGE_HEIGHT] = 32;
+		style[mxConstants.STYLE_IMAGE] = element.src;
+		style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+		style[mxConstants.STYLE_SPACING_TOP] = -26;
+	}
 	style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-	style[mxConstants.STYLE_SPACING_TOP] = -26;
 	this.graph.getStylesheet().putCellStyle(shape,style);
 	var _this = this;
 	var funct = function(graph, evt, cell, x, y){
