@@ -1,5 +1,8 @@
 package org.spiderflow.core.executor.shape;
 
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnel;
+import com.google.common.hash.Funnels;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -9,21 +12,21 @@ import org.slf4j.LoggerFactory;
 import org.spiderflow.Grammerable;
 import org.spiderflow.context.CookieContext;
 import org.spiderflow.context.SpiderContext;
+import org.spiderflow.core.executor.function.MD5FunctionExecutor;
 import org.spiderflow.core.io.HttpRequest;
 import org.spiderflow.core.io.HttpResponse;
 import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.io.SpiderResponse;
+import org.spiderflow.listener.SpiderListener;
 import org.spiderflow.model.Grammer;
 import org.spiderflow.model.SpiderNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -32,7 +35,7 @@ import java.util.*;
  *
  */
 @Component
-public class RequestExecutor implements ShapeExecutor,Grammerable{
+public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListener {
 	
 	public static final String SLEEP = "sleep";
 	
@@ -84,8 +87,18 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 
 	public static final String COOKIE_AUTO_SET = "cookie-auto-set";
 
+	public static final String REPEAT_ENABLE = "repeat-enable";
+
+	public static final String BLOOM_FILTER_KEY = "_bloomfilter";
+
 	@Value("${spider.workspace}")
 	private String workspcace;
+
+	@Value("${spider.bloomfilter.capacity:5000000}")
+	private Integer capacity;
+
+	@Value("${spider.bloomfilter.error-rate:0.00001}")
+	private Double errorRate;
 
 	private static final Logger logger = LoggerFactory.getLogger(RequestExecutor.class);
 	
@@ -127,6 +140,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 				logger.error("设置延迟时间失败", t);
 			}
 		}
+		BloomFilter<String> bloomFilter = null;
 		//重试次数
 		int retryCount = NumberUtils.toInt(node.getStringJsonValue(RETRY_COUNT), 0) + 1;
 		//重试间隔时间，单位毫秒
@@ -141,6 +155,15 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 			} catch (Exception e) {
 				logger.error("设置请求url出错，异常信息", e);
 				ExceptionUtils.wrapAndThrow(e);
+			}
+			if("1".equalsIgnoreCase(node.getStringJsonValue(REPEAT_ENABLE,"0"))){
+				bloomFilter = createBloomFilter(context);
+				synchronized (bloomFilter){
+					if(bloomFilter.mightContain(MD5FunctionExecutor.string(url))){
+						logger.info("过滤重复URL:{}",url);
+						return;
+					}
+				}
 			}
 			context.pause(node.getNodeId(),"common",URL,url);
 			logger.info("设置请求url:{}", url);
@@ -236,6 +259,11 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 				HttpResponse response = request.execute();
                 successed = response.getStatusCode() == 200;
                 if(successed){
+                	if(bloomFilter != null){
+                		synchronized (bloomFilter){
+							bloomFilter.put(MD5FunctionExecutor.string(url));
+						}
+					}
                     String charset = node.getStringJsonValue(RESPONSE_CHARSET);
                     if(StringUtils.isNotBlank(charset)){
                         response.setCharset(charset);
@@ -406,5 +434,48 @@ public class RequestExecutor implements ShapeExecutor,Grammerable{
 		grammer.setOwner("SpiderResponse");
 		grammers.add(grammer);
 		return grammers;
+	}
+
+	@Override
+	public void beforeStart(SpiderContext context) {
+
+	}
+
+	private BloomFilter<String> createBloomFilter(SpiderContext context){
+		BloomFilter<String> filter = context.get(BLOOM_FILTER_KEY);
+		if(filter == null){
+			Funnel<CharSequence> funnel = Funnels.stringFunnel(Charset.forName("UTF-8"));
+			String fileName = context.getFlowId() + File.separator + "url.bf";
+			File file = new File(workspcace,fileName);
+			if(file.exists()){
+				try(FileInputStream fis = new FileInputStream(file)){
+					filter = BloomFilter.readFrom(fis,funnel);
+				} catch (IOException e) {
+					logger.error("读取布隆过滤器出错",e);
+				}
+
+			}else{
+				filter = BloomFilter.create(funnel,capacity,errorRate);
+			}
+			context.put(BLOOM_FILTER_KEY,filter);
+		}
+		return filter;
+	}
+
+	@Override
+	public void afterEnd(SpiderContext context) {
+		BloomFilter<String> filter = context.get(BLOOM_FILTER_KEY);
+		if(filter != null){
+			File file = new File(workspcace,context.getFlowId() + File.separator + "url.bf");
+			if(!file.getParentFile().exists()){
+				file.getParentFile().mkdirs();
+			}
+			try(FileOutputStream fos = new FileOutputStream(file)){
+				filter.writeTo(fos);
+				fos.flush();
+			}catch(IOException e){
+				logger.error("保存布隆过滤器出错",e);
+			}
+		}
 	}
 }
