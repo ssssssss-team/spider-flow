@@ -27,7 +27,7 @@ public class ResponseFunctionExtension implements FunctionExtension {
     @Comment("将请求结果转为Element对象")
     @Example("${resp.element()}")
     public static Element element(SpiderResponse response) {
-        return Jsoup.parse(response.getHtml());
+        return Jsoup.parse(response.getHtml(),response.getUrl());
     }
 
     @Comment("根据xpath在请求结果中查找")
