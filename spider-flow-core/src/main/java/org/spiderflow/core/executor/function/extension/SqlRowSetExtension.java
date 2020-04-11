@@ -21,8 +21,7 @@ public class SqlRowSetExtension implements FunctionExtension {
     @Example("${rs.nextToMap()}")
     public static Map<String, Object> nextToMap(SqlRowSet sqlRowSet) {
         try {
-            boolean next = sqlRowSet.next();
-            if (!next) {
+            if (!sqlRowSet.next()) {
                 return null;
             }
             String[] columnNames = sqlRowSet.getMetaData().getColumnNames();
