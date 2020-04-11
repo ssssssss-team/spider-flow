@@ -69,6 +69,15 @@
 						<input type="text" name="csvName" placeholder="请输入文件名" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.csvName}}">
 					</div>
 				</div>
+				<div class="layui-col-md2 csvDiv" {{d.data.object['output-csv'] == '1' ? '' : 'style="display: none;"'}}>
+					<div class="layui-form-item">
+						<select name="csvEncoding">
+							<option value="GBK" {{d.data.object['csvEncoding'] == 'GBK' ? 'selected': ''}}>GBK</option>
+							<option value="UTF-8" {{d.data.object['csvEncoding'] == 'UTF-8' ? 'selected': ''}}>UTF-8</option>
+							<option value="UTF-8BOM" {{d.data.object['csvEncoding'] == 'UTF-8BOM' ? 'selected': ''}}>UTF-8 BOM</option>
+						</select>
+					</div>
+				</div>
 			</div>
 			<table class="layui-table" id="spider-output" data-cell="{{=d.cell.id}}" data-keys="output-name,output-value"></table>
     		<hr>
