@@ -2,9 +2,9 @@
     <img src="https://www.spiderflow.org/images/logo.svg" width="600">
 </p>
 <p align="center">
-    <a target="_blank" href="https://github.com/javamxd/spider-flow/releases"><img src="https://img.shields.io/github/v/release/javamxd/spider-flow"></a>
     <a target="_blank" href="https://www.oracle.com/technetwork/java/javase/downloads/index.html"><img src="https://img.shields.io/badge/JDK-1.8+-green.svg" /></a>
     <a target="_blank" href="https://www.spiderflow.org"><img src="https://img.shields.io/badge/Docs-latest-blue.svg"/></a>
+    <a target="_blank" href="https://github.com/javamxd/spider-flow/releases"><img src="https://img.shields.io/github/v/release/javamxd/spider-flow?logo=github"></a>
     <a target="_blank" href='https://gitee.com/jmxd/spider-flow'><img src="https://gitee.com/jmxd/spider-flow/badge/star.svg?theme=white" /></a>
     <a target="_blank" href='https://github.com/javamxd/spider-flow'><img src="https://img.shields.io/github/stars/javamxd/spider-flow.svg?style=social"/></a>
     <a target="_blank" href="LICENSE"><img src="https://img.shields.io/:license-MIT-blue.svg"></a>
@@ -40,8 +40,14 @@
 - [x] [电子邮箱插件](https://gitee.com/jmxd/spider-flow-mailbox)
 
 ## 项目部分截图
-![GVP项目爬虫测试](https://images.gitee.com/uploads/images/2019/1030/104033_0075e463_297689.gif "spider-test.gif")
-![数据展示](https://images.gitee.com/uploads/images/2019/0716/184618_21bce697_297689.png "demo-2.png")
+### 爬虫列表
+![爬虫列表](https://images.gitee.com/uploads/images/2020/0412/104521_e1eb3fbb_297689.png "list.png")
+### 爬虫测试
+![爬虫测试](https://images.gitee.com/uploads/images/2020/0412/104659_b06dfbf0_297689.gif "test.gif")
+### Debug
+![Debug](https://images.gitee.com/uploads/images/2020/0412/104741_f9e1190e_297689.png "debug.png")
+### 日志
+![日志](https://images.gitee.com/uploads/images/2020/0412/104800_a757f569_297689.png "logo.png")
 
 ## 免责声明
 请勿将`spider-flow`应用到任何可能会违反法律规定和道德约束的工作中,请友善使用`spider-flow`，遵守蜘蛛协议，不要将`spider-flow`用于任何非法用途。如您选择使用`spider-flow`即代表您遵守此协议，作者不承担任何由于您违反此协议带来任何的法律风险和损失，一切后果由您承担。
