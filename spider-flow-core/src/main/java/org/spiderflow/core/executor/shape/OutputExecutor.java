@@ -14,6 +14,7 @@ import org.spiderflow.core.utils.DataSourceUtils;
 import org.spiderflow.core.utils.ExpressionUtils;
 import org.spiderflow.executor.ShapeExecutor;
 import org.spiderflow.io.SpiderResponse;
+import org.spiderflow.listener.SpiderListener;
 import org.spiderflow.model.SpiderNode;
 import org.spiderflow.model.SpiderOutput;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,12 +29,12 @@ import java.util.*;
  *
  */
 @Component
-public class OutputExecutor implements ShapeExecutor{
+public class OutputExecutor implements ShapeExecutor, SpiderListener {
 
 	public static final String OUTPUT_ALL = "output-all";
-	
+
 	public static final String OUTPUT_NAME = "output-name";
-	
+
 	public static final String OUTPUT_VALUE = "output-value";
 
 	public static final String DATASOURCE_ID = "datasourceId";
@@ -46,13 +47,15 @@ public class OutputExecutor implements ShapeExecutor{
 
 	public static final String CSV_NAME = "csvName";
 
+	public static final String CSV_ENCODING = "csvEncoding";
+
 	private static Logger logger = LoggerFactory.getLogger(OutputExecutor.class);
 
 	/**
 	 * 输出CSVPrinter节点变量
 	 */
 	private Map<String, CSVPrinter> cachePrinter = new HashMap<>();
-	
+
 	@Override
 	public void execute(SpiderNode node, SpiderContext context, Map<String,Object> variables) {
 		SpiderOutput output = new SpiderOutput();
@@ -101,24 +104,6 @@ public class OutputExecutor implements ShapeExecutor{
 			outputCSV(node, context, csvName, outputData);
 		}
 		context.addOutput(output);
-	}
-
-	@Override
-	public boolean allowExecuteNext(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
-		String key = context.getId() + "-" + node.getNodeId();
-		if(node.isDone()){
-			CSVPrinter printer = cachePrinter.remove(key);
-			if(printer != null){
-				try {
-					printer.flush();
-					printer.close();
-				} catch (IOException e) {
-					logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
-					ExceptionUtils.wrapAndThrow(e);
-				}
-			}
-		}
-		return true;
 	}
 
 	/**
@@ -187,14 +172,24 @@ public class OutputExecutor implements ShapeExecutor{
 		try {
 			if (printer == null) {
 				CSVFormat format = CSVFormat.DEFAULT.withHeader(headers);
-				OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(csvName), "UTF-8");
+				FileOutputStream os = new FileOutputStream(csvName);
+				String csvEncoding = node.getStringJsonValue(CSV_ENCODING);
+				if ("UTF-8BOM".equals(csvEncoding)) {
+					csvEncoding = csvEncoding.substring(0, 5);
+					byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
+					os.write(bom);
+					os.flush();
+				}
+				OutputStreamWriter osw = new OutputStreamWriter(os, csvEncoding);
 				printer = new CSVPrinter(osw, format);
 				cachePrinter.put(key, printer);
 			}
 			for (int i = 0; i < headers.length; i++) {
 				records.add(data.get(headers[i]).toString());
 			}
-			printer.printRecord(records);
+			synchronized (printer) {
+				printer.printRecord(records);
+			}
 		} catch (IOException e) {
 			logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
 			ExceptionUtils.wrapAndThrow(e);
@@ -206,4 +201,30 @@ public class OutputExecutor implements ShapeExecutor{
 		return "output";
 	}
 
+	@Override
+	public void beforeStart(SpiderContext context) {
+
+	}
+
+	@Override
+	public void afterEnd(SpiderContext context) {
+		this.releasePrinters();
+	}
+
+	private void releasePrinters() {
+		for (Iterator<Map.Entry<String, CSVPrinter>> iterator = this.cachePrinter.entrySet().iterator(); iterator.hasNext(); ) {
+			Map.Entry<String, CSVPrinter> entry = iterator.next();
+			CSVPrinter printer = entry.getValue();
+			if (printer != null) {
+				try {
+					printer.flush();
+					printer.close();
+					this.cachePrinter.remove(entry.getKey());
+				} catch (IOException e) {
+					logger.error("文件输出错误,异常信息:{}", e.getMessage(), e);
+					ExceptionUtils.wrapAndThrow(e);
+				}
+			}
+		}
+	}
 }
