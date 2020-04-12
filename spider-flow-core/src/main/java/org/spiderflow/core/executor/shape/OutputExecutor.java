@@ -171,23 +171,28 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 		String[] headers = data.keySet().toArray(new String[data.size()]);
 		try {
 			if (printer == null) {
-				CSVFormat format = CSVFormat.DEFAULT.withHeader(headers);
-				FileOutputStream os = new FileOutputStream(csvName);
-				String csvEncoding = node.getStringJsonValue(CSV_ENCODING);
-				if ("UTF-8BOM".equals(csvEncoding)) {
-					csvEncoding = csvEncoding.substring(0, 5);
-					byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
-					os.write(bom);
-					os.flush();
+				synchronized (cachePrinter) {
+					printer = cachePrinter.get(key);
+					if (printer == null) {
+						CSVFormat format = CSVFormat.DEFAULT.withHeader(headers);
+						FileOutputStream os = new FileOutputStream(csvName);
+						String csvEncoding = node.getStringJsonValue(CSV_ENCODING);
+						if ("UTF-8BOM".equals(csvEncoding)) {
+							csvEncoding = csvEncoding.substring(0, 5);
+							byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
+							os.write(bom);
+							os.flush();
+						}
+						OutputStreamWriter osw = new OutputStreamWriter(os, csvEncoding);
+						printer = new CSVPrinter(osw, format);
+						cachePrinter.put(key, printer);
+					}
 				}
-				OutputStreamWriter osw = new OutputStreamWriter(os, csvEncoding);
-				printer = new CSVPrinter(osw, format);
-				cachePrinter.put(key, printer);
 			}
 			for (int i = 0; i < headers.length; i++) {
 				records.add(data.get(headers[i]).toString());
 			}
-			synchronized (printer) {
+			synchronized (cachePrinter) {
 				printer.printRecord(records);
 			}
 		} catch (IOException e) {
