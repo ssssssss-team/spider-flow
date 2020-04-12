@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.spiderflow</groupId>
 	<artifactId>spider-flow</artifactId>
@@ -14,16 +16,114 @@
 		<version>2.0.7.RELEASE</version>
 	</parent>
 	<properties>
-		<spider-flow.version>0.4.3</spider-flow.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spider-flow.version>${project.version}</spider-flow.version>
+		<alibaba.fastjson.version>1.2.58</alibaba.fastjson.version>
+		<alibaba.druid.version>1.1.16</alibaba.druid.version>
+		<alibaba.transmittable.version>2.11.2</alibaba.transmittable.version>
+		<mybatis.plus.version>3.1.0</mybatis.plus.version>
+		<apache.commons.text.verion>1.6</apache.commons.text.verion>
+		<apache.commons.csv.verion>1.8</apache.commons.csv.verion>
+		<commons.io.version>2.6</commons.io.version>
+		<guava.version>28.2-jre</guava.version>
+		<jsoup.version>1.11.3</jsoup.version>
+		<xsoup.version>0.3.1</xsoup.version>
 	</properties>
+
+	<dependencies>
+		<!-- spring-boot相关配置 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-quartz</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+		<!-- 数据库相关 -->
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-boot-starter</artifactId>
+			<version>${mybatis.plus.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<!-- alibaba相关包 -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>${alibaba.fastjson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid-spring-boot-starter</artifactId>
+			<version>${alibaba.druid.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>transmittable-thread-local</artifactId>
+			<version>${alibaba.transmittable.version}</version>
+		</dependency>
+		<!-- apache commons相关 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>${apache.commons.text.verion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>${apache.commons.csv.verion}</version>
+		</dependency>
+		<!-- commons包 -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons.io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<!-- 其它包 -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>${jsoup.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>us.codecraft</groupId>
+			<artifactId>xsoup</artifactId>
+			<version>${xsoup.version}</version>
+		</dependency>
+	</dependencies>
+
 	<dependencyManagement>
 		<dependencies>
-            <dependency>
-                <groupId>org.spiderflow</groupId>
-                <artifactId>spider-flow-api</artifactId>
-                <version>${spider-flow.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>org.spiderflow</groupId>
+				<artifactId>spider-flow-api</artifactId>
+				<version>${spider-flow.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.spiderflow</groupId>
 				<artifactId>spider-flow-core</artifactId>
@@ -70,5 +170,5 @@
 		<module>spider-flow-api</module>
 		<module>spider-flow-core</module>
 		<module>spider-flow-web</module>
-  	</modules>
+	</modules>
 </project>

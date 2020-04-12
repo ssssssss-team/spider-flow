@@ -13,10 +13,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
-		<dependency>  
-           <groupId>org.springframework.boot</groupId>  
-           <artifactId>spring-boot-starter-websocket</artifactId>  
-       	</dependency>
 		<dependency>
 			<groupId>org.spiderflow</groupId>
 			<artifactId>spider-flow-core</artifactId>
