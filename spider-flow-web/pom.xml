@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.spiderflow</groupId>
 		<artifactId>spider-flow</artifactId>
-		<version>0.4.3</version>
+		<version>0.5.0</version>
 	</parent>
 	<artifactId>spider-flow-web</artifactId>
 	<name>spider-flow-web</name>
@@ -16,6 +16,30 @@
 		<dependency>
 			<groupId>org.spiderflow</groupId>
 			<artifactId>spider-flow-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.spiderflow</groupId>
+			<artifactId>spider-flow-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.spiderflow</groupId>
+			<artifactId>spider-flow-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.spiderflow</groupId>
+			<artifactId>spider-flow-selenium</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.spiderflow</groupId>
+			<artifactId>spider-flow-ocr</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.spiderflow</groupId>
+			<artifactId>spider-flow-oss</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.spiderflow</groupId>
+			<artifactId>spider-flow-mailbox</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

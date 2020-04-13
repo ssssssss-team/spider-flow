@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.spiderflow</groupId>
 	<artifactId>spider-flow</artifactId>
-	<version>0.4.3</version>
+	<version>0.5.0</version>
 	<packaging>pom</packaging>
 	<name>spider-flow</name>
 	<url>https://gitee.com/jmxd/spider-flow</url>
