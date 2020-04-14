@@ -99,10 +99,8 @@
 			$("select[name='driverClassName']").next().find("input").focus(function () {
 				window.setTimeout(function(){
 					var sourceSelect =  $("select[name='driverClassName']").next();
-					var selectText = $(sourceSelect).find(".layui-anim-upbit").find(".layui-this");
+					var selectText = $(sourceSelect).find(".layui-anim-upbit .layui-this");
 					var selectVal = $(sourceSelect).find("input").val();
-					console.log(selectText)
-					console.log(selectVal)
 					if (selectVal !== selectText.text()) {
 						$(selectText).removeClass("layui-this");
 					}
