@@ -98,12 +98,12 @@
 		function addSelectListener() {
 			$("select[name='driverClassName']").next().find("input").focus(function () {
 				window.setTimeout(function(){
-					var selectText = $("select[name='driverClassName']").next().find(".layui-anim-upbit").find(".layui-this");
-					var selectVal = $("select[name='driverClassName']").next().find("input").val();
+					var sourceSelect =  $("select[name='driverClassName']").next();
+					var selectText = $(sourceSelect).find(".layui-anim-upbit").find(".layui-this");
+					var selectVal = $(sourceSelect).find("input").val();
 					console.log(selectText)
 					console.log(selectVal)
 					if (selectVal !== selectText.text()) {
-						console.log(true)
 						$(selectText).removeClass("layui-this");
 					}
 				},100)
