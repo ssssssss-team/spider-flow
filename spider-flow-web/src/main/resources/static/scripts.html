@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>DataSource</title>
+	<link rel="stylesheet" href="js/layui/css/layui.css" />
+	<link rel="stylesheet" href="css/layui-blue.css" />
+	<link rel="stylesheet" href="js/ztree/zTreeStyle/zTreeStyle.css">
+	<link rel="stylesheet" href="js/codemirror/codemirror.css">
+	<link rel="stylesheet" href="js/codemirror/dracula.css">
+	<script type="text/javascript" src="js/layui/layui.all.js" ></script>
+	<script type="text/javascript" src="js/codemirror/codemirror.js" ></script>
+	<script type="text/javascript" src="js/codemirror/python.js" ></script>
+	<script type="text/javascript" src="js/codemirror/javascript.js" ></script>
+	<script>var $ = layui.$;var jQuery = $;</script>
+	<script type="text/javascript" src="js/ztree/jquery.ztree.all.min.js" ></script>
+	<style type="text/css">
+		html,body,script-container{
+			width : 100%;
+			height: 100%;
+			box-sizing: border-box;
+			position: relative;
+		}
+		.script-container .script-left-container{
+			width : 200px;
+			height : 100px;
+			position: fixed;
+		}
+		.script-container .script-right-container{
+			right : 0;
+			left : 205px;
+			height : 100%;
+			position: fixed;
+		}
+		.script-tree-files{
+			top : 50px;
+			bottom:0px;
+			position: fixed;
+			width: 200px;
+			border : 1px solid #eee;
+		}
+		.script-right-container .script-buttons{
+			display: inline-block;
+			padding-left: 20px;
+		}
+		.script-right-container .script-buttons input{
+			display: inline-block;
+		}
+		.script-content{
+			top : 50px;
+			bottom: 0px;
+			position: fixed;
+			left : 225px;
+			right : 15px;
+			border:1px solid #eee;
+		}
+		#codemirror-content{
+			width:100%;
+			height:100%;
+		}
+		.ztree-contextmenu{
+			position: absolute;
+			z-index: 999;
+			border:1px solid #aaa;
+			background:#f2f2f2;
+			font-size : 12px;
+		}
+		.ztree-contextmenu li{
+			border-bottom: 1px solid #cdcdcd;
+			padding : 0px 10px;
+			height : 24px;
+			line-height: 24px;
+			cursor: pointer;
+		}
+		.ztree-contextmenu li:hover{
+			background:#1a7dc4;
+			color : #fff;
+		}
+		.ztree-contextmenu li:last-child{
+			border-bottom: none;
+		}
+	</style>
+</head>
+<body style="padding:5px;">
+<div class="script-container layui-form">
+	<div class="script-left-container">
+		<div class="script-select-container">
+			<select id="script-select" lay-filter="script-select"><option>请选择脚本</option></select>
+		</div>
+		<div class="script-tree-files">
+			<ul id="tree" class="ztree"></ul>
+		</div>
+	</div>
+	<div class="script-right-container">
+		<div class="script-buttons">
+			<button type="button" class="layui-btn layui-btn-sm layui-btn-normal btn-create-script">创建脚本</button>
+			<button type="button" class="layui-btn layui-btn-sm layui-btn-normal btn-refresh">刷新</button>
+			<button type="button" class="layui-btn layui-btn-sm layui-btn-normal btn-save">保存当前文件</button>
+			<input type="text" class="layui-input" id="path" value="./" readonly style="width: 200px"/>
+			<input type="text" class="layui-input" id="parameter" value="" placeholder="运行参数" style="width: 400px"/>
+			<button type="button" class="layui-btn layui-btn-sm layui-btn-normal btn-test">测试执行</button>
+		</div>
+		<div class="script-content">
+			<textarea id="codemirror-content"></textarea>
+		</div>
+	</div>
+</div>
+<script>
+    String.prototype.endWith = function (str) {
+        if (str == null || str == "" || this.length == 0 || str.length > this.length) {
+            return false;
+        }
+        if (this.substring(this.length - str.length) == str) {
+            return true;
+        } else {
+            return false;
+        }
+        return true;
+    }
+	$.ajax({
+		url : 'script/list',
+		success : function(data){
+		    var scripts = data.data;
+		    for(var i=0,len = scripts.length;i<len;i++){
+				$('#script-select').append('<option value="'+scripts[i]+'">'+scripts[i]+'</option>');
+			}
+            layui.form.render();
+		}
+	})
+	var currentScript;
+    var currentFile;
+	layui.form.on('select(script-select)',function(data){
+        renderScriptTree(data.value);
+	})
+	function renderScriptTree(scriptName,passCodemirror){
+        currentScript = scriptName;
+        $.ajax({
+            url : 'script/files',
+            type : 'post',
+            data : {
+                script : scriptName
+            },
+            success : function(data){
+                var process = function(item){
+                    item.name = item.node.name;
+                    item.isParent = item.node.directory;
+                    if(item.children){
+                        for(var i=0,len = item.children.length;i<len;i++){
+                            process(item.children[i]);
+                        }
+                    }
+                    return item;
+                }
+                var tree = data.data.children || [];
+                for (var i = 0; i < tree.length; i++) {
+                    process(tree[i])
+                }
+                var ztree = $.fn.zTree.init($("#tree"), {
+                    callback : {
+                        onClick : function(event,treeId,treeNode){
+							if(!treeNode.isParent){
+								loadScript(treeNode.node.path);
+							}
+						},
+                        onRightClick : function(event,treeId,treeNode){
+                            var path = treeNode&&treeNode.node&&treeNode.node.path || '';
+                            var name = treeNode&&treeNode.node&&treeNode.node.name || '';
+                            var html = '<ul class="ztree-contextmenu" data-name="'+name+'" data-path="'+path+'">';
+							if(treeNode.isRoot){
+                                html+='<li class="ztre-create-file">添加文件</li>';
+                                html+='<li class="ztre-create-directory">添加文件夹</li>';
+							}else if(treeNode.isParent){
+                                html+='<li class="ztre-create-file">添加文件</li>';
+                                html+='<li class="ztre-create-directory">添加文件夹</li>';
+                                html+='<li class="ztree-remove-file">删除文件夹</li>';
+                                html+='<li class="ztree-rename-file">重命名</li>';
+							}else{
+                                html+='<li class="ztree-remove-file">删除文件</li>';
+                                html+='<li class="ztree-rename-file">重命名</li>';
+							}
+							html+='</ul>';
+                            var y = event.clientY + document.body.scrollTop;
+                            var x = event.clientX + document.body.scrollLeft;
+                            $('.ztree-contextmenu').remove();
+							$('body').append(html);
+							$('.ztree-contextmenu').css({"top":y+"px", "left":x+"px"});
+						}
+					}
+				}, [{
+                    name : scriptName,
+					isRoot :true,
+					children : tree
+				}]);
+                ztree.expandAll(true);
+				if(passCodemirror === undefined){
+                    createCodeMirror('text');
+				}
+            }
+
+        })
+	}
+	function getMode(filename){
+        if(filename.endWith('.py')){
+            return  'python';
+        }else if(filename.endWith('.js')){
+            return 'javascript';
+        }
+        return 'text';
+	}
+	function loadScript(filename){
+        $.ajax({
+            url : 'script/read',
+            type : 'post',
+            data : {
+                file : filename,
+                scriptName : currentScript
+            },
+            success : function(data){
+                var content = data.data || '';
+                currentFile = filename;
+                $('#path').val(filename);
+                createCodeMirror(getMode(filename),content);
+            }
+        })
+	}
+	function saveFile(filename,content){
+        $.ajax({
+            url : 'script/save',
+            type : 'post',
+            data : {
+                file : filename,
+				content : content,
+                scriptName : currentScript
+            },
+            success : function(data){
+                if(data.data){
+                    layui.layer.msg('保存成功！');
+				}else{
+                    layui.layer.msg('保存失败！');
+				}
+            }
+        })
+	}
+	function removeFile(filename){
+        $.ajax({
+            url : 'script/remove/file',
+            type : 'post',
+            data : {
+                file : filename,
+                scriptName : currentScript
+            },
+            success : function(data){
+                if(data.data){
+                    layui.layer.msg('删除成功');
+                    renderScriptTree(currentScript);
+                }else{
+                    layui.layer.msg('删除失败');
+                }
+            }
+        })
+	}
+    function renameFile(oldName,newName){
+        $.ajax({
+            url : 'script/rename/file',
+            type : 'post',
+            data : {
+                file : oldName,
+                newFile : newName,
+                scriptName : currentScript
+            },
+            success : function(data){
+                if(data.data){
+                    layui.layer.msg('重命名成功');
+                    renderScriptTree(currentScript);
+                }else{
+                    layui.layer.msg('重命名失败');
+                }
+            }
+        })
+    }
+    function testRun(){
+		var parameter = $('#parameter').val();
+		var path = $('#path').val();
+        $.ajax({
+            url : 'script/test',
+            type : 'post',
+            data : {
+                file : path,
+				parameter : parameter,
+                scriptName : currentScript
+            },
+            success : function(data){
+                data = data.data;
+                if(data.exitValue == 0){
+                    layui.layer.alert(data.value,{
+                        title : '执行成功'
+					});
+                }else if(data.exitValue == -2){
+					layui.layer.msg('不支持的脚本类型');
+				}else {
+                    var message = ((data.value || '') + '\r\n' + (data.error || '')) + '\r\n' + (data.stack || '');
+                    message = message.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;');
+                    layui.layer.alert('<div style="font-weight: bold;font-family:Consolas;font-size:12px;">' + message + '</div>',{
+                        title : '执行失败,exitValue=' + data.exitValue,
+						area:['800px','400px']
+                    });
+                }
+            }
+        })
+
+	}
+	function createFile(filename,path,dir){
+        $.ajax({
+            url : 'script/create/file',
+            type : 'post',
+            data : {
+                file : (path||'') + '/'+ filename,
+				dir : dir,
+				scriptName : currentScript
+            },
+            success : function(data){
+                if(data.data){
+                    layui.layer.msg('创建文件'+(dir == '1' ? '夹' : '') +'成功');
+                    if(dir == '0'){
+                        renderScriptTree(currentScript,true);
+                        createCodeMirror(getMode(filename));
+                        loadScript((path ? path + '/' : '') + filename);
+					}else{
+                        renderScriptTree(currentScript);
+					}
+                }else{
+                    layui.layer.msg('创建失败');
+                }
+            }
+        })
+	}
+	var $instance;
+	function createCodeMirror(mode,content){
+	    if($instance){
+            $instance.toTextArea();
+		}
+        var element = document.getElementById('codemirror-content');
+		$instance = CodeMirror.fromTextArea(element,{
+            mode: mode,
+            lineNumbers : true,
+            theme: 'dracula',
+		})
+        $instance.setValue(content || '');
+	}
+	$('body').on('click','.btn-create-script',function(){
+	    layui.layer.prompt({
+			title : '请输入脚本名称'
+		},function(value,index){
+	        layui.layer.close(index);
+	        $.ajax({
+				url : 'script/create',
+				type : 'post',
+				data : {
+				    scriptName : value
+				},
+				success : function(data){
+				    if(data.data){
+				        layui.layer.msg('创建成功');
+				        $('#script-select').append('<option value="'+value+'" selected>'+value+'</option>');
+				        layui.form.render();
+                        $('#path').val('');
+                        currentFile = '';
+                        renderScriptTree(value);
+					}else{
+                        layui.layer.msg('创建失败');
+					}
+				}
+			})
+		})
+	}).on('click','.ztree-contextmenu .ztre-create-directory',function(){
+	    var path = $(this).parent().data('path');
+		layui.layer.prompt({
+			title : '请输入文件夹名称'
+		},function(value,index){
+            createFile(value,path,'1');
+            layui.layer.close(index);
+		})
+	}).on('click','.ztree-contextmenu .ztre-create-file',function(){
+        var path = $(this).parent().data('path');
+        layui.layer.prompt({
+            title : '请输入文件名称'
+        },function(value,index){
+            createFile(value,path,'0');
+            layui.layer.close(index);
+        })
+    }).on('click','.ztree-contextmenu  .ztree-remove-file',function(){
+        var path = $(this).parent().data('path');
+        layui.layer.confirm('是否删除该文件？',{
+            title : '是否删除？'
+        },function(index){
+            removeFile(path);
+            layui.layer.close(index);
+        })
+	}).on('click','.ztree-contextmenu .ztree-rename-file',function(){
+        var path = $(this).parent().data('path');
+        var oldName = $(this).parent().data('name');
+        layui.layer.prompt({
+            title : '重命名',
+			value : oldName
+        },function(newName,index){
+            renameFile(path,path.substring(0,path.length - oldName.length) + newName);
+            layui.layer.close(index);
+        })
+    }).on('click','.btn-save',function(){
+        if($instance && currentFile){
+            var content = $instance.getValue();
+			saveFile(currentFile,content);
+		}else{
+            layui.layer.msg('请选择文件！');
+		}
+
+	}).on('click','.btn-test',function(){
+        if($instance && currentFile){
+            testRun(currentFile);
+        }else{
+            layui.layer.msg('请选择文件！');
+        }
+
+    }).on('click','.btn-refresh',function(){
+        if($instance && currentFile){
+            loadScript(currentFile);
+        }
+	}).on('click',function(){
+        $('.ztree-contextmenu').remove();
+	})
+    createCodeMirror('text');
+</script>
+<script type="text/html" id="buttons">
+	<a class="layui-btn layui-btn-sm btn-edit" data-id="{{d.id}}">编辑</a>
+	<a class="layui-btn layui-btn-sm btn-remove" data-id="{{d.id}}">删除</a>
+</script>
+</body>
+</html>

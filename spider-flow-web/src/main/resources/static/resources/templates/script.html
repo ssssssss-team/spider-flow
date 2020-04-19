@@ -1,0 +1,67 @@
+<div class="layui-tab layui-tab-fixed layui-tab-brief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">配置</li>
+  </ul>
+  <div class="layui-tab-content">
+    <div class="layui-tab-item layui-show">
+    	<form class="layui-form editor-form-node">
+			<div class="layui-row">
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">节点名称</label>
+						<div class="layui-input-block">
+							<input type="text" name="value" placeholder="请输入节点名称" value="{{=d.value}}" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">结果变量</label>
+						<div class="layui-input-block">
+							<input type="text" name="scriptVariable" placeholder="请输入结果变量" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.scriptVariable}}">
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">超时时间</label>
+						<div class="layui-input-block">
+							<input type="text" name="scriptTimeout" placeholder="请输入超时时间" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.scriptTimeout}}">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-row">
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">脚本名</label>
+						<div class="layui-input-block">
+							<input type="text" name="scriptName" placeholder="请输入脚本名" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.scriptName}}">
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">脚本文件</label>
+						<div class="layui-input-block">
+							<input type="text" name="scriptFile" placeholder="请输入脚本文件" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.scriptFile}}">
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-md4">
+					<div class="layui-form-item">
+						<label class="layui-form-label">结果编码</label>
+						<div class="layui-input-block">
+							<input type="text" name="scriptCharset" placeholder="请输入结果编码" autocomplete="off" class="layui-input input-default" value="{{=d.data.object.scriptCharset}}">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">执行参数</label>
+				<div class="layui-input-block" codemirror="scriptParameter" placeholder="请输入执行参数" data-value="{{=d.data.object.scriptParameter}}"></div>
+			</div>
+    	</form>
+    </div>
+  </div>
+</div>

@@ -22,8 +22,9 @@
 		<alibaba.druid.version>1.1.16</alibaba.druid.version>
 		<alibaba.transmittable.version>2.11.2</alibaba.transmittable.version>
 		<mybatis.plus.version>3.1.0</mybatis.plus.version>
-		<apache.commons.text.verion>1.6</apache.commons.text.verion>
-		<apache.commons.csv.verion>1.8</apache.commons.csv.verion>
+		<apache.commons.text.version>1.6</apache.commons.text.version>
+		<apache.commons.csv.version>1.8</apache.commons.csv.version>
+		<apache.commons.exec.version>1.3</apache.commons.exec.version>
 		<commons.io.version>2.6</commons.io.version>
 		<guava.version>28.2-jre</guava.version>
 		<jsoup.version>1.11.3</jsoup.version>
@@ -82,12 +83,17 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
-			<version>${apache.commons.text.verion}</version>
+			<version>${apache.commons.text.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>${apache.commons.csv.verion}</version>
+			<version>${apache.commons.csv.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-exec</artifactId>
+			<version>${apache.commons.exec.version}</version>
 		</dependency>
 		<!-- commons包 -->
 		<dependency>
