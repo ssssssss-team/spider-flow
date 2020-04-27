@@ -140,8 +140,6 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	public void start(String id){
 		spiderJobManager.remove(id);
 		SpiderFlow spiderFlow = getById(id);
-		// 手动开启
-		spiderFlow.setEnabled("1");
 		Date nextExecuteTime = spiderJobManager.addJob(spiderFlow);
 		if (nextExecuteTime != null) {
 			spiderFlow.setNextExecuteTime(nextExecuteTime);
