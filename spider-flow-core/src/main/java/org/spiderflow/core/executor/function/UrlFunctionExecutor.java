@@ -44,7 +44,7 @@ public class UrlFunctionExecutor implements FunctionExecutor{
 		            if(kv.length > 0) {
 		            	if(StringUtils.isNotBlank(kv[0])) {
 		            		String value = "";
-		            		if(StringUtils.isNotBlank(kv[1])) {
+		            		if(kv.length > 1 && StringUtils.isNotBlank(kv[1])) {
 		            			int kv1Index = kv[1].indexOf("#");
 		            			if(kv1Index != -1) {
 		            				value = kv[1].substring(0,kv1Index);

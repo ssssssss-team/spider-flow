@@ -51,15 +51,11 @@ public class AstInterpreter {
 					return null;
 				}
 				result += "null";
-			}else if(value instanceof String || value instanceof Number || value instanceof Boolean){
+			}else {
 				if(i ==0 && i + 1 ==n){
 					return value;
 				}
 				result += value;
-			}else if(i + 1 < n){
-				ExpressionError.error("表达式执行错误", node.getSpan());
-			}else{
-				return value;
 			}
 		}
 		return result;

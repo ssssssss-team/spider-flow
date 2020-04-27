@@ -37,7 +37,16 @@
 		<div class="layui-form-item">
    			<label class="layui-form-label">DriverClassName</label>
    			<div class="layui-input-block">
-   				<input type="text" name="driverClassName" placeholder="请输入DriverClassName" autocomplete="off" class="layui-input" lay-verify="required"/>
+				<select name="driverClassName" lay-search  lay-verify="required">
+					<option value=""></option>
+					<option value="com.mysql.jdbc.Driver">com.mysql.jdbc.Driver</option>
+					<option value="org.hsqldb.jdbcDriver">org.hsqldb.jdbcDriver</option>
+					<option value="org.postgresql.Driver">org.postgresql.Driver</option>
+					<option value="oracle.jdbc.driver.OracleDriver">oracle.jdbc.driver.OracleDriver</option>
+					<option value="com.ibm.db2.jcc.DB2Driver">com.ibm.db2.jcc.DB2Driver</option>
+					<option value="com.microsoft.sqlserver.jdbc.SQLServerDriver">com.microsoft.sqlserver.jdbc.SQLServerDriver</option>
+					<option value="com.sybase.jdbc3.jdbc.SybDriver">com.sybase.jdbc3.jdbc.SybDriver</option>
+				</select>
    			</div>
    		</div>
 		<div class="layui-form-item">
@@ -66,6 +75,39 @@
 	</form>
 	<script type="text/javascript">
 		var $ = layui.$;
+		layui.use('form', function(){
+			var form = layui.form;
+			form.render();
+			resetSelect();
+			addSelectListener();
+		});
+
+
+		// 移除search的blur事件，作用可以让用户手动输入
+		function resetSelect(selValue) {
+			// 移除事件
+			var driverClassElement = $("select[name='driverClassName']").next().find("input");
+			driverClassElement.unbind("blur");
+			if(selValue){
+				driverClassElement.val(selValue);
+			}
+			return driverClassElement;
+		}
+
+		// 添加search监听,为了移除它默认选中最后一个
+		function addSelectListener() {
+			$("select[name='driverClassName']").next().find("input").focus(function () {
+				window.setTimeout(function(){
+					var sourceSelect =  $("select[name='driverClassName']").next();
+					var selectText = $(sourceSelect).find(".layui-anim-upbit .layui-this");
+					var selectVal = $(sourceSelect).find("input").val();
+					if (selectVal !== selectText.text()) {
+						$(selectText).removeClass("layui-this");
+					}
+				},100)
+			})
+		}
+
 		var dsId = getQueryString('id');
 		if(dsId){
 			$.ajax({
@@ -75,6 +117,8 @@
 				},
 				success : function(data) {
 					layui.form.val('form', data);
+					resetSelect(data.driverClassName);
+					addSelectListener();
 				}
 			});
 		}
@@ -85,7 +129,7 @@
 				data : {
 					id : dsId,
 					name : $("input[name=name]").val(),
-					driverClassName : $("input[name=driverClassName]").val(),
+					driverClassName : resetSelect().val(),
 					jdbcUrl : $("input[name=jdbcUrl]").val(),
 					username : $("input[name=username]").val(),
 					password : $("input[name=password]").val()
@@ -108,7 +152,7 @@
 				url : 'datasource/test',
 				type : 'post',
 				data : {
-					driverClassName : $("input[name=driverClassName]").val(),
+					driverClassName : resetSelect().val(),
 					jdbcUrl : $("input[name=jdbcUrl]").val(),
 					username : $("input[name=username]").val(),
 					password : $("input[name=password]").val()
