@@ -4,9 +4,9 @@
 <p align="center">
     <a target="_blank" href="https://www.oracle.com/technetwork/java/javase/downloads/index.html"><img src="https://img.shields.io/badge/JDK-1.8+-green.svg" /></a>
     <a target="_blank" href="https://www.spiderflow.org"><img src="https://img.shields.io/badge/Docs-latest-blue.svg"/></a>
-    <a target="_blank" href="https://github.com/javamxd/spider-flow/releases"><img src="https://img.shields.io/github/v/release/javamxd/spider-flow?logo=github"></a>
-    <a target="_blank" href='https://gitee.com/jmxd/spider-flow'><img src="https://gitee.com/jmxd/spider-flow/badge/star.svg?theme=white" /></a>
-    <a target="_blank" href='https://github.com/javamxd/spider-flow'><img src="https://img.shields.io/github/stars/javamxd/spider-flow.svg?style=social"/></a>
+    <a target="_blank" href="https://github.com/ssssssss-team/spider-flow/releases"><img src="https://img.shields.io/github/v/release/ssssssss-team/spider-flow?logo=github"></a>
+    <a target="_blank" href='https://gitee.com/ssssssss-team/spider-flow'><img src="https://gitee.com/ssssssss-team/spider-flow/badge/star.svg?theme=white" /></a>
+    <a target="_blank" href='https://github.com/ssssssss-team/spider-flow'><img src="https://img.shields.io/github/stars/ssssssss-team/spider-flow.svg?style=social"/></a>
     <a target="_blank" href="LICENSE"><img src="https://img.shields.io/:license-MIT-blue.svg"></a>
     <a target="_blank" href="https://shang.qq.com/wpa/qunwpa?idkey=10faa4cf9743e0aa379a72f2ad12a9e576c81462742143c8f3391b52e8c3ed8d"><img src="https://img.shields.io/badge/Join-QQGroup-blue"></a>
 </p>
@@ -31,13 +31,13 @@
 - [x] 支持自定义函数
 
 ## 插件
-- [x] [Selenium插件](https://gitee.com/jmxd/spider-flow-selenium)
-- [x] [Redis插件](https://gitee.com/jmxd/spider-flow-redis)
-- [x] [OSS插件](https://gitee.com/jmxd/spider-flow-oss)
-- [x] [Mongodb插件](https://gitee.com/jmxd/spider-flow-mongodb)
-- [x] [IP代理池插件](https://gitee.com/jmxd/spider-flow-proxypool)
-- [x] [OCR识别插件](https://gitee.com/jmxd/spider-flow-ocr)
-- [x] [电子邮箱插件](https://gitee.com/jmxd/spider-flow-mailbox)
+- [x] [Selenium插件](https://gitee.com/ssssssss-team/spider-flow-selenium)
+- [x] [Redis插件](https://gitee.com/ssssssss-team/spider-flow-redis)
+- [x] [OSS插件](https://gitee.com/ssssssss-team/spider-flow-oss)
+- [x] [Mongodb插件](https://gitee.com/ssssssss-team/spider-flow-mongodb)
+- [x] [IP代理池插件](https://gitee.com/ssssssss-team/spider-flow-proxypool)
+- [x] [OCR识别插件](https://gitee.com/ssssssss-team/spider-flow-ocr)
+- [x] [电子邮箱插件](https://gitee.com/ssssssss-team/spider-flow-mailbox)
 
 ## 项目部分截图
 ### 爬虫列表
@@ -50,9 +50,9 @@
 ![日志](https://images.gitee.com/uploads/images/2020/0412/104800_a757f569_297689.png "logo.png")
 
 ## 其它开源项目
-- [spider-flow-vue，spider-flow的前端](https://gitee.com/jmxd/spider-flow-vue)
-- [ssssssss，一个以XML为基础自动映射为HTTP接口的框架](https://gitee.com/jmxd/ssssssss)
-- [ssssssss-spring-boot-starter](https://gitee.com/jmxd/ssssssss-spring-boot-starter)
+- [spider-flow-vue，spider-flow的前端](https://gitee.com/ssssssss-team/spider-flow-vue)
+- [magic-api，一个以XML为基础自动映射为HTTP接口的框架](https://gitee.com/ssssssss-team/magic-api)
+- [magic-api-spring-boot-starter](https://gitee.com/ssssssss-team/magic-api-spring-boot-starter)
 
 
 ## 免责声明
