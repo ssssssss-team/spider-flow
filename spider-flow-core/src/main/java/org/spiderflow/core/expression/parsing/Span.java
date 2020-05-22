@@ -20,11 +20,18 @@ public class Span {
 	}
 
 	public Span (String source, int start, int end) {
-		if (start > end) throw new IllegalArgumentException("Start must be <= end.");
-		if (start < 0) throw new IndexOutOfBoundsException("Start must be >= 0.");
-		if (start > source.length() - 1) 
+		if (start > end) {
+			throw new IllegalArgumentException("Start must be <= end.");
+		}
+		if (start < 0) {
+			throw new IndexOutOfBoundsException("Start must be >= 0.");
+		}
+		if (start > source.length() - 1) {
 			throw new IndexOutOfBoundsException("Start outside of string.");
-		if (end >source.length()) throw new IndexOutOfBoundsException("End outside of string.");
+		}
+		if (end >source.length()) {
+			throw new IndexOutOfBoundsException("End outside of string.");
+		}
 
 		this.source = source;
 		this.start = start;
@@ -33,11 +40,21 @@ public class Span {
 	}
 
 	public Span (Span start, Span end) {
-		if (!start.source.equals(end.source)) throw new IllegalArgumentException("The two spans do not reference the same source.");
-		if (start.start > end.end) throw new IllegalArgumentException("Start must be <= end.");
-		if (start.start < 0) throw new IndexOutOfBoundsException("Start must be >= 0.");
-		if (start.start > start.source.length() - 1) throw new IndexOutOfBoundsException("Start outside of string.");
-		if (end.end > start.source.length()) throw new IndexOutOfBoundsException("End outside of string.");
+		if (!start.source.equals(end.source)) {
+			throw new IllegalArgumentException("The two spans do not reference the same source.");
+		}
+		if (start.start > end.end) {
+			throw new IllegalArgumentException("Start must be <= end.");
+		}
+		if (start.start < 0) {
+			throw new IndexOutOfBoundsException("Start must be >= 0.");
+		}
+		if (start.start > start.source.length() - 1) {
+			throw new IndexOutOfBoundsException("Start outside of string.");
+		}
+		if (end.end > start.source.length()) {
+			throw new IndexOutOfBoundsException("End outside of string.");
+		}
 
 		this.source = start.source;
 		this.start = start.start;
@@ -74,7 +91,9 @@ public class Span {
 	public Line getLine () {
 		int lineStart = start;
 		while (true) {
-			if (lineStart < 0) break;
+			if (lineStart < 0) {
+				break;
+			}
 			char c = source.charAt(lineStart);
 			if (c == '\n') {
 				lineStart = lineStart + 1;
@@ -82,11 +101,15 @@ public class Span {
 			}
 			lineStart--;
 		}
-		if (lineStart < 0) lineStart = 0;
+		if (lineStart < 0) {
+			lineStart = 0;
+		}
 
 		int lineEnd = end;
 		while (true) {
-			if (lineEnd > source.length() - 1) break;
+			if (lineEnd > source.length() - 1) {
+				break;
+			}
 			char c = source.charAt(lineEnd);
 			if (c == '\n') {
 				break;

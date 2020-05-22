@@ -30,9 +30,9 @@ public class AstInterpreter {
 		try {
 			return interpretNodeList(template.getNodes(), template, context);
 		} catch (Throwable t) {
-			if (t instanceof TemplateException)
+			if (t instanceof TemplateException) {
 				throw (TemplateException)t;
-			else {
+			} else {
 				ExpressionError.error("执行表达式出错 " + t.getMessage(), template.getNodes().get(0).getSpan(),t);
 				return null; // never reached
 			}

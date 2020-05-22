@@ -20,14 +20,15 @@ public class ExpressionError {
 	 * </p>
 	 */
 	public static void error (String message, TokenStream stream) {
-		if (stream.hasMore())
+		if (stream.hasMore()) {
 			error(message, stream.consume().getSpan());
-		else {
+		} else {
 			String source = stream.getSource();
-			if (source == null)
+			if (source == null) {
 				error(message, new Span(" ", 0, 1));
-			else
+			} else {
 				error(message, new Span(source, source.length() - 1, source.length()));
+			}
 		}
 	}
 
@@ -47,10 +48,11 @@ public class ExpressionError {
 			message += i >= errorStart && i <= errorEnd ? "^" : useTab ? "\t" : " ";
 		}
 
-		if (cause == null)
+		if (cause == null) {
 			throw new TemplateException(message, location);
-		else
+		} else {
 			throw new TemplateException(message, location, cause);
+		}
 	}
 
 	/** Create an error message based on the provided message and location, highlighting the location in the line on which the
@@ -98,10 +100,11 @@ public class ExpressionError {
 			while (cause != null && cause != this) {
 				if (cause instanceof TemplateException) {
 					TemplateException ex = (TemplateException)cause;
-					if (ex.getCause() == null || ex.getCause() == ex)
+					if (ex.getCause() == null || ex.getCause() == ex) {
 						builder.append(ex.errorMessage);
-					else
+					} else {
 						builder.append(ex.errorMessage.substring(0, ex.errorMessage.indexOf('\n')));
+					}
 					builder.append("\n");
 				}
 				cause = cause.getCause();
