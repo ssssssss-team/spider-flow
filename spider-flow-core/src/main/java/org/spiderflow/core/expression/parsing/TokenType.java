@@ -11,6 +11,7 @@ public enum TokenType {
 	// @off
 	TextBlock("a text block"),
 	Period(".", "."),
+	Lambda("->", "->"),
 	Comma(",", ","),
 	Semicolon(";", ";"),
 	Colon(":", ":"),

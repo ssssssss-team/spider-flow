@@ -1,37 +1,13 @@
 package org.spiderflow.core.expression.parsing;
 
 
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.transform.Source;
-
 import org.spiderflow.core.expression.ExpressionError;
 import org.spiderflow.core.expression.ExpressionTemplate;
-import org.spiderflow.core.expression.parsing.Ast.BinaryOperation;
-import org.spiderflow.core.expression.parsing.Ast.BooleanLiteral;
-import org.spiderflow.core.expression.parsing.Ast.ByteLiteral;
-import org.spiderflow.core.expression.parsing.Ast.CharacterLiteral;
-import org.spiderflow.core.expression.parsing.Ast.DoubleLiteral;
-import org.spiderflow.core.expression.parsing.Ast.Expression;
-import org.spiderflow.core.expression.parsing.Ast.FloatLiteral;
-import org.spiderflow.core.expression.parsing.Ast.FunctionCall;
-import org.spiderflow.core.expression.parsing.Ast.IntegerLiteral;
-import org.spiderflow.core.expression.parsing.Ast.ListLiteral;
-import org.spiderflow.core.expression.parsing.Ast.LongLiteral;
-import org.spiderflow.core.expression.parsing.Ast.MapLiteral;
-import org.spiderflow.core.expression.parsing.Ast.MapOrArrayAccess;
-import org.spiderflow.core.expression.parsing.Ast.MemberAccess;
-import org.spiderflow.core.expression.parsing.Ast.MethodCall;
-import org.spiderflow.core.expression.parsing.Ast.Node;
-import org.spiderflow.core.expression.parsing.Ast.NullLiteral;
-import org.spiderflow.core.expression.parsing.Ast.ShortLiteral;
-import org.spiderflow.core.expression.parsing.Ast.StringLiteral;
-import org.spiderflow.core.expression.parsing.Ast.TernaryOperation;
-import org.spiderflow.core.expression.parsing.Ast.Text;
-import org.spiderflow.core.expression.parsing.Ast.UnaryOperation;
-import org.spiderflow.core.expression.parsing.Ast.VariableAccess;
+import org.spiderflow.core.expression.parsing.Ast.*;
+
+import javax.xml.transform.Source;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /** Parses a {@link Source} into a {@link ExpressionTemplate}. The implementation is a simple recursive descent parser with a lookahead of
@@ -53,14 +29,16 @@ public class Parser {
 	private static Node parseStatement (TokenStream tokens) {
 		Node result = null;
 
-		if (tokens.match(TokenType.TextBlock, false))
+		if (tokens.match(TokenType.TextBlock, false)) {
 			result = new Text(tokens.consume().getSpan());
-		else
+		} else {
 			result = parseExpression(tokens);
+		}
 
 		// consume semi-colons as statement delimiters
-		while (tokens.match(";", true))
+		while (tokens.match(";", true)) {
 			;
+		}
 
 		return result;
 	}
@@ -152,6 +130,8 @@ public class Parser {
 			return new CharacterLiteral(stream.expect(TokenType.CharacterLiteral).getSpan());
 		} else if (stream.match(TokenType.NullLiteral, false)) {
 			return new NullLiteral(stream.expect(TokenType.NullLiteral).getSpan());
+		} else if (stream.match(TokenType.Lambda, false)) {
+			return parseAccessOrCall(stream,TokenType.Lambda);
 		} else {
 			ExpressionError.error("Expected a variable, field, map, array, function or method call, or literal.", stream);
 			return null; // not reached
@@ -172,7 +152,9 @@ public class Parser {
 			
 			stream.expect(":");
 			values.add(parseExpression(stream));
-			if (!stream.match("}", false)) stream.expect(TokenType.Comma);
+			if (!stream.match("}", false)) {
+				stream.expect(TokenType.Comma);
+			}
 		}
 		Span closeCurly = stream.expect("}").getSpan();
 		return new MapLiteral(new Span(openCurly, closeCurly), keys, values);
@@ -184,7 +166,9 @@ public class Parser {
 		List<Expression> values = new ArrayList<>();
 		while (stream.hasMore() && !stream.match(TokenType.RightBracket, false)) {
 			values.add(parseExpression(stream));
-			if (!stream.match(TokenType.RightBracket, false)) stream.expect(TokenType.Comma);
+			if (!stream.match(TokenType.RightBracket, false)) {
+				stream.expect(TokenType.Comma);
+			}
 		}
 
 		Span closeBracket = stream.expect(TokenType.RightBracket).getSpan();
@@ -197,16 +181,43 @@ public class Parser {
 		Span identifier = stream.expect(tokenType).getSpan();
 		Expression result = tokenType == TokenType.StringLiteral ? new StringLiteral(identifier) :new VariableAccess(identifier);
 
-		while (stream.hasMore() && stream.match(false, TokenType.LeftParantheses, TokenType.LeftBracket, TokenType.Period)) {
-
+		Expression function = null;
+		Span lpSpan = null;
+		List<Expression> results = null;
+		while (stream.hasMore() && stream.match(false, TokenType.LeftParantheses, TokenType.LeftBracket, TokenType.Period, TokenType.Lambda)) {
 			// function or method call
 			if (stream.match(TokenType.LeftParantheses, false)) {
-				List<Expression> arguments = parseArguments(stream);
+				Span ls = stream.expect(TokenType.LeftParantheses).getSpan();
+				List<Expression> arguments = parseArgumentsNotExpect(stream);
+				//�����lambda
+				if (stream.match(TokenType.RightParantheses, false) && stream.hasNext()) {
+					stream.expect(TokenType.RightParantheses);
+					if (stream.match(TokenType.Lambda, true)) {
+						Expression key = parseExpression(stream);
+						function = new Ast.LambdaAccess(new Span(ls, new Span(key.getSpan().getSource(), key.getSpan().getStart(), key.getSpan().getEnd() + 1)), key, arguments);
+						arguments.clear();
+						arguments.add(function);
+					} else {
+						stream.prev();
+					}
+				}
 				Span closingSpan = stream.expect(TokenType.RightParantheses).getSpan();
-				if (result instanceof VariableAccess || result instanceof MapOrArrayAccess)
+				if (result instanceof VariableAccess || result instanceof MapOrArrayAccess) {
 					result = new FunctionCall(new Span(result.getSpan(), closingSpan), result, arguments);
-				else if (result instanceof MemberAccess) {
-					result = new MethodCall(new Span(result.getSpan(), closingSpan), (MemberAccess)result, arguments);
+				} else if (result instanceof MemberAccess) {
+					for (Expression expression : arguments) {
+						if (expression instanceof LambdaAccess) {
+							LambdaAccess lambdaAccess = (LambdaAccess) expression;
+							lambdaAccess.setArrayLike((MemberAccess) result);
+						}
+					}
+					MethodCall methodCall = new MethodCall(new Span(result.getSpan(), closingSpan), (MemberAccess) result, arguments);
+					String name = ((MemberAccess) result).getName().getText();
+					if (ArrayLikeLambdaExecutor.SUPPORT_METHOD.contains(name)) {
+						methodCall.setCachedMethod(ArrayLikeLambdaExecutor.METHODS.get(name));
+						methodCall.setCachedMethodStatic(true);
+					}
+					result = methodCall;
 				} else {
 					ExpressionError.error("Expected a variable, field or method.", stream);
 				}
@@ -224,6 +235,11 @@ public class Parser {
 				identifier = stream.expect(TokenType.Identifier).getSpan();
 				result = new MemberAccess(result, identifier);
 			}
+
+			else if (stream.match(TokenType.Lambda, true)) {
+				Expression key = parseExpression(stream);
+				result = new Ast.LambdaAccess(new Span(result.getSpan(), key.getSpan()), key, result);
+			}
 		}
 
 		return result;
@@ -232,10 +248,52 @@ public class Parser {
 	/** Does not consume the closing parentheses. **/
 	private static List<Expression> parseArguments (TokenStream stream) {
 		stream.expect(TokenType.LeftParantheses);
+		return parseArgumentsNotExpect(stream);
+	}
+	private static List<Expression> parseArgumentsNotExpect (TokenStream stream) {
 		List<Expression> arguments = new ArrayList<Expression>();
 		while (stream.hasMore() && !stream.match(TokenType.RightParantheses, false)) {
+			boolean f1 = false, f2 = false;
+			int c = 0;
+			while (stream.hasNext()) {
+				c++;
+				stream.next();
+				if (f1 && stream.match(TokenType.Lambda, false)) {
+					f2 = true;
+					int count = c;
+					for (int i = 0; i < count - 1; i++) {
+						stream.prev();
+						c--;
+					}
+					break;
+				}
+				if (stream.match(TokenType.RightParantheses, false)) {
+					f1 = true;
+				} else {
+					f1 = false;
+				}
+			}
+			if (!f2) {
+				int count = c;
+				for (int i = 0; i < count; i++) {
+					stream.prev();
+					c--;
+				}
+			}
 			arguments.add(parseExpression(stream));
-			if (!stream.match(TokenType.RightParantheses, false)) stream.expect(TokenType.Comma);
+			if (f1 && f2) {
+				while (stream.match(TokenType.Comma, true)) {
+					arguments.add(parseExpression(stream));
+				}
+				return arguments;
+			}
+			if (!stream.match(TokenType.RightParantheses, false)) {
+//				if (stream.match(TokenType.Lambda, false)) {
+//					return arguments;
+//				} else {
+					stream.expect(TokenType.Comma);
+//				}
+			}
 		}
 		return arguments;
 	}

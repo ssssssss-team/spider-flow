@@ -1,17 +1,16 @@
 package org.spiderflow.core.expression;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.spiderflow.ExpressionEngine;
-import org.spiderflow.core.expression.interpreter.Reflection;
+import org.spiderflow.core.expression.interpreter.AbstractReflection;
 import org.spiderflow.executor.FunctionExecutor;
 import org.spiderflow.executor.FunctionExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class DefaultExpressionEngine implements ExpressionEngine{
@@ -25,7 +24,7 @@ public class DefaultExpressionEngine implements ExpressionEngine{
 	@PostConstruct
 	private void init(){
 		for (FunctionExtension extension : functionExtensions) {
-			Reflection.getInstance().registerExtensionClass(extension.support(), extension.getClass());
+			AbstractReflection.getInstance().registerExtensionClass(extension.support(), extension.getClass());
 		}
 	}
 	
