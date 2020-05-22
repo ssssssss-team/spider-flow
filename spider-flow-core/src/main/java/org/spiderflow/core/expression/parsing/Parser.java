@@ -189,7 +189,7 @@ public class Parser {
 			if (stream.match(TokenType.LeftParantheses, false)) {
 				Span ls = stream.expect(TokenType.LeftParantheses).getSpan();
 				List<Expression> arguments = parseArgumentsNotExpect(stream);
-				//�����lambda
+				//多参数 lambda
 				if (stream.match(TokenType.RightParantheses, false) && stream.hasNext()) {
 					stream.expect(TokenType.RightParantheses);
 					if (stream.match(TokenType.Lambda, true)) {
