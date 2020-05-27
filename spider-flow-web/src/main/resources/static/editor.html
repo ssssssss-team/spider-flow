@@ -6,9 +6,6 @@
 		<link rel="stylesheet" href="js/layui/css/layui.css" />
 		<link rel="stylesheet" href="css/layui-blue.css" />
 		<link rel="stylesheet" href="css/editor.css" />
-		<link rel="stylesheet" href="js/codemirror/codemirror.css" />
-		<link rel="stylesheet" href="js/codemirror/idea.css" />
-		<link rel="stylesheet" href="js/codemirror/show-hint.css" />
 		<link rel="stylesheet" href="js/jsontree/jsontree.css" />
 		<script type="text/javascript" src="js/layui/layui.all.js" ></script>
 		<script>mxBasePath = 'js/mxgraph';$=layui.$</script>
@@ -16,12 +13,9 @@
 		<script type="text/javascript" src="js/common.js" ></script>
 		<script type="text/javascript" src="js/spider-editor.js" ></script>
 		<script type="text/javascript" src="js/canvas-viewer.js" ></script>
-		<script type="text/javascript" src="js/codemirror/codemirror.js" ></script>
-		<script type="text/javascript" src="js/codemirror/spiderflow.js" ></script>
-		<script type="text/javascript" src="js/codemirror/placeholder.js" ></script>
-		<script type="text/javascript" src="js/codemirror/sql.js" ></script>
-		<script type="text/javascript" src="js/codemirror/show-hint.js" ></script>
-		<script type="text/javascript" src="js/codemirror/spiderflow-hint.js" ></script>
+		<script type="text/javascript" src="js/monaco/loader.js"></script>
+		<script type="text/javascript">require.config({ paths: { 'vs': 'js/monaco' }});</script>
+		<script type="text/javascript" src="js/monaco/language/spiderflow/spiderflow.js"></script>
 		<script type="text/javascript" src="js/jsontree/jsontree.js" ></script>
 		<script type="text/javascript" src="js/editor.js" ></script>
 	</head>

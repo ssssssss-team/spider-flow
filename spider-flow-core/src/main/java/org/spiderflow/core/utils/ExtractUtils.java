@@ -1,17 +1,16 @@
 package org.spiderflow.core.utils;
 
+import com.alibaba.fastjson.JSONPath;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import us.codecraft.xsoup.Xsoup;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import com.alibaba.fastjson.JSONPath;
-import us.codecraft.xsoup.Xsoup;
 
 /**
  * 抽取数据工具类
@@ -21,8 +20,8 @@ import us.codecraft.xsoup.Xsoup;
 public class ExtractUtils {
 	
 	private static Map<String,Pattern> patterns = new HashMap<>();
-	
-	private static Pattern compile(String regx){
+
+	public static Pattern compile(String regx){
 		Pattern pattern = patterns.get(regx);
 		if(pattern == null){
 			pattern = Pattern.compile(regx,Pattern.DOTALL);
@@ -176,5 +175,5 @@ public class ExtractUtils {
 	public static boolean isNumber(String str) {
         return compile("^(\\-|\\+)?\\d+(\\.\\d+)?$").matcher(str).matches();  
 	}
-	
+
 }

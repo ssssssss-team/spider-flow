@@ -608,3 +608,10 @@ html,body{
 .layui-table-box .layui-table-header .layui-table{
 	width: 100%;
 }
+.properties-container .monaco-editor .view-overlays .current-line{
+	border : none !important;
+}
+.properties-container .monaco-editor{
+	border : 1px solid #e6e6e6;
+	overflow: hidden;
+}

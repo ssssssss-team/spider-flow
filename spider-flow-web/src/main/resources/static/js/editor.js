@@ -12,23 +12,49 @@ function renderCodeMirror(){
 			return;
 		}
 		$dom.attr("rendered",true)
-		var cm = CodeMirror(this,{
-			mode : 'spiderflow',	//语法
-			theme : 'idea',	//设置样式
-			placeholder : $dom.attr("placeholder"),
-			value : $dom.attr('data-value') || '',
-			scrollbarStyle : 'null',	//隐藏滚动条
-		});
-		initHint(cm);
+		var cm = monaco.editor.create(this,{
+			language: 'spiderflow',
+			contextmenu :false,
+			minimap : {
+				enabled : false
+			},
+			overviewRulerBorder : false,
+			overviewRulerLanes : 0,
+			folding:false,
+			fixedOverflowWidgets :true,
+			scrollbar : {
+				horizontal : 'auto',
+				vertical : 'hidden'
+			},
+			lineNumbers : 'off',
+			theme : 'spiderflow',
+			value : $dom.attr('data-value') || ''
+		})
+		// var cm = CodeMirror(this,{
+		// 	mode : 'spiderflow',	//语法
+		// 	theme : 'idea',	//设置样式
+		// 	placeholder : $dom.attr("placeholder"),
+		// 	value : $dom.attr('data-value') || '',
+		// 	scrollbarStyle : 'null',	//隐藏滚动条
+		// });
+		// initHint(cm);
 		codeMirrorInstances[$(this).attr('codemirror')] = cm;
-		cm.on('change',function(){
+		// cm.on('change',function(){
+		// 	$dom.attr('data-value',cm.getValue());
+		// 	if($dom.attr('codemirror') == 'condition'){
+		// 		var $select = $('select[name="exception-flow"]');
+		// 		$select.siblings("div.layui-form-select").find('dl dd[lay-value=' + $select.val() + ']').click();
+		// 	}
+		// 	serializeForm();
+		// });
+		cm.onDidChangeModelContent(function(){
 			$dom.attr('data-value',cm.getValue());
 			if($dom.attr('codemirror') == 'condition'){
 				var $select = $('select[name="exception-flow"]');
 				$select.siblings("div.layui-form-select").find('dl dd[lay-value=' + $select.val() + ']').click();
 			}
 			serializeForm();
-		});
+		})
 		codeMirrorInstances[$(this).attr('codemirror')] = cm;
 	});
 }
@@ -144,6 +170,14 @@ function validXML(callback){
 	}
 }
 $(function(){
+	$.ajax({
+		url : 'spider/objects',
+		type : 'post',
+		dataType : 'json',
+		success : function(data){
+			spiderflowGrammer.reset(data.data)
+		}
+	})
 	$.ajax({
 		url : 'spider/other',
 		type : 'post',
@@ -520,9 +554,9 @@ $(function(){
 			}
 		});
 		layui.element.on('tab',function(){
-			for(var key in codeMirrorInstances){
-				codeMirrorInstances[key].refresh();
-			}
+			// for(var key in codeMirrorInstances){
+			// 	codeMirrorInstances[key].refresh();
+			// }
 		})
 		layui.form.on('select',serializeForm);
 		var id = getQueryString('id');

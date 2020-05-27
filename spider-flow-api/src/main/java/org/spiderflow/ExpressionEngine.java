@@ -15,4 +15,8 @@ public interface ExpressionEngine {
 	 */
 	Object execute(String expression, Map<String, Object> variables);
 
+	default Object getExpressionObjectMap(){
+		return null;
+	}
+
 }

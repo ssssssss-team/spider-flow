@@ -6,17 +6,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spiderflow.Grammerable;
-import org.spiderflow.annotation.Comment;
+import org.spiderflow.ExpressionEngine;
 import org.spiderflow.core.model.SpiderFlow;
 import org.spiderflow.core.service.SpiderFlowService;
 import org.spiderflow.core.utils.ExecutorsUtils;
-import org.spiderflow.executor.FunctionExecutor;
-import org.spiderflow.executor.FunctionExtension;
 import org.spiderflow.executor.PluginConfig;
 import org.spiderflow.io.Line;
 import org.spiderflow.io.RandomAccessFileReader;
-import org.spiderflow.model.Grammer;
 import org.spiderflow.model.JsonBean;
 import org.spiderflow.model.Plugin;
 import org.spiderflow.model.Shape;
@@ -30,12 +26,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,16 +44,10 @@ import java.util.stream.Collectors;
 public class SpiderFlowController {
 	
 	@Autowired
-	private List<FunctionExecutor> functionExecutors;
-	
-	@Autowired
-	private List<FunctionExtension> functionExtensions;
-	
-	@Autowired
-	private List<Grammerable> grammerables;
-	
-	@Autowired
 	private SpiderFlowService spiderFlowService;
+
+	@Autowired
+	private ExpressionEngine expressionEngine;
 	
 	@Autowired(required = false)
 	private List<PluginConfig> pluginConfigs;
@@ -67,33 +55,9 @@ public class SpiderFlowController {
 	@Value("${spider.workspace}")
 	private String workspace;
 	
-	private final List<Grammer> grammers = new ArrayList<Grammer>();
-	
 	private static Logger logger = LoggerFactory.getLogger(SpiderFlowController.class);
 	
-	@PostConstruct
-	private void init(){
-		for (FunctionExecutor executor : functionExecutors) {
-			String function = executor.getFunctionPrefix();
-			grammers.addAll(Grammer.findGrammers(executor.getClass(),function,function,true));
-			Comment comment = executor.getClass().getAnnotation(Comment.class);
-			Grammer grammer = new Grammer();
-			if(comment!= null){
-				grammer.setComment(comment.value());
-			}
-			grammer.setFunction(function);
-			grammers.add(grammer);
-		}
-		
-		for (FunctionExtension extension : functionExtensions) {
-			String owner = extension.support().getSimpleName();
-			grammers.addAll(Grammer.findGrammers(extension.getClass(),null,owner,true));
-		}
-		for (Grammerable grammerable : grammerables) {
-			grammers.addAll(grammerable.grammers());
-		}
-	}
-	
+
 	/**
 	 * 爬虫列表
 	 * @param page 页数
@@ -202,12 +166,12 @@ public class SpiderFlowController {
 	public List<Plugin> pluginConfigs(){
 		return null == pluginConfigs ? Collections.emptyList() : pluginConfigs.stream().filter(e-> e.plugin() != null).map(plugin -> plugin.plugin()).collect(Collectors.toList());
 	}
-	
-	@RequestMapping("/grammers")
-	public JsonBean<List<Grammer>> grammers(){
-		return new JsonBean<>(this.grammers);
-	}
 
+	@RequestMapping("/objects")
+	public JsonBean<Object> objects(){
+		return new JsonBean<>(expressionEngine.getExpressionObjectMap());
+	}
+	
 	@GetMapping("/recent5TriggerTime")
 	public List<String> getRecent5TriggerTime(String cron){
 		return spiderFlowService.getRecentTriggerTime(cron,5);
