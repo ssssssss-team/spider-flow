@@ -2,18 +2,18 @@
 package org.spiderflow.core.expression.interpreter;
 
 /** Used by {@link AstInterpreter} to access fields and methods of objects. This is a singleton class used by all
- * {@link AstInterpreter} instances. Replace the default implementation via {@link #setInstance(Reflection)}. The implementation
+ * {@link AstInterpreter} instances. Replace the default implementation via {@link #setInstance(AbstractReflection)}. The implementation
  * must be thread-safe. */
-public abstract class Reflection {
-	private static Reflection instance = new JavaReflection();
+public abstract class AbstractReflection {
+	private static AbstractReflection instance = new JavaReflection();
 
 	/** Sets the Reflection instance to be used by all Template interpreters **/
-	public synchronized static void setInstance (Reflection reflection) {
-		instance = reflection;
+	public synchronized static void setInstance (AbstractReflection abstractReflection) {
+		instance = abstractReflection;
 	}
 
 	/** Returns the Reflection instance used to fetch field and call methods **/
-	public synchronized static Reflection getInstance () {
+	public synchronized static AbstractReflection getInstance () {
 		return instance;
 	}
 

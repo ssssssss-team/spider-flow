@@ -11,6 +11,7 @@ public enum TokenType {
 	// @off
 	TextBlock("a text block"),
 	Period(".", "."),
+	Lambda("->", "->"),
 	Comma(",", ","),
 	Semicolon(";", ";"),
 	Colon(":", ":"),
@@ -62,9 +63,15 @@ public enum TokenType {
 		Arrays.sort(values, new Comparator<TokenType>() {
 			@Override
 			public int compare (TokenType o1, TokenType o2) {
-				if (o1.literal == null && o2.literal == null) return 0;
-				if (o1.literal == null && o2.literal != null) return 1;
-				if (o1.literal != null && o2.literal == null) return -1;
+				if (o1.literal == null && o2.literal == null) {
+					return 0;
+				}
+				if (o1.literal == null && o2.literal != null) {
+					return 1;
+				}
+				if (o1.literal != null && o2.literal == null) {
+					return -1;
+				}
 				return o2.literal.length() - o1.literal.length();
 			}
 		});

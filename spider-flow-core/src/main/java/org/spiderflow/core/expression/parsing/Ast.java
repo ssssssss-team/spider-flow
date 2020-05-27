@@ -7,9 +7,9 @@ import org.spiderflow.core.expression.ExpressionError;
 import org.spiderflow.core.expression.ExpressionError.TemplateException;
 import org.spiderflow.core.expression.ExpressionTemplate;
 import org.spiderflow.core.expression.ExpressionTemplateContext;
+import org.spiderflow.core.expression.interpreter.AbstractReflection;
 import org.spiderflow.core.expression.interpreter.AstInterpreter;
 import org.spiderflow.core.expression.interpreter.JavaReflection;
-import org.spiderflow.core.expression.interpreter.Reflection;
 import org.spiderflow.core.script.ScriptManager;
 import org.spiderflow.expression.DynamicMethod;
 
@@ -379,6 +379,9 @@ public abstract class Ast {
 		}
 
 		private Object evaluateGreater (Object left, Object right) {
+            if(left == null || right == null){
+                return false;
+            }
 			if (left instanceof Double || right instanceof Double) {
 				return ((Number)left).doubleValue() > ((Number)right).doubleValue();
 			} else if (left instanceof Float || right instanceof Float) {
@@ -895,14 +898,14 @@ public abstract class Ast {
 			return name;
 		}
 
-		/** Returns the cached member descriptor as returned by {@link Reflection#getField(Object, String)} or
-		 * {@link Reflection#getMethod(Object, String, Object...)}. See {@link #setCachedMember(Object)}. **/
+		/** Returns the cached member descriptor as returned by {@link AbstractReflection#getField(Object, String)} or
+		 * {@link AbstractReflection#getMethod(Object, String, Object...)}. See {@link #setCachedMember(Object)}. **/
 		public Object getCachedMember () {
 			return cachedMember;
 		}
 
-		/** Sets the member descriptor as returned by {@link Reflection#getField(Object, String)} or
-		 * {@link Reflection#getMethod(Object, String, Object...)} for faster member lookups. Called by {@link AstInterpreter} the
+		/** Sets the member descriptor as returned by {@link AbstractReflection#getField(Object, String)} or
+		 * {@link AbstractReflection#getMethod(Object, String, Object...)} for faster member lookups. Called by {@link AstInterpreter} the
 		 * first time this node is evaluated. Subsequent evaluations can use the cached descriptor, avoiding a costly reflective
 		 * lookup. **/
 		public void setCachedMember (Object cachedMember) {
@@ -918,7 +921,7 @@ public abstract class Ast {
 			}
 
 			// special case for array.length
-			if (object.getClass().isArray() && getName().getText().equals("length")) {
+            if (object.getClass().isArray() && "length".equals(getName().getText())) {
 				return Array.getLength(object);
 			}
 
@@ -930,14 +933,14 @@ public abstract class Ast {
 
 			Object field = getCachedMember();
 			if (field != null) {
-				try {
-					return Reflection.getInstance().getFieldValue(object, field);
-				} catch (Throwable t) {
-					// fall through
-				}
-			}
-			String text = getName().getText();
-			field = Reflection.getInstance().getField(object, text);
+                try {
+                    return AbstractReflection.getInstance().getFieldValue(object, field);
+                } catch (Throwable t) {
+                    // fall through
+                }
+            }
+            String text = getName().getText();
+            field = AbstractReflection.getInstance().getField(object, text);
 			if (field == null) {
 				String methodName = null;
 				if(text.length() > 1){
@@ -975,11 +978,102 @@ public abstract class Ast {
 					}
 				}
 			}
-			setCachedMember(field);
-			return Reflection.getInstance().getFieldValue(object, field);
-		}
+            setCachedMember(field);
+            return AbstractReflection.getInstance().getFieldValue(object, field);
+        }
 	}
 
+    public static class LambdaAccess extends Expression {
+        private final List<Expression> elements = new ArrayList<>();
+        private final Expression function;
+        private MemberAccess arrayLike;
+
+        public LambdaAccess (Span span, Expression function, List<Expression> elements) {
+            super(span);
+            this.elements.addAll(elements);
+            this.function = function;
+        }
+        public LambdaAccess (Span span, Expression function, Expression... elements) {
+            super(span);
+            this.elements.addAll(Arrays.asList(elements));
+            this.function = function;
+        }
+
+        public List<Expression> getElements() {
+            return elements;
+        }
+
+        /** Returns an expression that is used as the key or index to fetch a map or array element. **/
+        public Expression getFunction() {
+            return function;
+        }
+        @SuppressWarnings("rawtypes")
+        @Override
+        public Object evaluate (ExpressionTemplate template, ExpressionTemplateContext context) throws IOException {
+            if (ArrayLikeLambdaExecutor.SUPPORT_METHOD.contains(arrayLike.getName().getText())) {
+                return oneArgumentParser(template, context);
+            } else {
+                ExpressionError.error("只支持 "+ String.join(",", ArrayLikeLambdaExecutor.SUPPORT_METHOD) +"。不支持的lambda函数： " + arrayLike.getName().getText(), arrayLike.getSpan());
+            }
+            return null;
+        }
+
+        private <T,R> Object oneArgumentParser(ExpressionTemplate template, ExpressionTemplateContext context) {
+            Object arrLikeObj;
+			try {
+				arrLikeObj = arrayLike.getObject().evaluate(template, context);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			if (arrLikeObj.getClass().isArray()) {
+				try {
+//                        Integer size = (Integer) arrLikeObj.getClass().getDeclaredField("length").get(arrLikeObj);
+					int size = Array.getLength(arrLikeObj);
+					List<Object> list = new ArrayList<>(size);
+					for (int i = 0; i < size; i++) {
+						list.add(Array.get(arrLikeObj, i));
+					}
+					arrLikeObj = list;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (arrLikeObj instanceof Iterator) {
+				Iterator<?> it = (Iterator<?>) arrLikeObj;
+				List<Object> list = new ArrayList<>();
+				it.forEachRemaining(list::add);
+				arrLikeObj = list;
+			} else if (arrLikeObj instanceof Enumeration) {
+				Enumeration<?> en = (Enumeration<?>) arrLikeObj;
+				arrLikeObj = Collections.list(en);
+			}
+			if (arrLikeObj instanceof Collection) {
+				return new ArrayLikeLambdaExecutor.MultipleArgumentsLambda(elements, lambdaArgumentsValues -> {
+					try {
+						context.push();
+						for (int i = 0; i < elements.size() && i < lambdaArgumentsValues.length; i++) {
+							Expression expression = elements.get(i);
+							context.setOnCurrentScope(expression.getSpan().getText(), lambdaArgumentsValues[i]);
+						}
+						return function.evaluate(template, context);
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw new RuntimeException(e);
+					} finally {
+						context.pop();
+					}
+				});
+			}
+            return null;
+        }
+
+        public void setArrayLike(MemberAccess arrayLike) {
+            this.arrayLike = arrayLike;
+        }
+
+        public MemberAccess getArrayLike() {
+            return arrayLike;
+        }
+    }
 	/** Represents a call to a top-level function. A function may either be a {@link FunctionalInterface} stored in a
 	 * {@link ExpressionTemplateContext}, or a {@link Macro} defined in a template. */
 	public static class FunctionCall extends Expression {
@@ -1005,13 +1099,13 @@ public abstract class Ast {
 			return arguments;
 		}
 
-		/** Returns the cached "function" descriptor as returned by {@link Reflection#getMethod(Object, String, Object...)} or the
+		/** Returns the cached "function" descriptor as returned by {@link AbstractReflection#getMethod(Object, String, Object...)} or the
 		 * {@link Macro}. See {@link #setCachedFunction(Object)}. **/
 		public Object getCachedFunction () {
 			return cachedFunction;
 		}
 
-		/** Sets the "function" descriptor as returned by {@link Reflection#getMethod(Object, String, Object...)} for faster
+		/** Sets the "function" descriptor as returned by {@link AbstractReflection#getMethod(Object, String, Object...)} for faster
 		 * lookups, or the {@link Macro} to be called. Called by {@link AstInterpreter} the first time this node is evaluated.
 		 * Subsequent evaluations can use the cached descriptor, avoiding a costly reflective lookup. **/
 		public void setCachedFunction (Object cachedFunction) {
@@ -1063,19 +1157,19 @@ public abstract class Ast {
 				if (function != null) {
 					Object method = getCachedFunction();
 					if (method != null) {
-						try {
-							return Reflection.getInstance().callMethod(function, method, argumentValues);
+                        try {
+                            return AbstractReflection.getInstance().callMethod(function, method, argumentValues);
 						} catch (Throwable t) {
 							// fall through
 						}
-					}
-					method = Reflection.getInstance().getMethod(function, null, argumentValues);
+                    }
+                    method = AbstractReflection.getInstance().getMethod(function, null, argumentValues);
 					if (method == null) {
 						ExpressionError.error("Couldn't find function.", getSpan());
 					}
 					setCachedFunction(method);
-					try {
-						return Reflection.getInstance().callMethod(function, method, argumentValues);
+                    try {
+                        return AbstractReflection.getInstance().callMethod(function, method, argumentValues);
 					} catch (Throwable t) {
 						ExpressionError.error(t.getMessage(), getSpan(), t);
 						return null; // never reached
@@ -1103,6 +1197,7 @@ public abstract class Ast {
 		private final List<Expression> arguments;
 		private Object cachedMethod;
 		private final ThreadLocal<Object[]> cachedArguments;
+        private boolean cachedMethodStatic;
 
 		public MethodCall (Span span, MemberAccess method, List<Expression> arguments) {
 			super(span);
@@ -1126,18 +1221,18 @@ public abstract class Ast {
 			return arguments;
 		}
 
-		/** Returns the cached member descriptor as returned by {@link Reflection#getMethod(Object, String, Object...)}. See
-		 * {@link #setCachedMember(Object)}. **/
-		public Object getCachedMethod () {
-			return cachedMethod;
-		}
+        /** Returns the cached member descriptor as returned by {@link AbstractReflection#getMethod(Object, String, Object...)}. See
+         * {@link #setCachedMember(Object)}. **/
+        public Object getCachedMethod () {
+            return cachedMethod;
+        }
 
-		/** Sets the method descriptor as returned by {@link Reflection#getMethod(Object, String, Object...)} for faster lookups.
-		 * Called by {@link AstInterpreter} the first time this node is evaluated. Subsequent evaluations can use the cached
-		 * descriptor, avoiding a costly reflective lookup. **/
-		public void setCachedMethod (Object cachedMethod) {
-			this.cachedMethod = cachedMethod;
-		}
+        /** Sets the method descriptor as returned by {@link AbstractReflection#getMethod(Object, String, Object...)} for faster lookups.
+         * Called by {@link AstInterpreter} the first time this node is evaluated. Subsequent evaluations can use the cached
+         * descriptor, avoiding a costly reflective lookup. **/
+        public void setCachedMethod (Object cachedMethod) {
+            this.cachedMethod = cachedMethod;
+        }
 
 		/** Returns a scratch buffer to store arguments in when calling the function in {@link AstInterpreter}. Avoids generating
 		 * garbage. **/
@@ -1176,7 +1271,7 @@ public abstract class Ast {
 					try {
 						Object method = DynamicMethod.class.getDeclaredMethod("execute", String.class,List.class);
 						Object[] newArgumentValues = new Object[]{getMethod().getName().getText(),Arrays.asList(argumentValues)};
-						return Reflection.getInstance().callMethod(object, method, newArgumentValues);
+						return AbstractReflection.getInstance().callMethod(object, method, newArgumentValues);
 					} catch (Throwable t) {
 						ExpressionError.error(t.getMessage(), getSpan(), t);
 						return null; // never reached
@@ -1187,24 +1282,28 @@ public abstract class Ast {
 				Object method = getCachedMethod();
 				if (method != null) {
 					try {
-						return Reflection.getInstance().callMethod(object, method, argumentValues);
+                        if (isCachedMethodStatic()) {
+                            return AbstractReflection.getInstance().callMethod(null, method, object, argumentValues);
+                        }
+                        return AbstractReflection.getInstance().callMethod(object, method, argumentValues);
 					} catch (Throwable t) {
-						// fall through
-					}
-				}
-				
-				method = Reflection.getInstance().getMethod(object, getMethod().getName().getText(), argumentValues);
+                        t.printStackTrace();
+                        // fall through
+                    }
+                }
+
+                method = AbstractReflection.getInstance().getMethod(object, getMethod().getName().getText(), argumentValues);
 				if (method != null) {
 					// found the method on the object, call it
 					setCachedMethod(method);
 					try {
-						return Reflection.getInstance().callMethod(object, method, argumentValues);
+                        return AbstractReflection.getInstance().callMethod(object, method, argumentValues);
 					} catch (Throwable t) {
 						ExpressionError.error(t.getMessage(), getSpan(), t);
 						return null; // never reached
 					}
 				} 
-				method = Reflection.getInstance().getExtensionMethod(object, getMethod().getName().getText(), argumentValues);
+                method = AbstractReflection.getInstance().getExtensionMethod(object, getMethod().getName().getText(), argumentValues);
 				if(method != null){
 					try {
 						int argumentLength = argumentValues == null ? 0 : argumentValues.length;
@@ -1222,7 +1321,7 @@ public abstract class Ast {
 							}
 							parameters[0] = objs;
 						}
-						return Reflection.getInstance().callMethod(object, method, parameters);
+                        return AbstractReflection.getInstance().callMethod(object, method, parameters);
 					} catch (Throwable t) {
 						ExpressionError.error(t.getMessage(), getSpan(), t);
 						// fall through
@@ -1230,19 +1329,19 @@ public abstract class Ast {
 					}
 				}else {
 					// didn't find the method on the object, try to find a field pointing to a lambda
-					Object field = Reflection.getInstance().getField(object, getMethod().getName().getText());
+                    Object field = AbstractReflection.getInstance().getField(object, getMethod().getName().getText());
 					if (field == null){
 						ExpressionError.error("在'" + object.getClass() + "'中找不到方法 " + getMethod().getName().getText() + "(" + StringUtils.join(JavaReflection.getStringTypes(argumentValues),",") + ")",
 							getSpan());
 					}
-					Object function = Reflection.getInstance().getFieldValue(object, field);
-					method = Reflection.getInstance().getMethod(function, null, argumentValues);
+                    Object function = AbstractReflection.getInstance().getFieldValue(object, field);
+                    method = AbstractReflection.getInstance().getMethod(function, null, argumentValues);
 					if (method == null){
 						ExpressionError.error("在'" + object.getClass() + "'中找不到方法 " + getMethod().getName().getText() + "("+ StringUtils.join(JavaReflection.getStringTypes(argumentValues),",") +")",
 								getSpan());
 					} 
 					try {
-						return Reflection.getInstance().callMethod(function, method, argumentValues);
+                        return AbstractReflection.getInstance().callMethod(function, method, argumentValues);
 					} catch (Throwable t) {
 						ExpressionError.error(t.getMessage(), getSpan(), t);
 						return null; // never reached
@@ -1252,12 +1351,19 @@ public abstract class Ast {
 				clearCachedArguments();
 			}
 		}
-	}
+        public void setCachedMethodStatic(boolean cachedMethodStatic) {
+            this.cachedMethodStatic = cachedMethodStatic;
+        }
 
-	/** Represents a map literal of the form <code>{ key: value, key2: value, ... }</code> which can be nested. */
-	public static class MapLiteral extends Expression {
-		private final List<Token> keys;
-		private final List<Expression> values;
+        public boolean isCachedMethodStatic() {
+            return cachedMethodStatic;
+        }
+    }
+
+    /** Represents a map literal of the form <code>{ key: value, key2: value, ... }</code> which can be nested. */
+    public static class MapLiteral extends Expression {
+        private final List<Token> keys;
+        private final List<Expression> values;
 
 		public MapLiteral (Span span, List<Token> keys, List<Expression> values) {
 			super(span);

@@ -16,19 +16,25 @@ public class Tokenizer {
 	 * tokens this tokenizer understands. */
 	public List<Token> tokenize (String source) {
 		List<Token> tokens = new ArrayList<Token>();
-		if (source.length() == 0) return tokens;
+		if (source.length() == 0) {
+			return tokens;
+		}
 		CharacterStream stream = new CharacterStream(source);
 		stream.startSpan();
 
 		RuntimeException re = null;
 		while (stream.hasMore()) {
 			if (stream.match("${", false)) {
-				if (!stream.isSpanEmpty()) tokens.add(new Token(TokenType.TextBlock, stream.endSpan()));
+				if (!stream.isSpanEmpty()) {
+					tokens.add(new Token(TokenType.TextBlock, stream.endSpan()));
+				}
 				stream.startSpan();
 				boolean isContinue = false;
 				do{
 					while (!stream.match("}", true)) {
-						if (!stream.hasMore()) ExpressionError.error("Did not find closing }.", stream.endSpan());
+						if (!stream.hasMore()) {
+							ExpressionError.error("Did not find closing }.", stream.endSpan());
+						}
 						stream.consume();
 					}
 					try{
@@ -51,7 +57,9 @@ public class Tokenizer {
 				stream.consume();
 			}
 		}
-		if (!stream.isSpanEmpty()) tokens.add(new Token(TokenType.TextBlock, stream.endSpan()));
+		if (!stream.isSpanEmpty()) {
+			tokens.add(new Token(TokenType.TextBlock, stream.endSpan()));
+		}
 		return tokens;
 	}
 
@@ -61,7 +69,9 @@ public class Tokenizer {
 		List<Token> tokens = new ArrayList<Token>();
 
 		// match opening tag and throw it away
-		if (!stream.match("${", true)) ExpressionError.error("Expected ${", new Span(source, stream.getPosition(), stream.getPosition() + 1));
+		if (!stream.match("${", true)) {
+			ExpressionError.error("Expected ${", new Span(source, stream.getPosition(), stream.getPosition() + 1));
+		}
 		int leftCount = 0;
 		int rightCount = 0;
 		outer:
@@ -73,21 +83,29 @@ public class Tokenizer {
 			if (stream.matchDigit(false)) {
 				TokenType type = TokenType.IntegerLiteral;
 				stream.startSpan();
-				while (stream.matchDigit(true))
+				while (stream.matchDigit(true)) {
 					;
+				}
 				if (stream.match(TokenType.Period.getLiteral(), true)) {
 					type = TokenType.FloatLiteral;
-					while (stream.matchDigit(true))
+					while (stream.matchDigit(true)) {
 						;
+					}
 				}
 				if (stream.match("b", true) || stream.match("B", true)) {
-					if (type == TokenType.FloatLiteral) ExpressionError.error("Byte literal can not have a decimal point.", stream.endSpan());
+					if (type == TokenType.FloatLiteral) {
+						ExpressionError.error("Byte literal can not have a decimal point.", stream.endSpan());
+					}
 					type = TokenType.ByteLiteral;
 				} else if (stream.match("s", true) || stream.match("S", true)) {
-					if (type == TokenType.FloatLiteral) ExpressionError.error("Short literal can not have a decimal point.", stream.endSpan());
+					if (type == TokenType.FloatLiteral) {
+						ExpressionError.error("Short literal can not have a decimal point.", stream.endSpan());
+					}
 					type = TokenType.ShortLiteral;
 				} else if (stream.match("l", true) || stream.match("L", true)) {
-					if (type == TokenType.FloatLiteral) ExpressionError.error("Long literal can not have a decimal point.", stream.endSpan());
+					if (type == TokenType.FloatLiteral) {
+						ExpressionError.error("Long literal can not have a decimal point.", stream.endSpan());
+					}
 					type = TokenType.LongLiteral;
 				} else if (stream.match("f", true) || stream.match("F", true)) {
 					type = TokenType.FloatLiteral;
@@ -114,7 +132,9 @@ public class Tokenizer {
 					}
 					stream.consume();
 				}
-				if (!matchedEndQuote) ExpressionError.error("字符串没有结束符\'", stream.endSpan(),new StringLiteralException());
+				if (!matchedEndQuote) {
+					ExpressionError.error("字符串没有结束符\'", stream.endSpan(),new StringLiteralException());
+				}
 				Span stringSpan = stream.endSpan();
 				stringSpan = new Span(stringSpan.getSource(), stringSpan.getStart() - 1, stringSpan.getEnd());
 				tokens.add(new Token(TokenType.StringLiteral, stringSpan));
@@ -136,7 +156,9 @@ public class Tokenizer {
 					}
 					stream.consume();
 				}
-				if (!matchedEndQuote) ExpressionError.error("字符串没有结束符\"", stream.endSpan(),new StringLiteralException());
+				if (!matchedEndQuote) {
+					ExpressionError.error("字符串没有结束符\"", stream.endSpan(),new StringLiteralException());
+				}
 				Span stringSpan = stream.endSpan();
 				stringSpan = new Span(stringSpan.getSource(), stringSpan.getStart() - 1, stringSpan.getEnd());
 				tokens.add(new Token(TokenType.StringLiteral, stringSpan));
@@ -146,14 +168,15 @@ public class Tokenizer {
 			// Identifier, keyword, boolean literal, or null literal
 			if (stream.matchIdentifierStart(true)) {
 				stream.startSpan();
-				while (stream.matchIdentifierPart(true))
+				while (stream.matchIdentifierPart(true)) {
 					;
+				}
 				Span identifierSpan = stream.endSpan();
 				identifierSpan = new Span(identifierSpan.getSource(), identifierSpan.getStart() - 1, identifierSpan.getEnd());
 
-				if (identifierSpan.getText().equals("true") || identifierSpan.getText().equals("false")) {
+				if ("true".equals(identifierSpan.getText()) || "false".equals(identifierSpan.getText())) {
 					tokens.add(new Token(TokenType.BooleanLiteral, identifierSpan));
-				} else if (identifierSpan.getText().equals("null")) {
+				} else if ("null".equals(identifierSpan.getText())) {
 					tokens.add(new Token(TokenType.NullLiteral, identifierSpan));
 				} else {
 					tokens.add(new Token(TokenType.Identifier, identifierSpan));
@@ -179,13 +202,17 @@ public class Tokenizer {
 				continue outer;
 			}
 			// match closing tag
-			if (stream.match("}", false)) break;
+			if (stream.match("}", false)) {
+				break;
+			}
 
 			ExpressionError.error("Unknown token", new Span(source, stream.getPosition(), stream.getPosition() + 1));
 		}
 
 		// code spans must end with }
-		if (!stream.match("}", true)) ExpressionError.error("Expected }", new Span(source, stream.getPosition(), stream.getPosition() + 1));
+		if (!stream.match("}", true)) {
+			ExpressionError.error("Expected }", new Span(source, stream.getPosition(), stream.getPosition() + 1));
+		}
 		return tokens;
 	}
 }
