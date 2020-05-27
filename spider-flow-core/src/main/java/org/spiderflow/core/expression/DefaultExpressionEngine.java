@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.spiderflow.ExpressionEngine;
-import org.spiderflow.core.expression.interpreter.Reflection;
+import org.spiderflow.core.expression.interpreter.AbstractReflection;
 import org.spiderflow.executor.FunctionExecutor;
 import org.spiderflow.executor.FunctionExtension;
 import org.spiderflow.io.SpiderResponse;
@@ -28,7 +28,7 @@ public class DefaultExpressionEngine implements ExpressionEngine {
     @PostConstruct
     private void init() {
         for (FunctionExtension extension : functionExtensions) {
-            Reflection.getInstance().registerExtensionClass(extension.support(), extension.getClass());
+            AbstractReflection.getInstance().registerExtensionClass(extension.support(), extension.getClass());
         }
     }
 
