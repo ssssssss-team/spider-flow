@@ -85,7 +85,7 @@ public class OutputExecutor implements ShapeExecutor, SpiderListener {
 			}
 			output.addOutput(outputName, value);
 			if ((databaseFlag || csvFlag) && value != null) {
-				outputData.put(outputName, value.toString());
+				outputData.put(outputName, value);
 			}
 		}
 		if(databaseFlag){
