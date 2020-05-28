@@ -65,6 +65,9 @@ CharacterStream.prototype.consume = function(){
     return this.source.charAt(this.index++);
 }
 CharacterStream.prototype.match = function(needle,consume){
+    if (typeof needle !== 'string') {
+        needle = needle.literal;
+    }
     var needleLength = needle.length;
     if(needleLength + this.index > this.end){
         return false;
@@ -138,66 +141,68 @@ Token.prototype.getSpan = function(){
     return this.span;
 }
 Token.prototype.getText = function(){
-    return this.text;
+    return this.span.getText();
 }
 var TokenType = {
-    TextBlock : 0,
-    Period : '.',
-    Comma : ',',
-    Semicolon : ';',
-    Colon : ':',
-    Plus : '+',
-    Minus : '-',
-    Asterisk : '*',
-    ForwardSlash : '/',
-    PostSlash : '\\',
-    Percentage : '%',
-    LeftParantheses : '(',
-    RightParantheses : ')',
-    LeftBracket : '[',
-    RightBracket : ']',
-    LeftCurly : '{',
-    RightCurly : 12,
-    Less : '<',
-    Greater : '>',
-    LessEqual : '<=',
-    GreaterEqual : '>=',
-    Equal : '==',
-    NotEqual : '!=',
-    Assignment : '=',
-    And : '&&',
-    Or : '||',
-    Xor : '^',
-    Not : '!',
-    Questionmark : '?',
-    DoubleQuote : '"',
-    SingleQuote : "'",
-    BooleanLiteral : 1,
-    DoubleLiteral : 2,
-    FloatLiteral : 3,
-    LongLiteral : 4,
-    IntegerLiteral : 5,
-    ShortLiteral : 6,
-    ByteLiteral : 7,
-    CharacterLiteral : 8,
-    StringLiteral : 9,
-    NullLiteral : 10,
-    Identifier : 11
+    TextBlock : {error:'一个文本'},
+    Period : {literal:'.', error: '.'},
+    Comma : {literal:',', error: ','},
+    Semicolon : {literal:';', error: ';'},
+    Colon : {literal:':', error: ':'},
+    Plus : {literal:'+', error: '+'},
+    Minus : {literal:'-', error: '-'},
+    Asterisk : {literal:'*', error: '*'},
+    ForwardSlash : {literal:'/', error: '/'},
+    PostSlash : {literal:'\\', error: '\\'},
+    Percentage : {literal:'%', error: '%'},
+    LeftParantheses : {literal:'(', error: '('},
+    RightParantheses : {literal:')', error: ')'},
+    LeftBracket : {literal:'[', error: '['},
+    RightBracket : {literal:']', error: ']'},
+    LeftCurly : {literal:'{', error: '{'},
+    RightCurly : {error:'}'},// 特殊待遇！
+    Less : {literal:'<', error: '<'},
+    Greater : {literal:'>', error: '>'},
+    LessEqual : {literal:'<=', error: '<='},
+    GreaterEqual : {literal:'>=', error: '>='},
+    Equal : {literal:'==', error: '=='},
+    NotEqual : {literal:'!=', error: '!='},
+    Assignment : {literal:'=', error: '='},
+    And : {literal:'&&', error: '&&'},
+    Or : {literal:'||', error: '||'},
+    Xor : {literal:'^', error: '^'},
+    Not : {literal:'!', error: '!'},
+    Questionmark : {literal:'?', error: '?'},
+    DoubleQuote : {literal:'"', error: '"'},
+    SingleQuote : {literal:'\'', error: '\''},
+    BooleanLiteral : {error:'true 或 false'},
+    DoubleLiteral : {error:'一个 double 类型数值'},
+    FloatLiteral : {error:'一个 float 类型数值'},
+    LongLiteral : {error:'一个 long 类型数值'},
+    IntegerLiteral : {error:'一个 int 类型数值'},
+    ShortLiteral : {error:'一个 short 类型数值'},
+    ByteLiteral : {error:'一个 byte 类型数据'},
+    CharacterLiteral : {error:'一个 char 类型数据'},
+    StringLiteral : {error:'一个 字符串'},
+    NullLiteral : {error:'null'},
+    Identifier : {error:'标识符'}
 }
-var tokenTypeValues = Object.getOwnPropertyNames(TokenType);
+var tokenTypeValues = Object.getOwnPropertyNames(TokenType).map(e=>TokenType[e]);
 TokenType.getSortedValues = function(){
     if(this.values){
         return this.values;
     }
     this.values = tokenTypeValues.sort(function(o1,o2){
-        var v1 = TokenType[o1];
-        var v2 = TokenType[o2];
-        var t1 = typeof v1;
-        var t2 = typeof v2;
-        if (t1 != 'string' && o2.literal != 'string') return 0;
-        if (t1 != 'string' && t2 == 'string') return 1;
-        if (t1 == 'string' && t2 != 'string') return -1;
-        return v2.length - v1.length;
+        if (!o1.literal && !o2.literal) {
+            return 0;
+        }
+        if (!o1.literal && !!o2.literal) {
+            return 1;
+        }
+        if (!!o1.literal && !o2.literal) {
+            return -1;
+        }
+        return o2.literal.length - o1.literal.length;
     })
     return this.values;
 }
@@ -256,7 +261,7 @@ Tokenizer.prototype.tokenize = function(source){
             }
             if (!stream.isSpanEmpty()) tokens.push(new Token(TokenType.TextBlock, stream.endSpan()));
         }catch(ex){
-            //console.log(ex);
+            console.error(ex);
         }
     }
     return tokens;
@@ -364,13 +369,12 @@ Tokenizer.prototype.tokenizeCodeSpan = function(span){
         var sortedValues = TokenType.getSortedValues();
         for (var i=0,len = sortedValues.length;i<len;i++) {
             var t = sortedValues[i]
-            var literal = TokenType[t];
-            if (typeof literal == 'string') {
-                if (stream.match(literal, true)) {
+            if (!!t.literal) {
+                if (stream.match(t.literal, true)) {
                     if(t == TokenType.LeftCurly){
                         leftCount ++;
                     }
-                    tokens.push(new Token(literal, new Span(source, stream.getPosition() - literal.length, stream.getPosition())));
+                    tokens.push(new Token(t.literal, new Span(source, stream.getPosition() - t.literal.length, stream.getPosition())));
                     contineOuter = true;
                     break;
                 }
