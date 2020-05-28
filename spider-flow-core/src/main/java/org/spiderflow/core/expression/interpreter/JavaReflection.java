@@ -376,8 +376,13 @@ public class JavaReflection extends AbstractReflection {
 		try {
 			return javaMethod.invoke(obj, arguments);
 		} catch (Throwable t) {
-			throw new RuntimeException("Couldn't call method '" + javaMethod.getName() + "' with arguments '" + Arrays.toString(arguments)
-				+ "' on object of type '" + obj.getClass().getSimpleName() + "'.", t);
+			if (obj == null) {
+				throw new RuntimeException("Couldn't call static method '" + javaMethod.getName() + "' with arguments '" + Arrays.toString(arguments)
+						+ "' on type '" + javaMethod.getDeclaringClass().getSimpleName() + "'.", t);
+			} else {
+				throw new RuntimeException("Couldn't call method '" + javaMethod.getName() + "' with arguments '" + Arrays.toString(arguments)
+						+ "' on object of type '" + obj.getClass().getSimpleName() + "'.", t);
+			}
 		}
 	}
 
