@@ -36,7 +36,7 @@ public class ArrayLikeLambdaExecutor {
             initialMap.put(name, ArrayLikeLambdaExecutor.class.getMethod(name, Object.class, Object[].class));
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new LambdaExecuteException(e);
         }
     }
 
@@ -69,7 +69,7 @@ public class ArrayLikeLambdaExecutor {
             Enumeration<Object> en = (Enumeration<Object>) arrayLike;
             return Collections.list(en);
         }
-        throw new RuntimeException("未实现");
+        throw new LambdaExecuteException("未实现");
     }
 
     @SuppressWarnings("unchecked")
@@ -145,7 +145,7 @@ public class ArrayLikeLambdaExecutor {
             }
             Object result = handler.apply(args.toArray());
             if (!(result instanceof Boolean)) {
-                throw new RuntimeException("lambda函数 filter 的结果非布尔类型");
+                throw new LambdaExecuteException("lambda函数 filter 的结果非布尔类型");
             }
             if ((Boolean) result) {
                 results.add(obj);
@@ -192,7 +192,7 @@ public class ArrayLikeLambdaExecutor {
             }
             Object result = handler.apply(args.toArray());
             if (!(result instanceof Boolean)) {
-                throw new RuntimeException("lambda函数 every 的结果非布尔类型");
+                throw new LambdaExecuteException("lambda函数 every 的结果非布尔类型");
             }
             if ( !(Boolean)result ) {
                 return Boolean.FALSE;
@@ -216,7 +216,7 @@ public class ArrayLikeLambdaExecutor {
             }
             Object result = handler.apply(args.toArray());
             if (!(result instanceof Boolean)) {
-                throw new RuntimeException("lambda函数some的结果非布尔类型");
+                throw new LambdaExecuteException("lambda函数 some 的结果非布尔类型");
             }
             if ( (Boolean)result ) {
                 return Boolean.TRUE;
@@ -254,4 +254,35 @@ public class ArrayLikeLambdaExecutor {
         }
     }
 
+    public static class LambdaExecuteException extends RuntimeException{
+        private int argumentIndex;
+
+        public int getArgumentIndex() {
+            return argumentIndex;
+        }
+
+        public void setArgumentIndex(int argumentIndex) {
+            this.argumentIndex = argumentIndex;
+        }
+
+        public LambdaExecuteException() {
+            super();
+        }
+
+        public LambdaExecuteException(String message) {
+            super(message);
+        }
+
+        public LambdaExecuteException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public LambdaExecuteException(Throwable cause) {
+            super(cause);
+        }
+
+        protected LambdaExecuteException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+            super(message, cause, enableSuppression, writableStackTrace);
+        }
+    }
 }

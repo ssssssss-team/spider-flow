@@ -10,6 +10,7 @@ import org.spiderflow.core.expression.ExpressionTemplateContext;
 import org.spiderflow.core.expression.interpreter.AbstractReflection;
 import org.spiderflow.core.expression.interpreter.AstInterpreter;
 import org.spiderflow.core.expression.interpreter.JavaReflection;
+import org.spiderflow.core.expression.parsing.ArrayLikeLambdaExecutor.LambdaExecuteException;
 import org.spiderflow.core.script.ScriptManager;
 import org.spiderflow.expression.DynamicMethod;
 
@@ -1289,6 +1290,12 @@ public abstract class Ast {
 					} catch (Throwable t) {
                         t.printStackTrace();
                         // fall through
+						if (t.getCause()!=null && t.getCause().getCause() instanceof LambdaExecuteException) {
+							LambdaExecuteException lee = (LambdaExecuteException)t.getCause().getCause();
+							List<Expression> args = getArguments();
+							LambdaAccess lambdaAccess = (LambdaAccess)args.get(lee.getArgumentIndex());
+							ExpressionError.error(t.getMessage(), lambdaAccess.getFunction().getSpan());
+						}
                     }
                 }
 
