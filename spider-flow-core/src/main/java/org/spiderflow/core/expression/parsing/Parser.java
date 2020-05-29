@@ -9,6 +9,8 @@ import javax.xml.transform.Source;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.stream.IntStream;
+import java.util.stream.Collectors;
 
 /** Parses a {@link Source} into a {@link ExpressionTemplate}. The implementation is a simple recursive descent parser with a lookahead of
  * 1. **/
@@ -253,13 +255,13 @@ public class Parser {
 	private static List<Expression> parseArgumentsNotExpect (TokenStream stream) {
 		List<Expression> arguments = new ArrayList<Expression>();
 		while (stream.hasMore() && !stream.match(TokenType.RightParantheses, false)) {
-			boolean f1 = false, f2 = false;
+			boolean lambdaMultArgs = false, foundLambda = false;
 			int c = 0;
 			while (stream.hasNext()) {
 				c++;
 				stream.next();
-				if (f1 && stream.match(TokenType.Lambda, false)) {
-					f2 = true;
+				if (lambdaMultArgs && stream.match(TokenType.Lambda, false)) {
+					foundLambda = true;
 					int count = c;
 					for (int i = 0; i < count - 1; i++) {
 						stream.prev();
@@ -268,12 +270,15 @@ public class Parser {
 					break;
 				}
 				if (stream.match(TokenType.RightParantheses, false)) {
-					f1 = true;
+					lambdaMultArgs = true;
 				} else {
-					f1 = false;
+					lambdaMultArgs = false;
+					if (!stream.match(false, TokenType.Identifier, TokenType.Comma)) {
+						break;
+					}
 				}
 			}
-			if (!f2) {
+			if (!foundLambda) {
 				int count = c;
 				for (int i = 0; i < count; i++) {
 					stream.prev();
@@ -281,7 +286,7 @@ public class Parser {
 				}
 			}
 			arguments.add(parseExpression(stream));
-			if (f1 && f2) {
+			if (lambdaMultArgs && foundLambda) {
 				while (stream.match(TokenType.Comma, true)) {
 					arguments.add(parseExpression(stream));
 				}
