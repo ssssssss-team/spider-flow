@@ -482,9 +482,26 @@ SpiderFlowGrammer.prototype.init = function(){
         lambdasArrayFunctions.push(makeLambdaFunction('every', 'boolean', 'every((e,i)->expression)', '是否每个元素都符合条件', 'every((e,i)->${1:true})'));
         lambdasArrayFunctions.push(makeLambdaFunction('some', 'boolean', 'some(e->expression)', '是否至少有一个元素都符合条件', 'some(e->${1:true})'));
         lambdasArrayFunctions.push(makeLambdaFunction('some', 'boolean', 'some((e,i)->expression)', '是否至少有一个元素都符合条件', 'some((e,i)->${1:true})'));
-        for (let i = 0; i < lambdasArrayFunctions.length; i++) {
-            this.clazz.List.methods.push(lambdasArrayFunctions[i])
+        // var types = new Set()
+        // for(var k in this.clazz){
+        //     this.clazz[k].methods.forEach(e=>types.add(e.returnType))
+        // }
+        // console.log(Array.from(types))
+        var _this = this;
+        var pushMethod = function (type, lambdaFunction) {
+            if (!_this.clazz[type]) {
+                _this.clazz[type] = {methods:[]}
+            }
+            _this.clazz[type].methods.push(lambdaFunction)
         }
+        for (let i = 0; i < lambdasArrayFunctions.length; i++) {
+            pushMethod('List', lambdasArrayFunctions[i])
+            pushMethod('Set', lambdasArrayFunctions[i])
+            pushMethod('Elements', lambdasArrayFunctions[i])
+            pushMethod('String[]', lambdasArrayFunctions[i])
+            pushMethod('Object[]', lambdasArrayFunctions[i])
+        }
+        delete this.clazz.void;
     }
 }
 SpiderFlowGrammer.prototype.findHoverSuggestion = function(inputs){
