@@ -490,7 +490,7 @@ SpiderFlowGrammer.prototype.init = function(){
         var _this = this;
         var pushMethod = function (type, lambdaFunction) {
             if (!_this.clazz[type]) {
-                _this.clazz[type] = {methods:[]}
+                _this.clazz[type] = {methods:[],attributes:[]}
             }
             _this.clazz[type].methods.push(lambdaFunction)
         }
@@ -552,6 +552,12 @@ SpiderFlowGrammer.prototype.findSuggestions = function(inputs){
         if(!target){
             target = this.clazz[input];
         }else{
+            for(var j=0;j<target.attributes.length;j++){
+                if(target.attributes[j].name == input){
+                    target = this.clazz[target.attributes[j].type];
+                    break;
+                }
+            }
             for(var j=0;j<target.methods.length;j++){
                 if(target.methods[j].name == input){
                     target = this.clazz[target.methods[j].returnType];
