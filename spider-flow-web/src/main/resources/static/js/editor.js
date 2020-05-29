@@ -4,58 +4,82 @@ var flows;
 var codeMirrorInstances = {};
 var socket;
 var version = 'lastest';
+var tokenizer = new Tokenizer();
 function renderCodeMirror(){
 	codeMirrorInstances = {};
-	$('[codemirror]').each(function(){
-		var $dom = $(this);
-		if($dom.attr("rendered") == 'true'){
-			return;
-		}
-		$dom.attr("rendered",true)
-		var cm = monaco.editor.create(this,{
-			language: 'spiderflow',
-			contextmenu :false,
-			minimap : {
-				enabled : false
-			},
-			overviewRulerBorder : false,
-			overviewRulerLanes : 0,
-			folding:false,
-			fixedOverflowWidgets :true,
-			scrollbar : {
-				horizontal : 'auto',
-				vertical : 'hidden'
-			},
-			lineNumbers : 'off',
-			theme : 'spiderflow',
-			value : $dom.attr('data-value') || ''
-		})
-		// var cm = CodeMirror(this,{
-		// 	mode : 'spiderflow',	//语法
-		// 	theme : 'idea',	//设置样式
-		// 	placeholder : $dom.attr("placeholder"),
-		// 	value : $dom.attr('data-value') || '',
-		// 	scrollbarStyle : 'null',	//隐藏滚动条
-		// });
-		// initHint(cm);
-		codeMirrorInstances[$(this).attr('codemirror')] = cm;
-		// cm.on('change',function(){
-		// 	$dom.attr('data-value',cm.getValue());
-		// 	if($dom.attr('codemirror') == 'condition'){
-		// 		var $select = $('select[name="exception-flow"]');
-		// 		$select.siblings("div.layui-form-select").find('dl dd[lay-value=' + $select.val() + ']').click();
-		// 	}
-		// 	serializeForm();
-		// });
-		cm.onDidChangeModelContent(function(){
-			$dom.attr('data-value',cm.getValue());
-			if($dom.attr('codemirror') == 'condition'){
-				var $select = $('select[name="exception-flow"]');
-				$select.siblings("div.layui-form-select").find('dl dd[lay-value=' + $select.val() + ']').click();
+	require(['vs/editor/editor.main'], function() {
+		$('[codemirror]').each(function(){
+			var $dom = $(this);
+			if($dom.attr("rendered") == 'true'){
+				return;
 			}
-			serializeForm();
-		})
-		codeMirrorInstances[$(this).attr('codemirror')] = cm;
+			$dom.attr("rendered",true)
+			var cm = monaco.editor.create(this,{
+				language: 'spiderflow',
+				contextmenu :false,
+				minimap : {
+					enabled : false
+				},
+				overviewRulerBorder : false,
+				overviewRulerLanes : 0,
+				folding:false,
+				fixedOverflowWidgets :true,
+				scrollbar : {
+					horizontal : 'auto',
+					vertical : 'hidden'
+				},
+				lineNumbers : 'off',
+				theme : 'spiderflow',
+				value : $dom.attr('data-value') || ''
+			})
+			// var cm = CodeMirror(this,{
+			// 	mode : 'spiderflow',	//语法
+			// 	theme : 'idea',	//设置样式
+			// 	placeholder : $dom.attr("placeholder"),
+			// 	value : $dom.attr('data-value') || '',
+			// 	scrollbarStyle : 'null',	//隐藏滚动条
+			// });
+			// initHint(cm);
+			codeMirrorInstances[$(this).attr('codemirror')] = cm;
+			// cm.on('change',function(){
+			// 	$dom.attr('data-value',cm.getValue());
+			// 	if($dom.attr('codemirror') == 'condition'){
+			// 		var $select = $('select[name="exception-flow"]');
+			// 		$select.siblings("div.layui-form-select").find('dl dd[lay-value=' + $select.val() + ']').click();
+			// 	}
+			// 	serializeForm();
+			// });
+			var oldDecorations = [];
+			var newDecorations = [];
+			cm.onDidChangeModelContent(function(){
+				var value = cm.getValue();
+				$dom.attr('data-value',value);
+				if($dom.attr('codemirror') == 'condition'){
+					var $select = $('select[name="exception-flow"]');
+					$select.siblings("div.layui-form-select").find('dl dd[lay-value=' + $select.val() + ']').click();
+				}
+				serializeForm();
+				try{
+					tokenizer.tokenize(value,true);
+					newDecorations = [];
+					cm.deltaDecorations(oldDecorations,newDecorations)
+					oldDecorations = newDecorations;
+				}catch(e){
+					var decorations = [{
+						range : new monaco.Range(1,e.span.start,1,e.span.end),
+						options : {
+							hoverMessage : {
+								value : e.message
+							},
+							inlineClassName : 'squiggly-error',
+						}
+					}];
+					cm.deltaDecorations(oldDecorations,decorations)
+					oldDecorations = decorations;
+				}
+			})
+			codeMirrorInstances[$(this).attr('codemirror')] = cm;
+		});
 	});
 }
 function getCellData(cellId,keys){

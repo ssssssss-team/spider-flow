@@ -47,10 +47,17 @@ Span.prototype.toString = function(){
 }
 function throwError(){
     var message = '';
+    var span;
     for(var i=0,len = arguments.length;i<len;i++){
-        message += arguments[i] + ' ';
+        var value = arguments[i];
+        if(value instanceof Span){
+            span = value
+        }else{
+            message += value + ' ';
+        }
+
     }
-    throw new Error(message);
+    throw {message : message, span : span};
 }
 function CharacterStream(source,start,end){
     this.index = start === undefined ? 0 : start;
@@ -146,6 +153,7 @@ Token.prototype.getText = function(){
 var TokenType = {
     TextBlock : {error:'一个文本'},
     Period : {literal:'.', error: '.'},
+    Lambda : {literal:'->', error:'->'},
     Comma : {literal:',', error: ','},
     Semicolon : {literal:';', error: ';'},
     Colon : {literal:':', error: ':'},
@@ -222,7 +230,7 @@ TokenStream.prototype.getToken = function(consume){
     return token;
 }
 function Tokenizer(){}
-Tokenizer.prototype.tokenize = function(source){
+Tokenizer.prototype.tokenize = function(source,throwException){
     var tokens = [];
     if (source.length > 0){
         try{
@@ -252,7 +260,10 @@ Tokenizer.prototype.tokenize = function(source){
 
                     }while(isContinue);
                     if(re != null){
-                        throw re;
+                        if(throwException){
+                            throw re;
+                        }
+                        return tokens;
                     }
                     stream.startSpan();
                 } else {
@@ -261,7 +272,9 @@ Tokenizer.prototype.tokenize = function(source){
             }
             if (!stream.isSpanEmpty()) tokens.push(new Token(TokenType.TextBlock, stream.endSpan()));
         }catch(ex){
-            console.error(ex);
+            if(throwException){
+                throw ex;
+            }
         }
     }
     return tokens;
@@ -440,6 +453,28 @@ SpiderFlowGrammer.prototype.init = function(){
         }
         this.clazz.resp = this.clazz.SpiderResponse;
         this.clazz.resp.sortText = '___';
+        this.clazz.List.methods.push({
+            name : 'filter',
+            returnType : 'boolean',
+            parameters : [{
+                name : 'call',
+                type : 'function'
+            }],
+            fullName : 'filter(lambda)',
+            comment : '过滤',
+            insertText : 'filter(e->${1:e})'
+        })
+        this.clazz.List.methods.push({
+            name : 'map',
+            returnType : 'Object',
+            parameters : [{
+                name : 'call',
+                type : 'function'
+            }],
+            fullName : 'map(lambda)',
+            comment : 'map',
+            insertText : 'map(e->${1:e})'
+        })
     }
 }
 SpiderFlowGrammer.prototype.findHoverSuggestion = function(inputs){
@@ -630,7 +665,7 @@ require(['vs/editor/editor.main'], function() {
                 while(stream.hasMore()){
                     var token = stream.getToken(true);
                     var tokenType = token.getTokenType();
-                    if(tokenType == TokenType.LeftParantheses || tokenType == TokenType.LeftBracket){
+                    if(tokenType == TokenType.LeftParantheses || tokenType == TokenType.LeftBracket || tokenType == TokenType.Lambda){
                         array = [];
                         stack.push(array);
                     }else if(tokenType == TokenType.RightParantheses || tokenType == TokenType.RightBracket){
