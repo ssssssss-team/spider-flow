@@ -452,29 +452,39 @@ SpiderFlowGrammer.prototype.init = function(){
             }
         }
         this.clazz.resp = this.clazz.SpiderResponse;
-        this.clazz.resp.sortText = '___';
-        this.clazz.List.methods.push({
-            name : 'filter',
-            returnType : 'boolean',
-            parameters : [{
-                name : 'call',
-                type : 'function'
-            }],
-            fullName : 'filter(lambda)',
-            comment : '过滤',
-            insertText : 'filter(e->${1:e})'
-        })
-        this.clazz.List.methods.push({
-            name : 'map',
-            returnType : 'Object',
-            parameters : [{
-                name : 'call',
-                type : 'function'
-            }],
-            fullName : 'map(lambda)',
-            comment : 'map',
-            insertText : 'map(e->${1:e})'
-        })
+        this.clazz.resp.kind = 'Constant';
+        this.clazz.resp.sortText = ' ~';
+        var lambdasArrayFunctions = [];
+        var makeLambdaFunction = function (name, returnType, fullName, comment, insertText) {
+            return {
+                name : name,
+                kind: 'Function',
+                returnType : returnType,
+                parameters : [{
+                    name : 'call',
+                    type : 'function'
+                }],
+                sortText: fullName.replace(/([()])/g, '~$1'),
+                fullName : fullName,
+                comment : comment,
+                insertText : insertText
+            };
+        }
+        lambdasArrayFunctions.push(makeLambdaFunction('filter', 'List', 'filter(e->expression)', '过滤列表元素，返回符合条件的数据', 'filter(e->${1:true})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('filter', 'List', 'filter((e,i)->expression)', '过滤列表元素，返回符合条件的数据', 'filter((e,i)->${1:true})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('map', 'List', 'map(e->expression)', '将列表中的元素转为其他类型数据', 'map(e->${1:e})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('map', 'List', 'map((e,i)->expression)', '将列表中的元素转为其他类型数据', 'map((e,i)->${1:e})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('reduce', 'Object', 'reduce((a,b)->expression)', '将列表中的元素整合为一个数据', 'reduce((a,b)->${1:a+b})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('sort', 'List', 'sort((a,b)->expression)', '将列表中的元素进行排序', 'sort((a,b)->${1:a-b})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('distinct', 'List', 'distinct(e->expression)', '将列表中的元素按条件去重', 'sort(e->${1:e})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('distinct', 'List', 'distinct((e,i)->expression)', '将列表中的元素按条件去重', 'distinct((e,i)->${1:e})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('every', 'boolean', 'every(e->expression)', '是否每个元素都符合条件', 'every(e->${1:true})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('every', 'boolean', 'every((e,i)->expression)', '是否每个元素都符合条件', 'every((e,i)->${1:true})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('some', 'boolean', 'some(e->expression)', '是否至少有一个元素都符合条件', 'some(e->${1:true})'));
+        lambdasArrayFunctions.push(makeLambdaFunction('some', 'boolean', 'some((e,i)->expression)', '是否至少有一个元素都符合条件', 'some((e,i)->${1:true})'));
+        for (let i = 0; i < lambdasArrayFunctions.length; i++) {
+            this.clazz.List.methods.push(lambdasArrayFunctions[i])
+        }
     }
 }
 SpiderFlowGrammer.prototype.findHoverSuggestion = function(inputs){
@@ -539,19 +549,19 @@ SpiderFlowGrammer.prototype.findSuggestions = function(inputs){
             var attribute = target.attributes[j];
             suggestions.push({
                 label: attribute.name,
-                kind: monaco.languages.CompletionItemKind.Field,
+                kind: monaco.languages.CompletionItemKind[attribute.kind] || monaco.languages.CompletionItemKind.Field,
                 detail : attribute.type + ":" + attribute.name,
                 insertText: attribute.name,
-                sortText : '__'
+                sortText : ' ~~' + attribute.name
                 //insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
             })
         }
         for(var j=0;j<target.methods.length;j++){
             var method = target.methods[j];
             suggestions.push({
-                sortText : method.fullName,
+                sortText : method.sortText || method.fullName,
                 label: method.fullName,
-                kind: monaco.languages.CompletionItemKind.Method,
+                kind: monaco.languages.CompletionItemKind[method.kind] || monaco.languages.CompletionItemKind.Method,
                 detail : method.comment,
                 insertText: method.insertText,
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
@@ -563,7 +573,7 @@ SpiderFlowGrammer.prototype.findSuggestions = function(inputs){
             var value = this.clazz[key];
             if(/^[a-z]+$/.test(key.charAt(0))){
                 suggestions.push({
-                    sortText : value.sortText || 'ZZZZ',
+                    sortText : value.sortText || ' ~' + key,
                     label: key,
                     kind: monaco.languages.CompletionItemKind.Variable,
                     insertText: key,
@@ -576,7 +586,7 @@ SpiderFlowGrammer.prototype.findSuggestions = function(inputs){
         for(var j=0;j<target.methods.length;j++){
             var method = target.methods[j];
             suggestions.push({
-                sortText : 'ZZZZZZZZ____',
+                sortText : '~~~~~~' + method.fullName,
                 label: method.fullName,
                 kind: monaco.languages.CompletionItemKind.Method,
                 detail : method.comment,
