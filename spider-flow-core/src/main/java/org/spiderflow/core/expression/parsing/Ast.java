@@ -1295,6 +1295,8 @@ public abstract class Ast {
 							List<Expression> args = getArguments();
 							LambdaAccess lambdaAccess = (LambdaAccess)args.get(lee.getArgumentIndex());
 							ExpressionError.error(t.getMessage(), lambdaAccess.getFunction().getSpan());
+						} else if (isCachedMethodStatic() && RuntimeException.class.equals(t.getClass()) && t.getCause() != null) {
+							throw new TemplateException(t.getMessage(), getSpan(), t.getCause());
 						}
                     }
                 }

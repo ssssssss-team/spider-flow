@@ -4,6 +4,7 @@ package org.spiderflow.core.expression.interpreter;
 import org.spiderflow.core.expression.parsing.ArrayLikeLambdaExecutor.LambdaExecuteException;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -380,6 +381,9 @@ public class JavaReflection extends AbstractReflection {
 		} catch (Throwable t) {
 			if (t.getCause() instanceof LambdaExecuteException) {
 				throw new RuntimeException(t.getCause().getMessage(), t);
+			} else if (obj == null && t instanceof InvocationTargetException) {
+				Throwable t2 = ((InvocationTargetException) t).getTargetException();
+				throw new RuntimeException(t2);
 			} else {
 				throw new RuntimeException("Couldn't call method '" + javaMethod.getName() + "' with arguments '" + Arrays.toString(arguments)
 						+ "' on object of type '" + obj.getClass().getSimpleName() + "'.", t);
