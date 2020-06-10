@@ -82,6 +82,14 @@ public class JavaReflection extends AbstractReflection {
 					cachedList.add(method);
 				}
 			}
+			Collection<List<Method>> methodsValues = cachedMethodMap.values();
+			for (List<Method> methodList : methodsValues) {
+				methodList.sort((m1, m2) -> {
+					int sum1 = Arrays.stream(m1.getParameterTypes()).mapToInt(JavaReflection::calcToObjectDistance).sum();
+					int sum2 = Arrays.stream(m2.getParameterTypes()).mapToInt(JavaReflection::calcToObjectDistance).sum();
+					return sum2 - sum1;
+				});
+			}
 		}
 	}
 	
@@ -221,11 +229,6 @@ public class JavaReflection extends AbstractReflection {
 	private static Method findMethod (List<Method> methods, Class<?>[] parameterTypes) {
 		Method foundMethod = null;
 		int foundScore = 0;
-		methods.sort((m1, m2) -> {
-			int sum1 = Arrays.stream(m1.getParameterTypes()).mapToInt(JavaReflection::calcToObjectDistance).sum();
-			int sum2 = Arrays.stream(m2.getParameterTypes()).mapToInt(JavaReflection::calcToObjectDistance).sum();
-			return sum2 - sum1;
-		});
 		for (Method method : methods) {
 			// Check if the types match.
 			Class<?>[] otherTypes = method.getParameterTypes();
