@@ -229,6 +229,10 @@ public class Spider {
 				}else if(loopArray instanceof Collection){
 					loopCount = ((Collection)loopArray).size();
 					loopArray = ((Collection)loopArray).toArray();
+				}else if(loopArray instanceof Map){
+					Set entrySet = ((Map) loopArray).entrySet();
+					loopCount = entrySet.size();
+					loopArray = entrySet.toArray();
 				}else if(loopArray.getClass().isArray()){
 					loopCount = Array.getLength(loopArray);
 				}else{
