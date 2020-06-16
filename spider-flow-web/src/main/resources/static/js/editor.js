@@ -6,7 +6,6 @@ var socket;
 var version = 'lastest';
 var tokenizer = new Tokenizer();
 function renderCodeMirror(){
-	codeMirrorInstances = {};
 	require(['vs/editor/editor.main'], function() {
 		$('[codemirror]').each(function(){
 			var $dom = $(this);
@@ -175,6 +174,7 @@ function resizeSlideBar(){
 	var w = Math.ceil(totalHeight / height);
 	$dom.width(w * 50);
 	$(".editor-container,.xml-container").css("left",w * 50 + "px");
+	monacoLayout();
 }
 
 function validXML(callback){
@@ -191,6 +191,11 @@ function validXML(callback){
 		})
 	}else{
 		callback&&callback();
+	}
+}
+function monacoLayout(){
+	for(var key in codeMirrorInstances){
+		codeMirrorInstances[key].layout();
 	}
 }
 $(function(){
@@ -578,9 +583,7 @@ $(function(){
 			}
 		});
 		layui.element.on('tab',function(){
-			// for(var key in codeMirrorInstances){
-			// 	codeMirrorInstances[key].refresh();
-			// }
+			monacoLayout();
 		})
 		layui.form.on('select',serializeForm);
 		var id = getQueryString('id');
@@ -783,6 +786,7 @@ function bindToolbarClickAction(editor){
 				$(".editor-container").css('right',($('body').width() - moveLen) + 'px')
 				$(".properties-container").width(box.clientWidth - moveLen - 5);
 				$(".xml-container").width($(".main-container").width() - $(".properties-container").width() - $(".sidebar-container").width() + 8);
+				monacoLayout();
 			}
 			document.onmouseup = function(evt){
 				document.onmousemove = null;
@@ -792,6 +796,7 @@ function bindToolbarClickAction(editor){
 			resize.setCapture && resize.setCapture();
 			return false;
 		}
+		monacoLayout();
 	}).on('click','.btn-dock-bottom',function(){
 		resizeSlideBar();
 		$('.main-container').removeClass('right');
@@ -812,6 +817,7 @@ function bindToolbarClickAction(editor){
 			  resize.style.top = moveLen + 'px';
 			  resizeSlideBar();
 			  $(".editor-container,.sidebar-container,.xml-container").css('bottom',($('body').height() - moveLen) + 'px');
+			  monacoLayout();
 			  $(".properties-container").height(box.clientHeight - moveLen - 5);
 			}
 			document.onmouseup = function(evt){
@@ -822,6 +828,7 @@ function bindToolbarClickAction(editor){
 			resize.setCapture && resize.setCapture();
 			return false;
 		}
+		monacoLayout();
 	})
 	$('.btn-dock-bottom').click();
 }
