@@ -423,6 +423,7 @@ html,body{
 .layui-input-block{
 	min-height: 24px;
 	line-height: 24px;
+	height : 24px;
 }
 .layui-input-block{
 	margin-left : 100px;
