@@ -89,7 +89,12 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 
 	public static final String REPEAT_ENABLE = "repeat-enable";
 
+	public static final String REPEAT_IGNORE_EXECUTE = "repeat-ignore-execute";
+
+	public static final String IS_REPEAT = "_is_repeat";
+
 	public static final String BLOOM_FILTER_KEY = "_bloomfilter";
+
 
 	@Value("${spider.workspace}")
 	private String workspcace;
@@ -111,6 +116,11 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 	void init(){
 		//允许设置被限制的请求头
 		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+	}
+
+	@Override
+	public boolean allowExecuteNext(SpiderNode node, SpiderContext context, Map<String, Object> variables) {
+		return variables.remove(IS_REPEAT) == null;
 	}
 
 	@Override
@@ -161,6 +171,9 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 				synchronized (bloomFilter){
 					if(bloomFilter.mightContain(MD5FunctionExecutor.string(url))){
 						logger.info("过滤重复URL:{}",url);
+						if("1".equalsIgnoreCase(node.getStringJsonValue(REPEAT_IGNORE_EXECUTE,"0"))){
+							variables.put(IS_REPEAT,true);
+						}
 						return;
 					}
 				}
@@ -441,7 +454,7 @@ public class RequestExecutor implements ShapeExecutor,Grammerable, SpiderListene
 
 	}
 
-	private BloomFilter<String> createBloomFilter(SpiderContext context){
+	private synchronized BloomFilter<String> createBloomFilter(SpiderContext context){
 		BloomFilter<String> filter = context.get(BLOOM_FILTER_KEY);
 		if(filter == null){
 			Funnel<CharSequence> funnel = Funnels.stringFunnel(Charset.forName("UTF-8"));
