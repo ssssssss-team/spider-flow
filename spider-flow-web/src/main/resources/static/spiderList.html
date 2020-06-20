@@ -103,9 +103,11 @@
 			},
 			success : function(){
 				layui.layer.msg((e.elem.checked ? '切换为定时任务': '切换为长任务') + '成功');
+                reloadTable();
 			},
 			error : function(){
 				layui.layer.msg((e.elem.checked ? '切换为定时任务': '切换为长任务') + '成功');
+                reloadTable();
 			}
 		})
 	})
