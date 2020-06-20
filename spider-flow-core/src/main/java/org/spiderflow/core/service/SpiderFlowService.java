@@ -54,7 +54,7 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	@PostConstruct
 	private void initJobs(){
 		//清空所有任务下次执行时间
-		sfMapper.resetNextExecuteTime();
+		sfMapper.resetNextExecuteTimeAll();
 		//获取启用corn的任务
 		List<SpiderFlow> spiderFlows = sfMapper.selectList(new QueryWrapper<SpiderFlow>().eq("enabled", "1"));
 		if(spiderFlows != null && !spiderFlows.isEmpty()){
@@ -139,12 +139,12 @@ public class SpiderFlowService extends ServiceImpl<SpiderFlowMapper, SpiderFlow>
 	
 	public void start(String id){
 		spiderJobManager.remove(id);
+		sfMapper.resetSpiderStatus(id, "1");
 		SpiderFlow spiderFlow = getById(id);
 		Date nextExecuteTime = spiderJobManager.addJob(spiderFlow);
 		if (nextExecuteTime != null) {
 			spiderFlow.setNextExecuteTime(nextExecuteTime);
 			sfMapper.updateById(spiderFlow);
-			sfMapper.resetSpiderStatus(id, "1");
 		}
 	}
 	

@@ -59,7 +59,7 @@ public interface SpiderFlowMapper extends BaseMapper<SpiderFlow>{
 	int resetNextExecuteTime(@Param("id") String id);
 
 	@Update("update sp_flow set next_execute_time = null")
-	int resetNextExecuteTime();
+	int resetNextExecuteTimeAll();
 	
 	@Select("select id,name from sp_flow")
 	List<SpiderFlow> selectFlows();
