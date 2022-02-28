@@ -30,7 +30,7 @@
 - [x] 支持Cookie自动管理
 - [x] 支持自定义函数
 
-### 一键部署
+## 一键部署
 安装docker及docker-compose，切换到docker-compose目录，执行脚本
 ```shell
  docker-compose up -d
