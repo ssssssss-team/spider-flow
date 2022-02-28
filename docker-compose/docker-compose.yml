@@ -10,7 +10,7 @@ services:
     volumes:
       - "./mysql/my.cnf:/etc/mysql/my.cnf"
       - "./mysql/datadir:/var/lib/mysql"
-      - ":../db:/docker-entrypoint-initdb.d"
+      - ":../db/spiderflow.sql:/docker-entrypoint-initdb.d/spiderflow.sql"
     environment:
       MYSQL_DATABASE: spiderflow
       MYSQL_ROOT_PASSWORD: 123456
