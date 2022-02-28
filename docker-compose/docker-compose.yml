@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./mysql/my.cnf:/etc/mysql/my.cnf"
+      - "./mysql/datadir:/var/lib/mysql"
+      - ":../db:/docker-entrypoint-initdb.d"
+    environment:
+      MYSQL_DATABASE: spiderflow
+      MYSQL_ROOT_PASSWORD: 123456
+
+  spider:
+    image: qinshower/spider:0.5.0-beta
+    container_name: spider
+    restart: always
+    ports:
+      - "8088:8088"
+    volumes:
+      - "./spider/application.properties:/app/resources/application.properties"
