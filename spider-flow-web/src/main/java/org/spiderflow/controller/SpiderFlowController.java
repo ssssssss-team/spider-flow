@@ -48,29 +48,29 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/spider")
 public class SpiderFlowController {
-	
+
 	@Autowired
 	private List<FunctionExecutor> functionExecutors;
-	
+
 	@Autowired
 	private List<FunctionExtension> functionExtensions;
-	
+
 	@Autowired
 	private List<Grammerable> grammerables;
-	
+
 	@Autowired
 	private SpiderFlowService spiderFlowService;
-	
+
 	@Autowired(required = false)
 	private List<PluginConfig> pluginConfigs;
-	
+
 	@Value("${spider.workspace}")
 	private String workspace;
-	
+
 	private final List<Grammer> grammers = new ArrayList<Grammer>();
-	
+
 	private static Logger logger = LoggerFactory.getLogger(SpiderFlowController.class);
-	
+
 	@PostConstruct
 	private void init(){
 		for (FunctionExecutor executor : functionExecutors) {
@@ -84,7 +84,7 @@ public class SpiderFlowController {
 			grammer.setFunction(function);
 			grammers.add(grammer);
 		}
-		
+
 		for (FunctionExtension extension : functionExtensions) {
 			String owner = extension.support().getSimpleName();
 			grammers.addAll(Grammer.findGrammers(extension.getClass(),null,owner,true));
@@ -93,7 +93,7 @@ public class SpiderFlowController {
 			grammers.addAll(grammerable.grammers());
 		}
 	}
-	
+
 	/**
 	 * 爬虫列表
 	 * @param page 页数
@@ -104,7 +104,7 @@ public class SpiderFlowController {
 	public IPage<SpiderFlow> list(@RequestParam(name = "page", defaultValue = "1") Integer page, @RequestParam(name = "limit", defaultValue = "1") Integer size, @RequestParam(name = "name", defaultValue = "") String name) {
 		return spiderFlowService.selectSpiderPage(new Page<>(page, size), name);
 	}
-	
+
 	@RequestMapping("/save")
 	public String save(SpiderFlow spiderFlow){
 		spiderFlowService.save(spiderFlow);
@@ -119,12 +119,12 @@ public class SpiderFlowController {
 			return new JsonBean<>(spiderFlowService.historyList(id));
 		}
 	}
-	
+
 	@RequestMapping("/get")
 	public SpiderFlow get(String id){
 		return spiderFlowService.getById(id);
 	}
-	
+
 	@RequestMapping("/other")
 	public List<SpiderFlow> other(String id){
 		if(StringUtils.isBlank(id)){
@@ -132,32 +132,37 @@ public class SpiderFlowController {
 		}
 		return spiderFlowService.selectOtherFlows(id);
 	}
-	
+
 	@RequestMapping("/remove")
 	public void remove(String id){
 		spiderFlowService.remove(id);
 	}
-	
+
 	@RequestMapping("/start")
 	public void start(String id){
 		spiderFlowService.start(id);
 	}
-	
+
 	@RequestMapping("/stop")
 	public void stop(String id){
 		spiderFlowService.stop(id);
 	}
-	
+
+	@RequestMapping("/copy")
+	public void copy(String id){
+		spiderFlowService.copy(id);
+	}
+
 	@RequestMapping("/run")
 	public void run(String id){
 		spiderFlowService.run(id);
 	}
-	
+
 	@RequestMapping("/cron")
 	public void cron(String id,String cron){
 		spiderFlowService.resetCornExpression(id, cron);
 	}
-	
+
 	@RequestMapping("/xml")
 	public String xml(String id){
 		return spiderFlowService.getById(id).getXml();
@@ -192,17 +197,17 @@ public class SpiderFlowController {
 			return new JsonBean<>(-1,"读取日志文件出错");
 		}
 	}
-	
+
 	@RequestMapping("/shapes")
 	public List<Shape> shapes(){
 		return ExecutorsUtils.shapes();
 	}
-	
+
 	@RequestMapping("/pluginConfigs")
 	public List<Plugin> pluginConfigs(){
 		return null == pluginConfigs ? Collections.emptyList() : pluginConfigs.stream().filter(e-> e.plugin() != null).map(plugin -> plugin.plugin()).collect(Collectors.toList());
 	}
-	
+
 	@RequestMapping("/grammers")
 	public JsonBean<List<Grammer>> grammers(){
 		return new JsonBean<>(this.grammers);

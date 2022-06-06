@@ -84,7 +84,7 @@
 			align : 'center'
 		},{
 			title : '操作',
-			width : 195,
+			width : 250,
 			align : 'center',
 			templet : '#buttons'
 		}]]
@@ -121,6 +121,28 @@
 	}
 	$("body").on('click','.btn-search',function(){
 		reloadTable();
+	}).on('click','.btn-copy',function(){
+		var id = $(this).data('id');
+		layui.layer.confirm('您确定要复制此爬虫吗？',{
+			title : '复制'
+		},function(index){
+			$table.reload();
+			$.ajax({
+				url : 'spider/copy',
+				data : {
+					id : id
+				},
+				success : function(){
+					layui.layer.msg('复制成功',{time : 500},function(){
+						$table.reload();
+					})
+				},
+				error : function(){
+					layui.layer.msg('复制失败')
+				}
+			})
+			layui.layer.close(index);
+		})
 	}).on('click','.btn-remove',function(){
 		var id = $(this).data('id');
 		layui.layer.confirm('您确定要删除此爬虫吗？',{
