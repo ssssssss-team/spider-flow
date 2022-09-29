@@ -18,7 +18,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spider-flow.version>${project.version}</spider-flow.version>
-		<alibaba.fastjson.version>1.2.58</alibaba.fastjson.version>
+		<alibaba.fastjson.version>1.2.83</alibaba.fastjson.version>
 		<alibaba.druid.version>1.1.16</alibaba.druid.version>
 		<alibaba.transmittable.version>2.11.5</alibaba.transmittable.version>
 		<mybatis.plus.version>3.1.0</mybatis.plus.version>
