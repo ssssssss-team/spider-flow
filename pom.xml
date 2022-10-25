@@ -20,7 +20,7 @@
 		<alibaba.druid.version>1.1.16</alibaba.druid.version>
 		<alibaba.transmittable.version>2.11.5</alibaba.transmittable.version>
 		<mybatis.plus.version>3.1.0</mybatis.plus.version>
-		<apache.commons.text.verion>1.6</apache.commons.text.verion>
+		<apache.commons.text.verion>1.10.0</apache.commons.text.verion>
 		<apache.commons.csv.verion>1.8</apache.commons.csv.verion>
 		<commons.io.version>2.7</commons.io.version>
 		<guava.version>28.2-jre</guava.version>
