@@ -26,6 +26,7 @@
 		<guava.version>28.2-jre</guava.version>
 		<jsoup.version>1.11.3</jsoup.version>
 		<xsoup.version>0.3.1</xsoup.version>
+		<snakeyaml.version>1.33</snakeyaml.version>
 	</properties>
 
 	<dependencies>
@@ -112,6 +113,11 @@
 			<groupId>us.codecraft</groupId>
 			<artifactId>xsoup</artifactId>
 			<version>${xsoup.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.yaml</groupId>
+		    <artifactId>snakeyaml</artifactId>
+		    <version>${snakeyaml.version}</version>
 		</dependency>
 	</dependencies>
 
