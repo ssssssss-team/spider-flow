@@ -49,11 +49,3 @@
 ### 日志
 ![日志](https://images.gitee.com/uploads/images/2020/0412/104800_a757f569_297689.png "logo.png")
 
-## 其它开源项目
-- [spider-flow-vue，spider-flow的前端](https://gitee.com/ssssssss-team/spider-flow-vue)
-- [magic-api，一个以XML为基础自动映射为HTTP接口的框架](https://gitee.com/ssssssss-team/magic-api)
-- [magic-api-spring-boot-starter](https://gitee.com/ssssssss-team/magic-api-spring-boot-starter)
-
-
-## 免责声明
-请勿将`spider-flow`应用到任何可能会违反法律规定和道德约束的工作中，请友善使用`spider-flow`，遵守蜘蛛协议，不要将`spider-flow`用于任何非法用途。如您选择使用`spider-flow`即代表您遵守此协议，作者不承担任何由于您违反此协议带来任何的法律风险和损失，一切后果由您承担。
